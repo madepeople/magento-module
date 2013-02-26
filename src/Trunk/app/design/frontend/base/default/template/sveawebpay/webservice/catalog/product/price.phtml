@@ -1,0 +1,38 @@
+<div class="sveawebpayCampainInfo">
+    <?php $anyInterestAndAmortizationTypesFound = false; ?>
+    <?php $helper = Mage::helper("sveawebpayws"); ?>
+    <?php if($this->getData("useExtendedInfo")): ?>
+        <?php $campains = $this->getData("campains"); ?> 
+        <a href="#" onclick="$('sveawebpayCampainsInfoContainer').toggle();"><span class="pricePerMonthText"><?php echo $helper->__("PartpaymentCampainsLabel",number_format($this->getData("pricePerMonth"),2)); ?></span></a>
+        
+        <br />
+        <div id="sveawebpayCampainsInfoContainer" style="display: none;">
+        
+            <table>
+            <tr>
+                <th><b><?php echo $helper->__("PartpaymentCampainsLabelMonth"); ?></b></th>
+                <th><b><?php echo $helper->__("PartpaymentCampainsLabelSum"); ?></b></th>
+            </tr>
+            <?php foreach($campains as $campain): ?>
+                <?php if($campain["paymentplantype"] != "InterestAndAmortizationFree"): ?>
+                    <tr><td><?php echo $campain["contractlength"]; ?></td><td><?php echo number_format($campain["monthlyannuity"],2); ?></td></tr>
+                <?php else: $anyInterestAndAmortizationTypesFound = true; endif; ?>
+            <?php endforeach; ?>
+            
+            <?php if($anyInterestAndAmortizationTypesFound): ?>
+            <tr><td>&nbsp;</td><td></td></tr>
+            <tr><td><b>Andra alternativ</b></td><td></td></tr>
+            <?php foreach($campains as $campain): ?>
+                <?php if($campain["paymentplantype"] == "InterestAndAmortizationFree"): ?>
+                    <tr><td><?php echo $helper->__("PartpaymentCampainsLabelAfterMonth","<b>".$campain["contractlength"]."</b>"); ?>&nbsp;<b>:</b>&nbsp;&nbsp;</td><td><?php echo number_format($campain["monthlyannuity"],2); ?></td></tr>
+                <?php endif; ?>
+            <?php endforeach; ?>
+            <?php endif; ?>
+            </table>
+            
+        </div>
+    <?php else: ?>
+    <span class="pricePerMonthText"><?php echo $helper->__("PartpaymentCampainsLabel",number_format($this->getData("pricePerMonth"),2)); ?></span>
+    <?php endif; ?>
+    <br />
+</div>

@@ -1,0 +1,143 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * SveaWebPay Payment Module for Magento.
+ *   Copyright (C) 2012  SveaWebPay
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Any questions may be directed to kundtjanst.sveawebpay@sveaekonomi.se
+ */
+-->
+<config>
+	<modules>
+		<SveaWebPay_HostedG>
+			<version>3.3.4</version>
+		</SveaWebPay_HostedG>
+	</modules>	
+
+	<global>
+
+		<models>
+			<swphostedg>
+				<class>SveaWebPay_HostedG_Model</class>
+			</swphostedg>
+		</models>
+		
+		<blocks>
+			<swphostedg>
+				<class>SveaWebPay_HostedG_Block</class>
+			</swphostedg>
+		</blocks>	
+		
+		<helpers>
+			<SveaWebPay_HostedG>
+				<class>SveaWebPay_HostedG_Helper</class>
+			</SveaWebPay_HostedG>
+			<swphostedg>
+				<class>SveaWebPay_HostedG_Helper</class>
+			</swphostedg>
+		</helpers>
+
+		<rewrite>
+			<sveawebpay_hostedg>
+				<from><![CDATA[#^/sveawebpay/hostedg/#]]></from>
+				<to>/swphostedg/base/</to>
+			</sveawebpay_hostedg>
+		</rewrite>
+	
+	</global>
+
+	<frontend>
+		<translate>
+			<modules>
+				<SveaWebPay_HostedG>
+					<files>
+						<default>SveaWebPay_HostedG.csv</default>
+					</files>
+				</SveaWebPay_HostedG>
+			</modules>	
+		</translate>
+		
+		<routers>
+			<sveawebpay_hostedg>
+				<use>standard</use>
+				<args>
+					<module>SveaWebPay_HostedG</module>
+					<frontName>swphostedg</frontName>
+				</args>
+			</sveawebpay_hostedg>
+		</routers>
+	</frontend>  
+
+	<default>
+		<payment>
+			
+			<!--// SveaWebPay CardPayment //-->
+			<swphgcard>
+				<model>swphostedg/card</model>
+				<active>0</active>
+				<test>1</test>
+				<title>SveaWebPay Hosted 3.0 Card Payment</title>
+				
+				<!--// Merchan default values //-->
+				<merchant_id></merchant_id>
+				<merchant_secret_word></merchant_secret_word>
+				
+				<!--// Paymentmethod Restrictions //-->
+				<allowspecific>0</allowspecific>
+				<specificcountry>Sverige</specificcountry>
+				<min_order_total></min_order_total>
+				<max_order_total></max_order_total>
+
+                <order_success_status>pending</order_success_status>
+
+				<!--// Handlingfee Setups //-->
+				<handlingfee_value></handlingfee_value>
+				<sort_order>1</sort_order>
+        
+                <display_images>0</display_images>
+                
+			</swphgcard>
+			
+			<!--// SveaWebPay AllPaymentS //-->
+			<swphgall>
+				<model>swphostedg/all</model>
+				<active>0</active>
+				<test>1</test>
+				<title>SveaWebPay Hosted 3.0 Internet</title>
+                
+				<!--// Merchan default values //-->
+				<merchant_id></merchant_id>
+				<merchant_secret_word></merchant_secret_word>
+				
+				<!--// Paymentmethod Restrictions //-->
+				<allowspecific>0</allowspecific>
+				<specificcountry>Sverige</specificcountry>
+				<min_order_total></min_order_total>
+				<max_order_total></max_order_total>
+
+				<!--// Payment order // -->
+                <order_success_status>pending</order_success_status>
+
+				<!--// Handlingfee Setups //-->
+				<handlingfee_value></handlingfee_value>
+				<sort_order>1</sort_order>
+        
+                <display_images>0</display_images>
+			</swphgall>
+      		
+		</payment>
+	</default>
+</config>

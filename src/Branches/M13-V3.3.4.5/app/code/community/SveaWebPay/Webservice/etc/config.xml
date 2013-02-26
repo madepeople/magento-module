@@ -1,0 +1,314 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * SveaWebPay Payment Module for Magento.
+ *   Copyright (C) 2012  SveaWebPay
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *  Any questions may be directed to kundtjanst.sveawebpay@sveaekonomi.se
+ */
+-->
+<config>
+	<modules>
+		<SveaWebPay_Webservice>
+			<version>3.3.4</version>
+		</SveaWebPay_Webservice>
+	</modules>
+	<global>
+		<models>
+			<sveawebpayws>
+				<class>SveaWebPay_Webservice_Model</class>
+				<resourceModel>sveawebpayws_mysql4</resourceModel>
+			</sveawebpayws>
+
+			<sveawebpayws_mysql4>
+				<class>SveaWebPay_Webservice_Model_Mysql4</class>
+				<entities>
+					<order>
+						<table>sveawebpay_webservice_order</table>
+					</order>
+					<invoice>
+						<table>sveawebpay_webservice_invoice</table>
+					</invoice>
+					<refund>
+						<table>sveawebpay_webservice_refund</table>
+					</refund>
+					<paymentplan>
+						<table>sveawebpay_webservice_paymentplan</table>
+					</paymentplan>
+					<approvedpaymentplan>
+						<table>sveawebpay_webservice_approved_paymentplan</table>
+					</approvedpaymentplan>
+					<campains>
+						<table>sveawebpay_webservice_campains</table>
+					</campains>
+				</entities>
+			</sveawebpayws_mysql4>
+		</models>
+    
+    <pdf>
+      <totals>
+       <handlingfee translate="title">
+         <title>Handlingfee</title>
+         <model>sveawebpayws/sales_pdf_invoice</model>
+         <font_size>7</font_size>
+         <display_zero>0</display_zero>
+         <sort_order>300</sort_order>
+        </handlingfee>
+      </totals>
+    </pdf>
+
+    <sales>
+      <quote>
+        <totals>
+          <handlingfee>
+            <class>SveaWebPay_Webservice_Model_Sales_Order_View</class>
+            <after>discount,tax,subtotal</after>  
+            <before>grand_total</before>
+            <renderer>sveawebpayws/checkout_handlingfeeTotalRenderer</renderer>
+          </handlingfee>
+        </totals>
+        
+      </quote>
+      
+      <order_invoice>
+        <totals>
+          <handlingfee>
+            <class>sveawebpayws/order_invoice_total_handlingfee</class>
+            <after>discount,tax</after>
+            <before>grand_total</before>
+          </handlingfee>
+        </totals>
+      </order_invoice>
+
+    </sales>
+    
+    <events>
+    
+      <sales_order_place_before>
+        <observers>
+          <sveawebpayws>
+            <type>singleton</type>
+            <class>SveaWebPay_Webservice_Model_Observer_Order</class>
+            <method>retrieve</method>
+          </sveawebpayws>
+        </observers>
+      </sales_order_place_before>
+      
+      <sales_order_place_after>
+        <observers>
+          <sveawebpayws>
+            <type>singleton</type>
+            <class>SveaWebPay_Webservice_Model_Observer_Order</class>
+            <method>create</method>
+          </sveawebpayws>
+        </observers>
+      </sales_order_place_after>
+      
+      <sales_order_creditmemo_refund>
+        <observers>
+          <sveawebpayws>
+            <type>singleton</type>
+            <class>SveaWebPay_Webservice_Model_Observer_Refund</class>
+            <method>save</method>
+          </sveawebpayws>
+        </observers>
+      </sales_order_creditmemo_refund>
+      
+      <sales_order_invoice_save_after>
+        <observers>
+          <sveawebpayws>
+            <type>singleton</type>
+            <class>SveaWebPay_Webservice_Model_Observer_Invoice</class>
+            <method>save</method>
+          </sveawebpayws>
+        </observers>
+      </sales_order_invoice_save_after>
+    </events>
+    
+		<blocks>
+			<sveawebpayws>
+				<class>SveaWebPay_Webservice_Block</class>
+			</sveawebpayws>
+            <catalog>
+                <rewrite>
+                    <product_price>SveaWebPay_Webservice_Block_Frontend_Catalog_Product_Price</product_price>
+                </rewrite>
+            </catalog>
+            <bundle>
+                <rewrite>
+                    <catalog_product_price>SveaWebPay_Webservice_Block_Frontend_Catalog_Product_Price</catalog_product_price>
+                </rewrite>
+            </bundle>
+		</blocks>
+    
+		<helpers>
+			<SveaWebPay_Webservice>
+				<class>SveaWebPay_Webservice_Helper</class>
+			</SveaWebPay_Webservice>
+			<sveawebpayws>
+				<class>SveaWebPay_Webservice_Helper</class>
+			</sveawebpayws>
+		</helpers>
+
+
+		<resources>
+			<sveawebpayws_setup>
+				<setup>
+					<module>SveaWebPay_Webservice</module>
+				</setup>
+				<connection>
+					<use>core_setup</use>
+				</connection>
+			</sveawebpayws_setup>
+
+			<sveawebpayws_write>
+				<connection>
+					<use>core_write</use>
+				</connection>
+			</sveawebpayws_write>
+
+			<sveawebpayws_read>
+				<connection>
+					<use>core_read</use>
+				</connection>
+			</sveawebpayws_read>
+		</resources>
+	</global>
+    
+  <adminhtml>
+    <translate>
+      <modules>
+        <Custom_Module>
+          <files>
+             <default>SveaWebPay_Webservice.csv</default>
+          </files>
+        </Custom_Module>
+      </modules>
+    </translate>
+    
+    <layout>
+      <updates>
+        <sveawebpayws module="SveaWebPay_Webservice">
+          <file>sveawebpayws.xml</file>
+        </sveawebpayws>
+      </updates>
+    </layout>
+    
+  </adminhtml>
+    
+	<frontend>
+		<translate>
+			<modules>
+				<SveaWebPay_Webservice>
+					<files>
+						<default>SveaWebPay_Webservice.csv</default>
+					</files>
+				</SveaWebPay_Webservice>
+			</modules>	
+		</translate>
+		
+		<routers>
+			<SveaWebPay_Webservice>
+				<use>standard</use>
+				<args>
+					<module>SveaWebPay_Webservice</module>
+					<frontName>sveawebpayws</frontName>
+				</args>
+			</SveaWebPay_Webservice>
+		</routers>
+		
+    <layout>
+      <updates>
+        <sveawebpayws module="SveaWebPay_Webservice">
+          <file>sveawebpayws.xml</file>
+        </sveawebpayws>
+      </updates>
+    </layout>
+    
+	</frontend>
+
+	<default>
+		<payment>
+			<swpwsinvoice>
+				<active>1</active>
+        
+			    <title>SveaWebPay Webservice Invoice</title>
+				<model>sveawebpayws/paymentmethod_invoice</model>
+        
+				<accnr>75021</accnr>
+                <username>Testinstallation</username>
+                <password>Testinstallation</password>
+                <test>1</test>
+                <default_country>0</default_country>
+				<order_success_status>pending</order_success_status>
+        
+				<set_paid>0</set_paid>
+				<display_images>1</display_images>
+				<allowspecific>1</allowspecific>
+                <specificcountry>Sverige</specificcountry>
+				<order_total_ignore></order_total_ignore>
+        
+				<handling_fee>0</handling_fee>
+				<handling_fee_description>Faktureringsavgift</handling_fee_description>
+				<handling_fee_value>0</handling_fee_value>
+				<handling_fee_includes_tax>0</handling_fee_includes_tax>
+				<handling_fee_inherit>1</handling_fee_inherit>
+				<handling_fee_tax_class>1</handling_fee_tax_class>
+				<handling_fee_display_cart>1</handling_fee_display_cart>
+				<handling_fee_display_order>1</handling_fee_display_order>
+				<shipping_tax_override>1</shipping_tax_override>
+        
+				<update_billing>1</update_billing>
+				<update_shipping>1</update_shipping>
+                <only_private>1</only_private>
+				<sort_order>13</sort_order>
+			</swpwsinvoice>
+
+			<swpwspartpay>
+				<active>1</active>
+				<title>SveaWebPay Webservice Partpay</title>
+				<model>sveawebpayws/paymentmethod_partpay</model>
+				<accnr>59012</accnr>
+				<username>Testinstallation</username>
+				<password>Testinstallation</password>
+                <test>1</test>
+                <default_country>0</default_country>
+				<order_success_status>pending</order_success_status>
+        
+				<set_paid>0</set_paid>
+				<display_images>1</display_images>
+				<allowspecific>1</allowspecific>
+                <specificcountry>Sverige</specificcountry>
+				<order_total_ignore></order_total_ignore>
+        
+				<handling_fee>0</handling_fee>
+				<handling_fee_description>Faktureringsavgift</handling_fee_description>
+				<handling_fee_value>0</handling_fee_value>
+				<handling_fee_includes_tax>0</handling_fee_includes_tax>
+				<handling_fee_inherit>1</handling_fee_inherit>
+				<handling_fee_tax_class>1</handling_fee_tax_class>
+				<handling_fee_display_cart>1</handling_fee_display_cart>
+				<handling_fee_display_order>1</handling_fee_display_order>
+				<shipping_tax_override>0</shipping_tax_override>
+        
+				<update_billing>1</update_billing>
+				<update_shipping>1</update_shipping>
+				<sort_order>14</sort_order>
+			</swpwspartpay>
+      
+		</payment>
+	</default>
+</config>

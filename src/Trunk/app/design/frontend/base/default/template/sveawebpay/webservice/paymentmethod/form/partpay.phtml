@@ -1,0 +1,85 @@
+<?php 
+
+  $_code               = $this->getMethodCode();
+  $paymentModel        = $this->getMethod();	
+  $session             = Mage::getSingleton( "sveawebpayws/session" );
+  $helper              = Mage::helper( "sveawebpayws" );
+  $counter             = 1;
+  
+  // Hack for finland since we can't do GetAddresses.
+  $defaultCountry      = $paymentModel->getConfigData("default_country");
+  $defaultCountry      = Mage::getModel("sveawebpayws/source_defaultcountry")->convertCountryIdToCode( $defaultCountry );
+  
+  $customer = $paymentModel->getQuote()->getCustomer();
+  if(!$customer)
+    return false;
+    
+  $requireEmail = $paymentModel->getConfigData("require_email"); 
+  $requireEmail = ($requireEmail == 1) ? true : false;
+   
+  $email = $customer->getEmail();
+  //$phone = $customer->getPhone();
+  
+  $subdir = $helper->getSubdirPath();
+  
+?>
+
+<fieldset class="form-list">
+  <?php $this->displayImages( $_code ); ?>
+	<div id="payment_form_<?php echo $_code ?>" style="display:none;">
+    <div class="input-box">
+    
+    	<label for="<?php echo $_code ?>:security_number" class="required">
+    		<em>*</em><?php echo $helper->__("LabelSecurityNumber") ?>
+    	</label><br />
+  	
+  		<input type="text" class="input-text required-entry" id="<?php echo $_code ?>:security_number" name="payment[<?php echo $_code ?>_security_number]" /><br />
+  		
+  	<?php if($defaultCountry == "FI"): ?>
+  	
+  	  <!-- // A solution to GetAddresses problem for Finnish // -->
+  	  <input type="button" class="input-button" value="<?php echo $helper->__("AddressFinishButton") ?>"
+          onclick="SWPWSGetAddressesJSON( this,'<?php echo $subdir; ?>','<?php echo $_code ?>','',true,'','',true);" />
+  	
+  	<?php else: ?>
+  	
+  		<input type="button" class="input-button" value="<?php echo $helper->__("AddressButton") ?>"
+  		    onclick="SWPWSGetAddressesJSON( this,'<?php echo $subdir; ?>','<?php echo $_code ?>','<?php echo $helper->__("AddressInformationDefault") ?>',true,'<?php echo $helper->__("PartpaymentInformationDefault") ?>');" />
+  		    
+    <?php endif; ?>
+     
+     
+      <br />
+      <br />
+      
+    
+      <div class="order-info-box" id="<?php echo $_code ?>:address_information_container" style="word-wrap: break-word; display: none;">
+        <?php echo $helper->__("PaymentMethodFormWebservicePartpayStartTextForGetPaymentplans"); ?>
+      </div>
+      
+      <input type="hidden" class="input-hidden required-entry" id="<?php echo $_code ?>:address_hidden_required" />
+      
+      <div class="order-info-box" id="<?php echo $_code ?>:paymentplans_information_container" style="word-wrap: break-word; display: none;">
+        <label for="swpwspartpay:paymentplanoption"><?php echo $helper->__("LabelPartpaymentOptions") ?></label><br />Inget.
+        <?php echo $helper->__("PaymentMethodFormWebserviceCommonDefaultTextForGetAddresses"); ?>
+      </div>
+    </div>
+    
+    <?php
+     /*
+      <label for="<?php echo $_code ?>:phone" class="required"><em>*</em><?php echo $helper->__("LabelPhone"); ?></label><br />
+      <div class="input-box">
+        <input type="text" class="input-text required-entry validate-phoneLax" value="<?php echo $phone; ?>" name="<?php echo $_code ?>:phone" id="<?php echo $_code ?>:phone" />
+      </div>
+     */
+    ?>
+    
+    <?php if($requireEmail) : ?>
+    <label for="<?php echo $_code ?>:email" class="required"><em>*</em><?php echo $helper->__("LabelEmail"); ?></label><br />
+    <div class="input-box">
+      <input type="text" class="input-text required-entry validate-email" value="<?php echo $email; ?>" name="payment[<?php echo $_code ?>_email]" id="<?php echo $_code ?>:email" />
+    </div>    
+    <?php endif; ?>
+    
+	</div>
+</fieldset>

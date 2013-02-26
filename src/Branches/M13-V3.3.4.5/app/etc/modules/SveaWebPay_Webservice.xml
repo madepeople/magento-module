@@ -1,0 +1,12 @@
+<config>
+	<modules>
+		<SveaWebPay_Webservice>
+			<active>false</active>
+			<codePool>community</codePool>
+			<depends>
+				<Mage_Payment />
+				<SveaWebPay_Common />
+			</depends>
+		</SveaWebPay_Webservice>
+	</modules>
+</config>

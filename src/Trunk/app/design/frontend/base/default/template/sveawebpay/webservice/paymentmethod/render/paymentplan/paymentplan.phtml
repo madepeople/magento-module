@@ -1,0 +1,28 @@
+<?php
+  $helper       = Mage::helper("sveawebpayws");
+  $session      = Mage::getSingleton( "sveawebpayws/session" );  
+  $paymentplans = $session->getPaymentplansArray();
+  $counter      = intval(0);
+  $subdir       = $helper->getSubdirPath();
+?>
+
+<label for="swpwspartpay:paymentplanoption"><?php echo $helper->__("LabelPartpaymentOptions") ?></label><br />
+<?php if(count($paymentplans) < 1) :?>
+  <?php echo $helper->__("PartpaymentInformationDefault") ?>
+<?php else: ?>
+  
+  <div class="input-box" id="swpwspartpay:paymentplanoption">
+  <?php foreach( $paymentplans as $option ): ?>
+    <input type="radio" class="input-radio" name="payment[paymentplanoption]"  value="<?php echo $counter ?>"  id="swpwspartpay:paymentplanoption_<?php echo $counter; ?>" onclick="SWPWSShowSelectedPaymentplan('swpwspartpay','<?php echo $subdir ?>',this.id,'swpwspartpay:paymentplanoption_information_container');" /> <?php echo $option["Description"] ?><br />
+  <?php $counter++; endforeach; ?>
+  </div>
+  
+  <br />
+  <label for="swpwspartpay:paymentplanoption_information_container"><?php echo $helper->__("LabelPartpaymentOption") ?></label><br />
+  <div class="input-box">
+    <div id="swpwspartpay:paymentplanoption_information_container"><?php echo $helper->__("PartpaymentOptionInformationStart"); ?></div>
+  </div>
+  <input type="hidden" class="input-hidden required-entry" id="swpwspartpay:paymentplanoption_hidden_required" />
+  <br />
+  
+<?php endif; ?>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<layout version="0.1.0">
+ 
+  <sales_email_order_items>
+	<block type="sales/order_email_items" name="items" template="sveawebpay/hosted/email/order/items.phtml">
+		<action method="addItemRender"><type>default</type><block>sales/order_email_items_order_default</block><template>email/order/items/order/default.phtml</template></action>
+		<action method="addItemRender"><type>grouped</type><block>sales/order_email_items_order_grouped</block><template>email/order/items/order/default.phtml</template></action>
+	</block>
+  </sales_email_order_items>
+  
+</layout>
