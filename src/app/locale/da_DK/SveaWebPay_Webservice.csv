@@ -1,0 +1,82 @@
+﻿"AddressFinishButton","Hent delbetalningsalternativ"
+"Fn","Virksomhed"
+"Pn","Kunde"
+
+
+
+"CreateSuccess","Købet gik igennem."
+"CreateFailed","Købet gik ikke igennem. Dette kan skyldes fejlagtigt personnummer."
+"CommonConfirmed","Betaling gennemført"
+"CommonFailed","Betaling mislykkedes"
+"CommonSecurityNr - %s","Perssonnummer - %s"
+"CommonPaymentMethod - %s","Betalingsmetode - %s"
+
+
+"LabelPhone","Telefonnummer"
+"LabelEmail","E-mail"
+"LabelSecurityNumber","Personnummer/CVR-nummer"
+"LabelInvoiceAddress","Leveringsadresse"
+"LabelAddressSelect	Select","Vælg hvilken adresse der skal bruges"
+
+
+
+"InitialFee","Opstartsgebyr"
+"MonthlyAnnuity","At betale pr. måned"
+
+"AddressButton","Find leveringsadresse"
+"AddressInformationDefault","Adressen kunne ikke findes, kontrollér venligst dit personnummer/CVR-nummer"
+"LabelPartpaymentOptions","Delbetalingsalternativ"
+"LabelPartpaymentOption","Delbetalingsinformation"
+"PartpaymentInformationDefault","Der kunne ikke findes nogle betalingsalternativer. Ordresummen kan være for lav, kontakt venligst butikken."
+"PartpaymentOptionInformationStart","	Vælg betalingsalternativ"
+
+
+
+"CreatePaymentplanCustomerCreditRejected","Afslag på kreditoplysning"
+"CreatePaymentplanCustomerOverCreditLimit","	Kreditgrænse er overskredet"
+"CreatePaymentplanCustomerAbuseBlock","Kunden er blokeret eller har foretaget usædvanlige handlinger."
+"CreatePaymentplanClientOverCreditLimit","Kreditgrænse overskredet"
+"CreatePaymentplanPaymentPlanIsCancelled","Betalingplanen er lukket"
+"CreatePaymentplanOverOrderLimit	Kreditgränsen","Kreditgrænsen for dette lån er overskredet"
+"CreatePaymentplanCustomerSveaRejected","Afslag på kredithistorik hos Svea"
+"CreatePaymentplanCustomerCreditNoSuchEntity","Personen/virksomheden findes ikke i kreditoplysningsvirksomhedens register"
+"CreatePaymentplanInvalidCampainCodeAmountCombination","Kombinationen af kampagnekode og beløb er forkert. Kan indtræffe f.eks. hvis den angivne kampagnekode ikke findes, eller hvis det angivne beløb er for højt/lavt i forhold til kampagnekoden."
+"CreatePaymentplanError","Købet gik ikke igennem. Dette kan skyldes et fejlagtigt personnummer."
+
+
+
+"CreateOrderCusomterCreditRejected","Kredit afvist af Svea"
+"CreateOrderCustomerOverCreditLimit","Denne ordre overstiger Sveas kreditgrænse for kunden."
+"CreateOrderCustomerAbuseBlock","	Kunden er spærret eller har udvist mistænkelig adfærd"
+"CreateOrderOrderExpired","Ordren er for gammel og kan ikke længere faktureres."
+"CreateOrderClientOverCreditLimit","Ordren vil overstige kundens kreditgrænse hos Svea."
+"CreateOrderOrderOverSveaLimit","Ordren overstiger Sveas maksimale ordresum."
+"CreateOrderOrderOverClientLimit","Ordren overstiger kundens maksimale ordresum."
+"CreateOrderCustomerSveaRejected","Kunden nægtes køb hos Svea pga. lav kreditværdighed"
+"CreateOrderCustomerCreditNoSuchEntity","Kunden findes ikke hos kreditoplysningsleverandøren."
+
+
+
+"FailedToApprovePaymentplanWithRejectionCode","Kunne ikke skabe betalingsplanen, fejlkode"
+"ApprovePaymentplanPaymentPlanDoesNotExist","Betalingsplanen findes ikke"
+"ApprovePaymentplanWrongStatus","Betalingsplanen kan ikke godkendes"
+
+
+"FailedToCreateInvoiceWithRejectionCode","Kunne ikke skabe faktura, fejlkode"
+"CreateInvoiceNotAuthorized","Ordren mangler godkendte kreditoplysninger."
+"CreateInvoiceExpired","Ordren er for gammel (En ordre udløber efter 60 dage som standard)."
+"CreateInvoiceOverAuthorizedAmount","Fakturabeløbet er større end den grænse, der er afsat til fakturaen på ordren."
+"CreateInvoiceOrderIsClosed","Ordren er lukket"
+"CreateInvoiceCreditInvoiceNotInOrder","Den faktura, som forsøges krediteret, tilhører ikke den aktuelle ordre."
+"CreateInvoiceCreditAmountTooHigh","Beløbet, som forsøges krediteret, er for stort"
+
+
+
+"FailedWithSaveOrCaptureOnline","Processen mislykkedes"
+
+
+"PartpaymentCampainsLabel","Fra %s kr. / måned"
+"PartpaymentCampainsLabelSum","Beløb"
+"PartpaymentCampainsLabelMonth","Måned"
+"PartpaymentCampainsLabelAfterMonth","To pay after %s months"
+"PartpaymentCampainsLabelAfterLabel","Other options"

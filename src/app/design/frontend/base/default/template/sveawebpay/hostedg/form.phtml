@@ -1,0 +1,9 @@
+<?php $_code = $this->getMethodCode(); ?>
+<fieldset class="form-list">
+  <ul>
+    <li>
+      <?php $this->displayImages($_code); ?>
+      <?php if ($this->getFee() > 0) { $this->getFeeText(); } ?>
+    </li>
+  </ul>
+</fieldset>

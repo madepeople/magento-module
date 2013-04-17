@@ -1,0 +1,16 @@
+﻿"You will be charged an extra fee of %s","Sinulta veloitetaan lisämaksu
+"Payment failed, ","Maksu epäonnistui, "
+"Security Number - %s, ","Henkilötunnus - %s, 														
+"Payment method - %s","Maksutapa	 - %s"													
+"Payment confirmed, ","Maksu vahvistettu, "										
+"Error in creating an invoice","Virhe luotaessa laskussa"												
+"Invoice #%s created","Lasku #%s luotu"			 														
+"SveaWebPay Transaction Failed.","Liiketoimi epaonnistui"											
+"Payment process has been canceled.","Maksu on keskeytetty"
+"The payment has been cancelled by the user before the transaction was completed.","Käyttäjä on peruuttanut  maksun  ennen kuin kauppa toteutui	"
+"Invalid or incorrect information was provided by the user (such as personal identification number etc).","Virheellinen tai virheelliset tiedot saatiin käyttäjälltä ( esimerkiksi  henkilötunnus)	"
+"Payment was rejected by the bank (the user lacks credit, reported as abusive etc).","Pankki hylkäsi maksun (asiakas on paljaana, raportoitu väärinkäyttöä"
+"Internal system error such as databases are down, resources not available etc.","Sisäinen järjestelmävirhe, tietokannat ovat alhaalla, resursseja ei ole käytettävissä jne."
+"External system error. A third party system was unable to service the payment request and reported an error.","Ulkoinen järjestelmävirhe. Kolmannen osapuolen järjestelmä ei pystynyt hoitamaan maksutusta j ailmoitti virheen"
+"Payment was canceled by user.","Käyttäjä perusi maksun"
+"Error processing payment","Virhe käsitellessä maksussn"
