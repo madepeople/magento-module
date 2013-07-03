@@ -1,0 +1,67 @@
+"lang_code","de"
+"invoice_info","Svea Rechnung"
+"paymentplan_info","Svea Ratenkauf"
+"redirect","Umleitung..."
+"from_about","Ab"
+"authorize_success %s","Order is created, Svea Order id: %s"
+"unit","st"
+"customer_type","Art"
+"private","Privat"
+"company","Geschäft"
+"text_ssn","Sozialversicherungsnummer"
+"text_birthyear","Geburtsjahr"
+"text_birthmonth","Geburtsmonat"
+"text_birthday","Geburtstag"
+"text_vat_no","MwSt"
+"text_initials","Initialen"
+"invoice_address","Rechnungsadresse"
+"get_address","Adresse bekommen"
+"invoice_fee","Svea Bearbeitungsgebühr"
+"delivered","Order is delivered"
+"month","monat"
+"initial_fee","Ausgangsgebühr hinzukommen"
+
+"no_orderid","No order is placed at Svea. Svea order id is required"
+
+"Error_20000","Svea error %s : Auftrag geschlossen"
+"Error_20001","Svea error %s : Auftrag abgelehnt"
+"Error_20002","Svea error %s : Fehler im Auftrag"
+"Error_20003","Svea error %s : Auftrag abgelaufen"
+"Error_20004","Svea error %s : Auftrag existiert nicht"
+"Error_20005","Svea error %s : Auftragart diskrepanz"
+"Error_20006","Svea error %s : Die Summe geltene alle Auftragzeilen können nicht null oder negativ sein"
+"Error_20013","Svea error %s : Auftrag ist anhängig"
+
+"Error_27000","Svea error %s : Die bereitsgestellte Kampagnekode-Betrag Kombination entspricht keiner Kampagnekode befestigt dieser Kunde"
+"Error_27001","Svea error %s : Auftrag kann nicht geliefert werden seit angegebene Pdf Vorlage fehlt.Kontaktieren Sie Sveawebpay Support"
+"Error_27002","Svea error %s : Die Zahlungsmethode kann nicht teilweise geliefert werden"
+"Error_27003","Svea error %s : Kampagnekode kann nicht mit fixierte monatlichen Betrag gemischt werden"
+"Error_27004","Svea error %s : Keiner geeignete Kampagnekode für den monatlichen Betrag gefunden"
+
+"Error_24000","Svea error %s : Die Rechnungssumme überschreitet die genehmigte Summe"
+
+"Error_30000","Svea error %s : Die Bonitätsprüfung ist abgelehnt"
+"Error_30001","Svea error %s : Die Kunde ist blockiert oder zeigt ungewöhnliche Verhalten
+"Error_30002","Svea error %s : Basiert der Bonitätsprüfung ist der Verlangen abgelehnt"
+"Error_30003","Svea error %s : Die Kunde könnte nicht durch Bonitätsprüfung gefunden werden"
+
+"Error_40000","Svea error %s : Die Kunde ist nicht gefunden"
+"Error_40001","Svea error %s : Die bereitgestellte Landskode ist nicht unterstützt"
+"Error_40002","Svea error %s : Ungültige Kundeninformationen"
+"Error_40004","Svea error %s : Keiner Adresse geltene dieser Kunde gefunden"
+
+"Error_50000","Svea error %s : Die Kunde ist nicht für dieser Verfahren zugelassen"
+"Error_error","Svea error %s "
+
+"Error_100","Svea error %s : Zahlung erfolglos. Kontaktieren Sie der Integrator";
+"Error_105","Svea error %s : Ungültige Transaktionsstatus";
+"Error_106","Svea error %s : Bankfehler";
+"Error_107","Svea error %s : Transaktion bei der Bank abgebrochen";
+"Error_108","Svea error %s : Transaktion abgebrochen";
+"Error_109","Svea error %s : Transaktion nicht bei der Bank gefunden";
+"Error_114","Svea error %s : Timeout bei der Bank";
+"Error_121","Svea error %s : Karte gelüscht";
+"Error_122","Svea error %s : Karte gestolen";
+"Error_123","Svea error %s : Karte verloren";
+"Error_127","Svea error %s : Auftrags-Nr schon bei einem anderen Transaktion benutzt";
+"Error_129","Svea error %s : Mehr als einer Transaktion für angegebene Kundenreferenz entdeckt";

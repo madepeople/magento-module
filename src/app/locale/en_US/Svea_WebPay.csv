@@ -1,0 +1,67 @@
+"lang_code","en"
+"invoice_info","Svea Invoice"
+"paymentplan_info","Svea paymentplan"
+"redirect","Redirecting..."
+"from_about","From about"
+"authorize_success %s","Order is created, Svea Order id: %s"
+"unit","unit"
+"customer_type","Type"
+"private","Private"
+"company","Business"
+"text_ssn","Social Security No"
+"text_birthyear","Birth year"
+"text_birthmonth","Birth month"
+"text_birthday","Birth day"
+"text_vat_no","VAT number"
+"text_initials","Initials"
+"invoice_address","Invoice address"
+"get_address","Get address"
+"invoice_fee","Svea Invoice fee"
+"delivered","Order is delivered"
+"month","month"
+"initial_fee","Initial fee will be added"
+
+"no_orderid","No order is placed at Svea. Svea order id is required"
+
+"Error_20000","Svea error %s : Order closed"
+"Error_20001","Svea error %s : Order denied"
+"Error_20002","Svea error %s : Something wrong with order"
+"Error_20003","Svea error %s : Order expired"
+"Error_20004","Svea error %s : Order does not exist"
+"Error_20005","Svea error %s : OrderType mismatch"
+"Error_20006","Svea error %s : The sum of all order rows cannot be zero or negative"
+"Error_20013","Svea error %s : Order is pending"
+
+"Error_27000","Svea error %s : The provided campaigncode-amount combination does not match any campaign code attached to this client"
+"Error_27001","Svea error %s : Can not deliver order since the specified pdf template is missing. Contact SveaWebPay´s support"
+"Error_27002","Svea error %s : Can not partial deliver a PaymentPlan"
+"Error_27003","Svea error %s : Can not mix CampaignCode with a fixed Monthly Amount."
+"Error_27004","Svea error %s : Can not find a suitable CampaignCode for the Monthly Amount"
+
+"Error_24000","Svea error %s : Invoice amount exceeds the authorized amount"
+
+"Error_30000","Svea error %s : The credit report was rejected"
+"Error_30001","Svea error %s : The customer is blocked or has shown strange or unusual behavior
+"Error_30002","Svea error %s : Based upon the performed credit check the request was rejected"
+"Error_30003","Svea error %s : Customer cannot be found by credit check"
+
+"Error_40000","Svea error %s : No customer found"
+"Error_40001","Svea error %s : The provided CountryCode is not supported"
+"Error_40002","Svea error %s : Invalid Customer information"
+"Error_40004","Svea error %s : Could not find any addresses for this customer"
+
+"Error_50000","Svea error %s : Client is not authorized for this method"
+"Error_error","Svea error %s "
+
+"Error_100","Svea error %s : Invalid. Contact integrator";
+"Error_105","Svea error %s : Invalid transaction status";
+"Error_106","Svea error %s : Failure at third party";
+"Error_107","Svea error %s : Transaction rejected by bank";
+"Error_108","Svea error %s : Transaction cancelled";
+"Error_109","Svea error %s : Transaction not found at the bank";
+"Error_114","Svea error %s : Timeout at the bank";
+"Error_121","Svea error %s : The card has expired";
+"Error_122","Svea error %s : Stolen card";
+"Error_123","Svea error %s : Lost card";
+"Error_127","Svea error %s : Customer reference number already used in another transaction";
+"Error_129","Svea error %s : More than one transaction found for the given customer reference number";
