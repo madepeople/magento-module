@@ -26,11 +26,17 @@ class Svea_WebPay_Block_Frontend_Catalog_Product_Price_Monthlyfee
                     ->getCollection();
             
             $price = Mage::helper('core')->currency($this->getProductPrice(), false, false);
+            $storeId = Mage::app()->getStore()->getStoreId();
             
-            $collection->getSelect()
+            /*$collection->getSelect()
                     ->where('fromamount < ?', $price)
                     ->orWhere('toamount > ?', $price)
-                    ->order('monthlyannuityfactor', Varien_Data_Collection::SORT_ORDER_ASC);
+                    ->order('monthlyannuityfactor', Varien_Data_Collection::SORT_ORDER_ASC);*/
+            $collection->getSelect()
+                    ->where('(fromamount <= ? AND toamount >= ?)', $price)
+                    ->where('storeid = ?',$storeId)
+                    //->where('timestamp = ?',$latestTimestamp)
+                    ->order('monthlyannuityfactor', Varien_Data_Collection::SORT_ORDER_ASC);        
             
             $this->_campaignCollection = $collection;
         }
@@ -136,6 +142,9 @@ class Svea_WebPay_Block_Frontend_Catalog_Product_Price_Monthlyfee
      */
     public function getCampaignString($campaign)
     {
+        if(empty($campaign))
+            return;
+        
         $formattedPrice = Mage::helper('core')->currency($this->getProductPrice(), false, false);
         $monthlyAmount = $campaign->getMonthlyannuityfactor() * $formattedPrice;
         $currentCurrency =  Mage::app()->getStore($storeID)->getCurrentCurrencyCode();

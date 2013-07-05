@@ -67,22 +67,29 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         if ($quote === null) {
             $quote = Mage::getSingleton('checkout/session')->getQuote();
         }
-
+        
+        //Get store id, latest timestamp and order total
+        $storeId = Mage::app()->getStore()->getStoreId();
         $orderTotal = $quote->getGrandTotal() - $quote->getShippingAmount();
-        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection();
-
-        $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams();
-
+        $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams($storeId);
+        $currentCurrency =  Mage::app()->getStore($storeID)->getCurrentCurrencyCode();
+        
         // Get most recent and filter out campaigns that does not fit the
         // order amount
+        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection();
+        $params->getSelect()
+                    ->where('(fromamount <= ? AND toamount >= ?)', $orderTotal)
+                    ->where('storeid = ?',$storeId)
+                    ->where('timestamp = ?',$latestTimestamp)
+                    ->order('monthlyannuityfactor', Varien_Data_Collection::SORT_ORDER_ASC);
+        
+
+        
         $paramsArray = array();
-        foreach ($params as &$cc) {
-            if ($cc->timestamp == $latestTimestamp) {
-                if ($orderTotal >= $cc->fromamount && $orderTotal <= $cc->toamount) {
-                    $cc->monthlyamount = round($orderTotal * $cc->monthlyannuityfactor);
-                    $paramsArray[] = $cc;
-                }
-            }
+        foreach ($params as $cc) {
+            $price = ($orderTotal * $cc->monthlyannuityfactor) + $cc->notificationfee;
+            $cc->monthlyamount = ($currentCurrency == "EUR") ? number_format($price,2) : number_format($price,0);
+            $paramsArray[] = $cc;
         }
 
         return (object) $paramsArray;
@@ -93,16 +100,19 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    public function getLatestUpdateOfPaymentPlanParams()
+    public function getLatestUpdateOfPaymentPlanParams($storeId)
     {
-        $collection = Mage::getModel('svea_webpay/paymentplan')->getCollection()
-                ->setOrder('timestamp', Varien_Data_Collection::SORT_ORDER_DESC);
+        $collection = Mage::getModel('svea_webpay/paymentplan')->getCollection();
+        $collection->getSelect()->where('storeid = ?',$storeId);
+        $collection->setOrder('timestamp', Varien_Data_Collection::SORT_ORDER_DESC);
+
 
         if (!$collection->count()) {
             return 'Never';
         }
 
-        return $collection->getIterator()
+        return $collection
+                ->getIterator()
                 ->current()
                 ->getTimestamp();
     }

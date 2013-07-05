@@ -1,6 +1,7 @@
 <!-- Show the least cost per month sentence -->
 <?php
 $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
+$_campaignString = $this->getCampaignString($this->getCheapestCampaign());
 ?>
 
 <div class="sveaCampainInfo">
@@ -11,11 +12,16 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
             <?php // echo $this->getCampaignString($campaign) ?>
         <?php endforeach ?>
         
-        <?php echo $this->getCampaignString($this->getCheapestCampaign()) ?>
+        <?php echo $_campaignString ?>
+        
+        <?php if(!empty($_campaignString)): ?>
+        <p>
+            <img src="<?php echo Mage::getBaseUrl("media"); ?>svea/<?php echo $_lang?>/svea_paymentplan.png">
+        </p>
+        <?php endif;?>
     <?php else: ?>
-        <?php echo $this->getCampaignString($this->getCheapestCampaign()) ?>
+        <?php echo $_campaignString ?>
     <?php endif ?>
-    <p>
-        <img src="<?php echo Mage::getBaseUrl("media"); ?>svea/<?php echo $_lang?>/svea_paymentplan.png">
-    </p>
+    
+    
 </div>
