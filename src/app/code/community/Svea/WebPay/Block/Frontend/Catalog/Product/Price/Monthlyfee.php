@@ -147,8 +147,9 @@ class Svea_WebPay_Block_Frontend_Catalog_Product_Price_Monthlyfee
         
         $formattedPrice = Mage::helper('core')->currency($this->getProductPrice(), false, false);
         $monthlyAmount = $campaign->getMonthlyannuityfactor() * $formattedPrice;
-        $currentCurrency =  Mage::app()->getStore($storeID)->getCurrentCurrencyCode();
-        
+        $currentCurrency =  Mage::app()->getStore()
+                ->getCurrentCurrencyCode();
+
         $finalPricePerMonth = ($currentCurrency == "EUR") ? number_format($monthlyAmount + $campaign->getNotificationfee(), 2) : number_format($monthlyAmount + $campaign->getNotificationfee(), 0);
         
         return Mage::helper('svea_webpay')->__('from_about')
