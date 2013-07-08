@@ -23,6 +23,11 @@ CREATE TABLE IF NOT EXISTS {$this->getTable('svea_webpay_paymentplan')} (
     `timestamp` INT UNSIGNED NOT NULL,
     `storeid` INT NOT NULL
 );
+
+UPDATE {$this->getTable('sales_flat_order_payment')} SET method = 'svea_paymentplan' WHERE method = 'swpwspartpay';
+UPDATE {$this->getTable('sales_flat_order_payment')} SET method = 'svea_invoice' WHERE method = 'swpwsinvoice';
+UPDATE {$this->getTable('sales_flat_order_payment')} SET method = 'svea_cardpayment' WHERE method = 'swphgcard';
+UPDATE {$this->getTable('sales_flat_order_payment')} SET method = 'svea_directpayment' WHERE method = 'swphgall';
 ");
 
 $installer->endSetup();
