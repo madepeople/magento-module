@@ -324,8 +324,8 @@
                             <frontend_type>button</frontend_type>
                             <frontend_model>svea_webpay/paymentPlanParams_button</frontend_model>
                             <sort_order>1</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
+                            <show_in_default>0</show_in_default>
+                            <show_in_website>0</show_in_website>
                             <show_in_store>1</show_in_store>
                             <comment>Update to latest params for Paymentplan payment. New date will show when page is refreshed.</comment>
                         </check>
