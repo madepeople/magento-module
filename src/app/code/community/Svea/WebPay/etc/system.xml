@@ -4,7 +4,7 @@
         <payment>
             <groups>
                 <svea_cardpayment translate="label" module="svea_webpay">
-                    <label>Svea Card Payment</label>
+                    <label>Svea Card Payment 4.0</label>
                     <sort_order>670</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -84,7 +84,7 @@
                 </svea_cardpayment>
 
                 <svea_directpayment translate="label" module="svea_webpay">
-                    <label>Svea Direct Payment</label>
+                    <label>Svea Direct Payment 4.0</label>
                     <sort_order>670</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -171,7 +171,7 @@
                 </svea_directpayment>
 
                 <svea_invoice translate="label" module="svea_webpay">
-                    <label>Svea Invoice</label>
+                    <label>Svea Invoice 4.0</label>
                     <sort_order>672</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
@@ -313,7 +313,7 @@
                 </svea_invoice>
 
                 <svea_paymentplan translate="label" module="svea_webpay">
-                    <label>Svea Payment Plan</label>
+                    <label>Svea Payment Plan 4.0</label>
                     <sort_order>673</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
