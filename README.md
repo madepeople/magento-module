@@ -7,10 +7,38 @@ Supported countries are
 
 ## Before installation
 ### **If you are upgrading from a previous version of this module, please contact Svea before installing to set your account settings correct.**
+    
+1. You will not be able to Invoice the old orders after the upgrade, so make sure they are already invoiced. Alternatively invoice them from Svea admin and invoice offline in Magento.
+2. Deactivate the paymentmethods from your stores administration in System->Configuration->Payment Methods
+	* Set all payment methods to *Enabled: No*
+3. Deactivate the module by changing true to false in the files:
+	* app/etc/modules/SveaWebPay_Common.xml
+	* app/etc/modules/SveaWebPay_Hosted.xml
+	* app/etc/modules/SveaWebPay_HostedG.xml
+	* app/etc/modules/SveaWebPay_Webservice.xml
+
+```xml
+<config>
+	<modules>
+		<SveaWebPay_Webservice>
+                <!-- Change true to false here -->
+			<active>false</active>
+			<codePool>community</codePool>
+			<depends>
+				<Mage_Payment />
+				<SveaWebPay_Common />
+			</depends>
+		</SveaWebPay_Webservice>
+	</modules>
+</config>
+```
+
+4. Install the new module
+5. Configure settings
 
 Please make sure the extensions *SOAP* and *OPENSSL* is aktivated for PHP. Also make sure to clean the cache of the store after installation and configuration is done.
 
-You will also be able to install this module by Magento Connect. If you choose to download it from here:
+Possibility to install this module from Magento Connect will be possible later on. If you choose to download it from here:
 * Unzip the src folder and copy all subfolders into your stores *root* catalog. You will there find folders named *app*, *js*, *lib*, *media*.
 You will be asked to *replace* the folders. Choose *Copy and replace*, so all the folders merge together.
 * You can also use the [**modman**](https://github.com/colinmollenhour/modman/wiki/Tutorial) script

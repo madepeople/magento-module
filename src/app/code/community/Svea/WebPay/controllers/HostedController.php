@@ -73,20 +73,23 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
                 ->loadByIncrementId($response->response->clientOrderNumber);
 
         if (!$order->getId()) {
-            Mage::getSingleton('core/session')->addError("Order #" . $response->response->clientOrderNumber . " couldn't be loaded");
+            Mage::getSingleton('core/session')  ->addError("Order #" . $response->response->clientOrderNumber . " couldn't be loaded")
+                                                ->addError( Mage::helper('svea_webpay')->responseCodes($response->response->resultcode, $response->response->errormessage));
             return $this->_redirect("checkout/onepage/failure", array("secure" => true));
         }
 
         if ($order->getTotalDue() == 0) {
             // The order has already been paid, is somebody messing with us?
-            Mage::getSingleton('core/session')->addError("Order #" . $response->response->clientOrderNumber . " has already been paid");
+            Mage::getSingleton('core/session')  ->addError("Order #" . $response->response->clientOrderNumber . " has already been paid")
+                                                ->addError( Mage::helper('svea_webpay')->responseCodes($response->response->resultcode, $response->response->errormessage));
+
             return $this->_redirect("checkout/onepage/failure", array("secure" => true));
         }
-            
+
         if ($response->response->accepted == 1) {
             $payment = $order->getPayment();
-            
-            
+
+
             $payment->addTransaction(Mage_Payment_Model_Method_Abstract::ACTION_AUTHORIZE_CAPTURE);
             $payment->setPreparedMessage('Order has been paid at Svea.')
                     ->setTransactionId($response->response->transactionId)
@@ -97,7 +100,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
                 if (!is_string($key)) {
                     continue;
                 }
-                
+
                 $rawDetails[$key] = $val;
             }
 
