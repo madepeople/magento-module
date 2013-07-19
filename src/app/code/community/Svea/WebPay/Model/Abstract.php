@@ -48,14 +48,28 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
 
         $billingAddress = $order->getBillingAddress();
         foreach ($order->getAllItems() as $item) {
+            
+            if($item->getProductType() !== Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){
+                   continue;    
+            }    
+            
+            if (($parentItem = $item->getParentItem()) !== null) {
+                $price = $parentItem->getPrice();
+                $priceInclTax = $parentItem->getPriceInclTax();
+            } else {
+                $price = $item->getPrice();
+                $priceInclTax = $item->getPriceInclTax();
+            }
+
+            
             $orderRow = Item::orderRow()
                     ->setArticleNumber($item->getProductId())
                     ->setQuantity(get_class($item) == 'Mage_Sales_Model_Quote_Item' ? $item->getQty() : $item->getQtyOrdered())
-                    ->setAmountExVat($item->getPrice())
+                    ->setAmountExVat($price)
                     ->setName($item->getName())
                     ->setDescription($item->getShortDescription())
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setAmountIncVat($item->getPriceInclTax());
+                    ->setAmountIncVat($priceInclTax);
 
             $svea->addOrderRow($orderRow);
         }
