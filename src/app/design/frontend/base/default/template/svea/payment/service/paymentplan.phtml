@@ -14,7 +14,7 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
     </li>
     <li>
         <label for=""></label>
-        <?php echo Mage::getStoreConfig("payment/$_code/paymentplan_info"); ?>
+        <?php echo(nl2br(Mage::getStoreConfig("payment/$_code/paymentplan_info"))); ?>
     </li>
 
     <!-- If Nordic countries show ssn input field -->
@@ -132,6 +132,15 @@ $("getAddressPP").observe("click", function(e) {
                     json.customerIdentity[0].locality;
 
             $("sveaPaymentPlanShowAddresses").insert(adress);
+
+                //For onestep checkouts, check if fields visible and auto-fill
+                if ($("billing:firstname").visible()) {
+                    $("billing:firstname").value = json.customerIdentity[0].firstName;
+                    $("billing:lastname").value = json.customerIdentity[0].lastName;
+                    $("billing:street1").value = json.customerIdentity[0].street;
+                    $("billing:city").value = json.customerIdentity[0].locality;
+                    $("billing:postcode").value = json.customerIdentity[0].zipCode;
+                }
         }
     });
 });
