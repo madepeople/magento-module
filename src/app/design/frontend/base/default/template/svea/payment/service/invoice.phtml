@@ -20,7 +20,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
     <li>
         <label for="svea_customerType"><?php echo Mage::helper('svea_webpay')->__('customer_type') . ":"; ?></label>
         <div class="input-box">
-            <select class="" id="svea_customerType" name="payment[svea_customerType]">
+            <select class="" id="payment_form_<?php echo $_code ?>_customerType" name="payment[<?php echo $_code ?>_customerType]">
                 <option value="0"><?php echo Mage::helper('svea_webpay')->__('private'); ?></option>
                 <option value="1"><?php echo Mage::helper('svea_webpay')->__('company'); ?></option>
             </select>
@@ -30,7 +30,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
     <!-- If Nordic countries show SSN input field -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
         <li>
-            <label for="payment_form_<?php echo $_code ?>_ssn" class="required" id="labelForSsn"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') . ":"; ?></label>
+            <label for="payment_form_<?php echo $_code ?>_ssn" class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') . ":"; ?></label>
             <div class="input-box">
                 <input type="text" title="payment_form_<?php echo $_code ?>_ssn" class="input-text required-entry" id="payment_form_<?php echo $_code ?>_ssn" name="payment[<?php echo $_code ?>_ssn]" />
             </div>
@@ -114,47 +114,32 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 <script>
 
 //Change customer type
-var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>,
-    companyText    = "<?php echo Mage::helper('svea_webpay')->__('text_vat_no'); ?>",
-    privateText    = "<?php echo Mage::helper('svea_webpay')->__('text_ssn'); ?>";
 
-
-
-
-$("svea_customerType").observe("change", function(e) {
-
-    if ($(this).value == 1) {
-
-        $("labelForSsn").update(companyText);
-
-        if (currentCountry == 'NL' || currentCountry == 'DE') {
+var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
+if (currentCountry == 'NL' || currentCountry == 'DE') {
+    $("sveaCustomerType").on("change", function(e) {
+        if ($(this).value == 1) {
             $$(".forNLDE").each(function(element) {
                 $(element).hide();
             });
             $("forNLDEcompany").show();
-        }
-    } else {
-        if (currentCountry == 'NL' || currentCountry == 'DE') {
+        } else {
             $("forNLDEcompany").hide();
             $$(".forNLDE").each(function(element) {
                 $(element).show();
             });
         }
 
-        $("labelForSsn").update(privateText);
-    }
-});
-
-
-
+    });
+}
 
 //Get Addresses
-$("getAddress").observe("click", function(e) {
+$("getAddress").on("click", function(e) {
 
     // Set vars
     var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
-        type = $("svea_customerType").value,
-        loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+            type = $("payment_form_<?php echo $_code ?>_customerType").value,
+            loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
 
     // Show Loader
     $("sveaInvoiceShowAddresses").update().insert(loader);

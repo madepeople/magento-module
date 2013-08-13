@@ -67,29 +67,22 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         if ($quote === null) {
             $quote = Mage::getSingleton('checkout/session')->getQuote();
         }
-        
-        //Get store id, latest timestamp and order total
-        $storeId = Mage::app()->getStore()->getStoreId();
+
         $orderTotal = $quote->getGrandTotal() - $quote->getShippingAmount();
-        $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams($storeId);
-        $currentCurrency =  Mage::app()->getStore($storeID)->getCurrentCurrencyCode();
-        
+        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection();
+
+        $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams();
+
         // Get most recent and filter out campaigns that does not fit the
         // order amount
-        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection();
-        $params->getSelect()
-                    ->where('(fromamount <= ? AND toamount >= ?)', $orderTotal)
-                    ->where('storeid = ?',$storeId)
-                    ->where('timestamp = ?',$latestTimestamp)
-                    ->order('monthlyannuityfactor', Varien_Data_Collection::SORT_ORDER_ASC);
-        
-
-        
         $paramsArray = array();
-        foreach ($params as $cc) {
-            $price = ($orderTotal * $cc->monthlyannuityfactor) + $cc->notificationfee;
-            $cc->monthlyamount = ($currentCurrency == "EUR") ? number_format($price,2) : number_format($price,0);
-            $paramsArray[] = $cc;
+        foreach ($params as &$cc) {
+            if ($cc->timestamp == $latestTimestamp) {
+                if ($orderTotal >= $cc->fromamount && $orderTotal <= $cc->toamount) {
+                    $cc->monthlyamount = round($orderTotal * $cc->monthlyannuityfactor);
+                    $paramsArray[] = $cc;
+                }
+            }
         }
 
         return (object) $paramsArray;
@@ -100,19 +93,16 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    public function getLatestUpdateOfPaymentPlanParams($storeId)
+    public function getLatestUpdateOfPaymentPlanParams()
     {
-        $collection = Mage::getModel('svea_webpay/paymentplan')->getCollection();
-        $collection->getSelect()->where('storeid = ?',$storeId);
-        $collection->setOrder('timestamp', Varien_Data_Collection::SORT_ORDER_DESC);
-
+        $collection = Mage::getModel('svea_webpay/paymentplan')->getCollection()
+                ->setOrder('timestamp', Varien_Data_Collection::SORT_ORDER_DESC);
 
         if (!$collection->count()) {
             return 'Never';
         }
 
-        return $collection
-                ->getIterator()
+        return $collection->getIterator()
                 ->current()
                 ->getTimestamp();
     }
@@ -144,23 +134,41 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $sveaObject = WebPay::deliverOrder($conf);
         $order = $invoice->getOrder();
         $countryCode = $order->getBillingAddress()->getCountryId();
-
+        
         // Add invoiced items
         foreach ($invoice->getAllItems() as $item) {
+            
+            //Check for product type in order to set bundled and configured products right
+            $orderItem = Mage::getModel('sales/order_item')->load($item->getOrderItemId());
+            if($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){ 
+                continue;          
+            }
+               
             if (!$item->getQty()) {
                 continue;
             }
+            
+            //Set price amounts in regards to above
+            if (($parentItem = $item->getParentItem()) !== null) {
+                $price = $parentItem->getPrice();
+                $priceInclTax = $parentItem->getPriceInclTax();
+            } else {
+                $price = $item->getPrice();
+                $priceInclTax = $item->getPriceInclTax();
+            }
+
 
             $orderRow = Item::orderRow()
                     ->setArticleNumber($item->getProductId())
                     ->setQuantity($item->getQty())
-                    ->setAmountExVat($item->getPrice())
+                    ->setAmountExVat($price)
                     ->setName($item->getName())
                     ->setDescription($item->getShortDescription())
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setAmountIncVat($item->getPriceInclTax());
+                    ->setAmountIncVat($priceInclTax);
 
             $sveaObject->addOrderRow($orderRow);
+
         }
 
         // Add shipping fee
@@ -219,6 +227,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         return $invoice->getData('svea_deliver_request');
     }
 
+
     /**
      * Builds request for DeliverInvoice as Credit for Invoice. Calls from
      * Magento Refund
@@ -229,7 +238,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      * @return type
      */
     public function getRefundRequest($payment, $auth, $sveaOrderId)
-    {
+    {       
         $conf = new SveaMageConfigProvider($auth);
         $sveaObject = WebPay::deliverOrder($conf);
 
@@ -238,20 +247,36 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $countryCode = $order->getBillingAddress()->getCountryId();
 
         foreach ($creditMemo->getAllItems() as $item) {
+            
+            $orderItem = Mage::getModel('sales/order_item')->load($item->getOrderItemId());
+            
+            if($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){ 
+                continue;          
+            }
+               
             if (!$item->getQty()) {
                 continue;
+            }
+            
+            if (($parentItem = $item->getParentItem()) !== null) {
+                $price = $parentItem->getPrice();
+                $priceInclTax = $parentItem->getPriceInclTax();
+            } else {
+                $price = $item->getPrice();
+                $priceInclTax = $item->getPriceInclTax();
             }
 
             $orderRow = Item::orderRow()
                     ->setArticleNumber($item->getProductId())
                     ->setQuantity($item->getQty())
-                    ->setAmountExVat($item->getPrice())
+                    ->setAmountExVat($price)
                     ->setName($item->getName())
                     ->setDescription($item->getShortDescription())
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setAmountIncVat($item->getPriceInclTax());
+                    ->setAmountIncVat($priceInclTax);
 
             $sveaObject->addOrderRow($orderRow);
+            
         }
 
         // Shipping
