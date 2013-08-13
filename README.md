@@ -39,7 +39,7 @@ Supported countries are
 Please make sure the extensions *SOAP* and *OPENSSL* is aktivated for PHP. Also make sure to clean the cache of the store after installation and configuration is done.
 
 Possibility to install this module from Magento Connect will be possible later on. If you choose to download it from here:
-* Unzip the src folder and copy all subfolders into your stores *root* catalog. You will there find folders named *app*, *js*, *lib*, *media*.
+* Unzip the src folder and copy all subfolders into your stores *root* catalog. You will there find folders named *app*,*media*.
 You will be asked to *replace* the folders. Choose *Copy and replace*, so all the folders merge together.
 * You can also use the [**modman**](https://github.com/colinmollenhour/modman/wiki/Tutorial) script
 
