@@ -1,0 +1,67 @@
+"lang_code","sv"
+"invoice_info","Svea faktura"
+"paymentplan_info","Svea delbetalning"
+"redirect","Vidarebefodrar..."
+"from_about","Från ca."
+"authorize_success %s","Lyckad betalning, Svea Order id: %s"
+"unit","st"
+"customer_type","Typ"
+"private","Privatperson"
+"company","Företag"
+"text_ssn","Personnummer"
+"text_birthyear","Födelseår"
+"text_birthmonth","Födelsemånad"
+"text_birthday","Födelsedag"
+"text_vat_no","Organisationsnummer"
+"text_initials","Initialer"
+"invoice_address","Fakturaadress"
+"get_address","Hämta adress"
+"invoice_fee","Svea fakturaavgift"
+"delivered","Order är levererad"
+"month","månad"
+"initial_fee","Uppläggningsavgift tillkommer"
+
+"no_orderid","Ingen order hittas hos Svea. Det krävs ett Svea orderid."
+
+"Error_20000","Svea error %s : Ordern är stängd"
+"Error_20001","Svea error %s : Ordern nekades"
+"Error_20002","Svea error %s : Något gick fel med ordern"
+"Error_20003","Svea error %s : Ordern har gått ut"
+"Error_20004","Svea error %s : Ordern existerar ej"
+"Error_20005","Svea error %s : Ordertypen matchar ej"
+"Error_20006","Svea error %s : Summan av orderraderna kan ej vara negativ eller noll"
+"Error_20013","Svea error %s : Ordern väntar"
+
+"Error_27000","Svea error %s : Delbetalningssumman matchar ej någon kampanj som är knuten till kontot"
+"Error_27001","Svea error %s : Det går ej att leverera order för en pdf saknas. Kontakta SveaWebPay’s support"
+"Error_27002","Svea error %s : Det går ej att delleverera en delbetalning"
+"Error_27003","Svea error %s : Det går ej att kombinera Kampanjkod med en fast summa"
+"Error_27004","Svea error %s : Det går ej att hitta en passande kampanjkod för den angivna summan"
+
+"Error_24000","Svea error %s : Fakturabeloppet överstiger tillåtet orderbelopp."
+
+"Error_30000","Svea error %s : Krediteringen nekades."
+"Error_30001","Svea error %s : The customer is blocked or has shown strange or unusual behavior."
+"Error_30002","Svea error %s : Baserat på kreditupplysningen nekades ordern."
+"Error_30003","Svea error %s : Det går ej att hitta kunden i kreditupplysningen."
+
+"Error_40000","Svea error %s : Ingen kund kunde hittas"
+"Error_40001","Svea error %s : Landskoden stöds ej"
+"Error_40002","Svea error %s : Ogiltiga kunduppgifter"
+"Error_40004","Svea error %s : Det gick ej att hitta några adresser för den här kunden."
+
+"Error_50000","Svea error %s : Kunden är ej godkänd för denna metod."
+"Error_error","Svea error %s "
+
+"Error_100","Svea error %s : Internfel";
+"Error_105","Svea error %s : Felaktig transaktionsstatus";
+"Error_106","Svea error %s : Fel hos tredjepart";
+"Error_107","Svea error %s : Transaktion nekad hos bank";
+"Error_108","Svea error %s : Transaktion avbruten";
+"Error_109","Svea error %s : Transaktion inte hittad hos bank";
+"Error_114","Svea error %s : Timeout hos bank";
+"Error_121","Svea error %s : Kortet har utgått";
+"Error_122","Svea error %s : Kort stulet";
+"Error_123","Svea error %s : Borttappat kort";
+"Error_127","Svea error %s : Kundrefernsnummer redan använt i en annan transaktion";
+"Error_129","Svea error %s : Mer än en transaktion hittad för angivet kundreferensnummer";

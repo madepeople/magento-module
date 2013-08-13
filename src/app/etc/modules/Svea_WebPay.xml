@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+	<modules>
+		<Svea_WebPay>
+			<active>true</active>
+			<codePool>community</codePool>
+		</Svea_WebPay>
+	</modules>
+</config>

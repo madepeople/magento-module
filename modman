@@ -1,0 +1,16 @@
+src/app/code/community/Svea/*                           app/code/community/Svea/
+src/app/design/adminhtml/default/default/template/*     app/design/adminhtml/default/default/template/
+src/app/design/frontend/base/default/template/*         app/design/frontend/base/default/template/
+src/app/design/frontend/base/default/layout/*           app/design/frontend/base/default/layout/
+src/app/etc/modules/*                                   app/etc/modules/
+src/app/locale/da_DK/*                                  app/locale/da_DK/
+src/app/locale/de_DE/*                                  app/locale/de_DE/
+src/app/locale/en_US/*                                  app/locale/en_US/
+src/app/locale/fi_FI/*                                  app/locale/fi_FI/
+src/app/locale/nb_NO/*                                  app/locale/nb_NO/
+src/app/locale/nl_NL/*                                  app/locale/nl_NL/
+src/app/locale/nn_NO/*                                  app/locale/nn_NO/
+src/app/locale/no_NO/*                                  app/locale/no_NO/
+src/app/locale/sv_SE/*                                  app/locale/sv_SE/
+src/media/svea/*                                        media/svea/
+package.xml                                             var/connect/Svea_WebPay.xml

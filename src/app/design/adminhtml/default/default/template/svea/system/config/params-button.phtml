@@ -1,0 +1,17 @@
+<script type="text/javascript">
+    //<![CDATA[
+    function sveaUpdatePaymentPlanParams() {
+        new Ajax.Request('<?php echo $this->getAjaxCheckUrl() ?>', {
+            method: 'get',
+            onSuccess: function(transport) {
+                var response = transport.responseJSON;
+                if (typeof response === 'string') {
+                    $("sveaParamsLastUpdated").update("<span><?php echo Mage::helper('svea_webpay')->__('Senast uppdaterat:') ?> " + response + "</span>");
+                }
+            }
+        });
+    }
+    //]]>
+</script>
+
+<?php echo $this->getButtonHtml() ?>
