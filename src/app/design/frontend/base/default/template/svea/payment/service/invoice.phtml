@@ -134,7 +134,7 @@ if (currentCountry == 'NL' || currentCountry == 'DE') {
 }
 
 //Get Addresses
-$("getAddress").on("click", function(e) {
+$("getAddress").observe("click", function(e) {
 
     // Set vars
     var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
