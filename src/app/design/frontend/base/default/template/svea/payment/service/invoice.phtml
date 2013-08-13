@@ -122,11 +122,11 @@ var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>,
 
 
 $("svea_customerType").observe("change", function(e) {
-    
+
     if ($(this).value == 1) {
-        
+
         $("labelForSsn").update(companyText);
-        
+
         if (currentCountry == 'NL' || currentCountry == 'DE') {
             $$(".forNLDE").each(function(element) {
                 $(element).hide();
@@ -140,7 +140,7 @@ $("svea_customerType").observe("change", function(e) {
                 $(element).show();
             });
         }
-        
+
         $("labelForSsn").update(privateText);
     }
 });
@@ -150,16 +150,16 @@ $("svea_customerType").observe("change", function(e) {
 
 //Get Addresses
 $("getAddress").observe("click", function(e) {
-    
+
     // Set vars
     var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
         type = $("svea_customerType").value,
-        loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>/svea/loader.gif' id='sveaLoader'>";
+        loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
 
     // Show Loader
     $("sveaInvoiceShowAddresses").update().insert(loader);
 
-    new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>/svea_webpay/service/getAddresses', {
+    new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>svea_webpay/service/getAddresses', {
         parameters: {ssn: ssn, type: type, cc: "<?php echo $_country; ?>"},
         onSuccess: function(transport) {
             var json = transport.responseText.evalJSON();
