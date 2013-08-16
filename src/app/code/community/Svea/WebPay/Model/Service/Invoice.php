@@ -21,7 +21,7 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
 
     /**
      * Take the Invoice path in Create Order object
-     * 
+     *
      * @param type $sveaObject
      * @return InvoicePayment
      */
@@ -29,21 +29,21 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
     {
         return $sveaObject->useInvoicePayment();
     }
-    
+
     /**
      * For Svea, Deliver order
-     * 
+     *
      * @param Varien_Object $payment
      * @param type $amount
      * @return type
      */
     public function capture(Varien_Object $payment, $amount)
     {
-        // Alternative: $sveaOrderId = $payment->getTransactionId(), comes with -capture
-        $sveaOrderId = $this->getInfoInstance()
-                ->getAdditionalInformation('svea_order_id');
         // Check if we are trying to deliver an existing order, or this is an autodeliver
-        if (empty($sveaOrderId)) {
+        // If no flag e.g. -capture, or if no transactionid, assume this is not sent from admin
+        //TODO: Make sure compatible with onestep checkout
+        $sveaOrderId = $payment->getTransactionId();
+        if (empty($sveaOrderId) || preg_match('/[A-Za-z]/',$sveaOrderId) == FALSE) {
             if (!$this->getConfigData('autodeliver')) {
                 $errorTranslated = Mage::helper('svea_webpay')->responseCodes("", 'no_orderid');
                 Mage::throwException($errorTranslated);
@@ -60,7 +60,6 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
         $response = $sveaObject
                 ->deliverInvoiceOrder()
                 ->doRequest();
-
         if ($response->accepted == 1) {
             $successMessage = Mage::helper('svea_webpay')->__('delivered');
             $order->addStatusToHistory($this->getConfigData('paid_order_status'), $successMessage, false);
@@ -84,7 +83,7 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
 
     /**
      * For Svea, Deliver order as Credit Invoice
-     * 
+     *
      * @param Varien_Object $payment
      * @param type $amount
      * @return type
@@ -95,7 +94,7 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
         // with -refund
         $sveaOrderId = $this->getInfoInstance()
                 ->getAdditionalInformation('svea_order_id');
-        
+
         // Check if we are trying to deliver an existing order, or this is
         // an autodeliver
         if (empty($sveaOrderId)) {
@@ -104,7 +103,7 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
                 Mage::throwException($errorTranslated);
             }
         }
-        
+
         $order = $payment->getOrder();
 
         $paymentMethodConfig = $this->getSveaStoreConfClass($order->getStoreId());
@@ -127,7 +126,7 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
 
     /**
      * End close order request
-     * 
+     *
      * @param type $sveaObject
      * @return type Svea Create order response
      */

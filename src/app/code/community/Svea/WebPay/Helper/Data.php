@@ -134,20 +134,20 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $sveaObject = WebPay::deliverOrder($conf);
         $order = $invoice->getOrder();
         $countryCode = $order->getBillingAddress()->getCountryId();
-        
         // Add invoiced items
         foreach ($invoice->getAllItems() as $item) {
-            
+            /** This causes bug for simple products!!
             //Check for product type in order to set bundled and configured products right
             $orderItem = Mage::getModel('sales/order_item')->load($item->getOrderItemId());
-            if($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){ 
-                continue;          
+            if($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){
+                continue;
             }
-               
+             *
+             */
+
             if (!$item->getQty()) {
                 continue;
             }
-            
             //Set price amounts in regards to above
             if (($parentItem = $item->getParentItem()) !== null) {
                 $price = $parentItem->getPrice();
@@ -156,7 +156,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                 $price = $item->getPrice();
                 $priceInclTax = $item->getPriceInclTax();
             }
-
 
             $orderRow = Item::orderRow()
                     ->setArticleNumber($item->getProductId())
@@ -168,7 +167,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                     ->setAmountIncVat($priceInclTax);
 
             $sveaObject->addOrderRow($orderRow);
-
         }
 
         // Add shipping fee
@@ -218,11 +216,11 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $payment->setAdditionalInformation('svea_payment_fee_invoiced', 1);
         }
 
-        $response = $sveaObject->setCountryCode($countryCode)
+        $sveaObject = $sveaObject->setCountryCode($countryCode)
                 ->setOrderId($sveaOrderId)
                 ->setInvoiceDistributionType(Mage::getStoreConfig("payment/svea_invoice/deliver_method"));
 
-        $invoice->setData('svea_deliver_request', $response);
+        $invoice->setData('svea_deliver_request', $sveaObject);
 
         return $invoice->getData('svea_deliver_request');
     }
@@ -238,7 +236,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      * @return type
      */
     public function getRefundRequest($payment, $auth, $sveaOrderId)
-    {       
+    {
         $conf = new SveaMageConfigProvider($auth);
         $sveaObject = WebPay::deliverOrder($conf);
 
@@ -247,17 +245,17 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $countryCode = $order->getBillingAddress()->getCountryId();
 
         foreach ($creditMemo->getAllItems() as $item) {
-            
+
             $orderItem = Mage::getModel('sales/order_item')->load($item->getOrderItemId());
-            
-            if($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){ 
-                continue;          
+
+            if($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){
+                continue;
             }
-               
+
             if (!$item->getQty()) {
                 continue;
             }
-            
+
             if (($parentItem = $item->getParentItem()) !== null) {
                 $price = $parentItem->getPrice();
                 $priceInclTax = $parentItem->getPriceInclTax();
@@ -276,7 +274,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                     ->setAmountIncVat($priceInclTax);
 
             $sveaObject->addOrderRow($orderRow);
-            
+
         }
 
         // Shipping
