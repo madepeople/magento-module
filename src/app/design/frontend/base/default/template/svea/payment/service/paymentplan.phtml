@@ -109,12 +109,12 @@ $("getAddressPP").observe("click", function(e) {
 
     // Set vars
     var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
-        loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>/svea/loader.gif' id='sveaLoader'>";
+        loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
 
     // Show Loader
     $("sveaPaymentPlanShowAddresses").update().insert(loader);
 
-    new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>/svea_webpay/service/getAddresses', {
+    new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>svea_webpay/service/getAddresses', {
         parameters: {ssn: ssn, type: 0, cc: "<?php echo $_country; ?>"},
         onSuccess: function(transport) {
             var json = transport.responseText.evalJSON();

@@ -30,4 +30,40 @@ UPDATE {$this->getTable('sales_flat_order_payment')} SET method = 'svea_cardpaym
 UPDATE {$this->getTable('sales_flat_order_payment')} SET method = 'svea_directpayment' WHERE method = 'swphgall';
 ");
 
+
+//Deactivate older modules
+
+$common     = Mage::getRoot() . "/etc/modules/SveaWebPay_Common.xml" ;
+$hosted     = Mage::getRoot() . "/etc/modules/SveaWebPay_Hosted.xml" ; 
+$hostedg    = Mage::getRoot() . "/etc/modules/SveaWebPay_HostedG.xml" ; 
+$webservice = Mage::getRoot() . "/etc/modules/SveaWebPay_Webservice.xml" ;  
+
+if (file_exists($common)) {
+    
+    $xml  = simplexml_load_file($common);
+    $xml->modules[0]->SveaWebPay_Common[0]->active = 'false';
+    $output = $xml->asXML($common);
+}
+
+if (file_exists($hosted)) {
+    
+    $xml  = simplexml_load_file($hosted);
+    $xml->modules[0]->SveaWebPay_Hosted[0]->active = 'false';
+    $output = $xml->asXML($hosted);
+}
+
+if (file_exists($hostedg)) {
+    
+    $xml  = simplexml_load_file($hostedg);
+    $xml->modules[0]->SveaWebPay_HostedG[0]->active = 'false';
+    $output = $xml->asXML($hostedg);
+}
+
+if (file_exists($webservice)) {
+    
+    $xml  = simplexml_load_file($webservice);
+    $xml->modules[0]->SveaWebPay_Webservice[0]->active = 'false';
+    $output = $xml->asXML($webservice);
+}
+
 $installer->endSetup();
