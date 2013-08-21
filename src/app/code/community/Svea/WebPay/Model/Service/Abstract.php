@@ -54,7 +54,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 $item = $item->setVatNumber($additionalInfo['svea_vatNo']);
             } else {
                 $item = $item->setNationalIdNumber($additionalInfo['svea_ssn']);
-                $item = $item->setAddressSelector($additionalInfo['addressSelector']);
+                $item = $item->setAddressSelector($additionalInfo['svea_addressSelector']);
             }
             $svea = $svea->addCustomerDetails($item);
         } else {

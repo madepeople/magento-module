@@ -156,7 +156,7 @@ function sveaGetAddress(e) {
 
             // Show dropdown if company, show only text if private customer
             if (json.customerIdentity.length > 1) {
-                var selectBox = "<select id='<?php echo $_code ?>_addressSelector'>";
+                var selectBox = "<select id='<?php echo $_code ?>_addressSelector' name='payment[<?php echo $_code ?>_addressSelector]'>";
 
                 json.customerIdentity.each(function(item) {
                     selectBox += "<option value='" + item.addressSelector + "'>" + item.firstName + " " + item.lastName + ", " + item.street + ", " + item.zipCode + " " + item.locality;

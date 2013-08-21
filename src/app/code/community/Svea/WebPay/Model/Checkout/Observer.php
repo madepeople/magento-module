@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Observer to get additional info from checkout
  *
@@ -11,6 +12,7 @@
  */
 class Svea_WebPay_Model_Checkout_Observer
 {
+
     /**
      * Add svea data to additional_information
      *
@@ -21,10 +23,10 @@ class Svea_WebPay_Model_Checkout_Observer
         $payment = $observer->getEvent()
                 ->getPayment();
         $data = $observer->getEvent()->getInput();
-        $payment = $this->_addAdditionalInfoToPayment($data,$payment);
+        $payment = $this->_addAdditionalInfoToPayment($data, $payment);
 
         if ($data['method'] == 'svea_invoice') {
-            // Get fee and tax clas
+            // Get fee and tax class
             $paymentFee = Mage::getStoreConfig('payment/svea_invoice/handling_fee');
             $paymentFeeTaxId = Mage::getStoreConfig('payment/svea_invoice/handling_fee_tax_class');
 
@@ -49,45 +51,45 @@ class Svea_WebPay_Model_Checkout_Observer
         }
     }
 
-    protected function _addAdditionalInfoToPayment($data,$payment)
+    protected function _addAdditionalInfoToPayment($data, $payment)
     {
         $method = $data['method'];
-         if (isset($data[$method.'_ssn'])) {
+        if (isset($data[$method . '_ssn'])) {
             $payment
-                ->setAdditionalInformation('svea_ssn', $data[$method.'_ssn']);
+                    ->setAdditionalInformation('svea_ssn', $data[$method . '_ssn']);
         }
-        if (isset($data[$method.'_birthDay'])) {
-          $payment
-                ->setAdditionalInformation('svea_birthDay', $data[$method.'_birthDay']);
-        }
-        if (isset($data[$method.'_birthMonth'])) {
-           $payment
-                ->setAdditionalInformation('svea_birthMonth', $data[$method.'_birthMonth']);
-        }
-        if (isset($data[$method.'_birthYear'])) {
-           $payment
-                ->setAdditionalInformation('svea_birthYear', $data[$method.'_birthYear']);
-        }
-        if (isset($data[$method.'_customerType'])) {
-           $payment
-                ->setAdditionalInformation('svea_customerType', $data[$method.'_customerType']);
-        }
-        if (isset($data[$method.'_vatNo'])) {
-          $payment
-                ->setAdditionalInformation('svea_vatNo', $data[$method.'_vatNo']);
-        }
-        if (isset($data[$method.'_initials'])) {
+        if (isset($data[$method . '_birthDay'])) {
             $payment
-                ->setAdditionalInformation('svea_initials', $data[$method.'_initials']);
+                    ->setAdditionalInformation('svea_birthDay', $data[$method . '_birthDay']);
         }
-        if (isset($data[$method.'_addressSelector'])) {
-           $payment
-                ->setAdditionalInformation('svea_addressSelector', $data[$method.'_addressSelector']);
+        if (isset($data[$method . '_birthMonth'])) {
+            $payment
+                    ->setAdditionalInformation('svea_birthMonth', $data[$method . '_birthMonth']);
+        }
+        if (isset($data[$method . '_birthYear'])) {
+            $payment
+                    ->setAdditionalInformation('svea_birthYear', $data[$method . '_birthYear']);
+        }
+        if (isset($data[$method . '_customerType'])) {
+            $payment
+                    ->setAdditionalInformation('svea_customerType', $data[$method . '_customerType']);
+        }
+        if (isset($data[$method . '_vatNo'])) {
+            $payment
+                    ->setAdditionalInformation('svea_vatNo', $data[$method . '_vatNo']);
+        }
+        if (isset($data[$method . '_initials'])) {
+            $payment
+                    ->setAdditionalInformation('svea_initials', $data[$method . '_initials']);
+        }
+        if (isset($data[$method . '_addressSelector'])) {
+            $payment
+                    ->setAdditionalInformation('svea_addressSelector', $data[$method . '_addressSelector']);
         }
 
-        if (isset($data[$method.'_campaign'])) {
-           $payment
-                ->setAdditionalInformation('svea_campaign', $data[$method.'_campaign']);
+        if (isset($data[$method . '_campaign'])) {
+            $payment
+                    ->setAdditionalInformation('svea_campaign', $data[$method . '_campaign']);
         }
         return $payment;
     }

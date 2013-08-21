@@ -26,7 +26,7 @@ class Svea_WebPay_Model_Hosted_Direct extends Svea_WebPay_Model_Hosted_Abstract
                 ->setPayPageLanguage(Mage::helper('svea_webpay')->__('lang_code'))
                 ->setReturnUrl(Mage::getUrl('svea_webpay/hosted/responseDirectPayment'))
                 ->setCancelUrl(Mage::getUrl('checkout/cart/'));
-        
+
         return $paymentFormPrep;
     }
 }
