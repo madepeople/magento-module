@@ -24,30 +24,32 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
         try {
             $result = Mage::helper('svea_webpay')->getAddresses($ssn, $countryCode, $conf);
 
-            $quote = Mage::getSingleton('checkout/session')->getQuote();
-            if ($quote && $quote->getId()) {
-                // Update the billing address so the fetched information is used
-                // in the order object request
-                $identity = $result->customerIdentity[0];
-                $identityParameterMap = array(
-                    'firstName' => 'Firstname',
-                    'lastName' => 'Lastname',
-                    'phoneNumber' => 'Telephone',
-                    'zipCode' => 'Postcode',
-                    'locality' => 'City',
-                    'street' => 'street',
-                );
+            if (isset($result->customerIdentity)) {
+                $quote = Mage::getSingleton('checkout/session')->getQuote();
+                if ($quote && $quote->getId()) {
+                    // Update the billing address so the fetched information is used
+                    // in the order object request
+                    $identity = $result->customerIdentity[0];
+                    $identityParameterMap = array(
+                        'firstName' => 'Firstname',
+                        'lastName' => 'Lastname',
+                        'phoneNumber' => 'Telephone',
+                        'zipCode' => 'Postcode',
+                        'locality' => 'City',
+                        'street' => 'street',
+                    );
 
-                $billingAddress = $quote->getBillingAddress();
-                foreach ($identityParameterMap as $source => $target) {
-                    if (!isset($identity->$source)) {
-                        continue;
+                    $billingAddress = $quote->getBillingAddress();
+                    foreach ($identityParameterMap as $source => $target) {
+                        if (!isset($identity->$source)) {
+                            continue;
+                        }
+                        $method = 'set' . $target;
+                        $billingAddress->$method($identity->$source);
                     }
-                    $method = 'set' . $target;
-                    $billingAddress->$method($identity->$source);
-                }
 
-                $billingAddress->save();
+                    $billingAddress->save();
+                }
             }
         } catch (Exception $e) {
             $result = $e->getMessage();
