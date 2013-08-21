@@ -21,8 +21,7 @@ class Svea_WebPay_Model_Creditmemo_Total_Paymentfee
         $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
         $paymentFeeTaxAmount = $payment->getAdditionalInformation('svea_payment_fee_tax_amount');
         $paymentFeeRefunded = $payment->getAdditionalInformation('svea_payment_fee_refunded');
-        
-        die($paymentFeeRefunded);
+
         if (empty($paymentFee) || $paymentFeeRefunded == 0) {
             return;
         }
