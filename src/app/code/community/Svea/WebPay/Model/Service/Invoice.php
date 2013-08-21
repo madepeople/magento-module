@@ -43,7 +43,7 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
         // If no flag e.g. -capture, or if no transactionid, assume this is not sent from admin
         //TODO: Make sure compatible with onestep checkout
         $sveaOrderId = $payment->getTransactionId();
-        if (empty($sveaOrderId) || preg_match('/[A-Za-z]/',$sveaOrderId) == FALSE) {
+        if (empty($sveaOrderId) || preg_match('/[A-Za-z]/', $sveaOrderId) == FALSE) {
             if (!$this->getConfigData('autodeliver')) {
                 $errorTranslated = Mage::helper('svea_webpay')->responseCodes("", 'no_orderid');
                 Mage::throwException($errorTranslated);
@@ -60,6 +60,7 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
         $response = $sveaObject
                 ->deliverInvoiceOrder()
                 ->doRequest();
+        
         if ($response->accepted == 1) {
             $successMessage = Mage::helper('svea_webpay')->__('delivered');
             $order->addStatusToHistory($this->getConfigData('paid_order_status'), $successMessage, false);
@@ -110,8 +111,9 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
         Mage::helper('svea_webpay')->getRefundRequest($payment, $paymentMethodConfig, $sveaOrderId);
         $sveaObject = $order->getData('svea_refund_request');
         $response = $sveaObject->setCreditInvoice($this->getInfoInstance()
-                                ->getAdditionalInformation('svea_invoice_id'))
-                        ->deliverInvoiceOrder()->doRequest();
+                ->getAdditionalInformation('svea_invoice_id'))
+                ->deliverInvoiceOrder()->doRequest();
+
         if ($response->accepted == 1) {
             return parent::refund($payment, $amount);
         } else {

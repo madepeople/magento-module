@@ -243,10 +243,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $countryCode = $order->getBillingAddress()->getCountryId();
 
         foreach ($creditMemo->getAllItems() as $item) {
-
-            $orderItem = Mage::getModel('sales/order_item')->load($item->getOrderItemId());
-
-            if($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){
+            $orderItem = $item->getOrderItem();
+            if ($orderItem->getProductType() !== Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
                 continue;
             }
 
