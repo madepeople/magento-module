@@ -15,15 +15,40 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
     public function getAddressesAction()
     {
         $ssn = $this->getRequest()->getParam('ssn');
-        $type = ($this->getRequest()->getParam('type') == 1) ? true : false;
         $countryCode = $this->getRequest()->getParam('cc');
 
         // Credentials
         $conf = Mage::getStoreConfig('payment/svea_invoice');
-        $conf['company'] = $type;
+        $conf['company'] = $this->getRequest()->getParam('type') == 1;
 
         try {
             $result = Mage::helper('svea_webpay')->getAddresses($ssn, $countryCode, $conf);
+
+            $quote = Mage::getSingleton('checkout/session')->getQuote();
+            if ($quote && $quote->getId()) {
+                // Update the billing address so the fetched information is used
+                // in the order object request
+                $identity = $result->customerIdentity[0];
+                $identityParameterMap = array(
+                    'firstName' => 'Firstname',
+                    'lastName' => 'Lastname',
+                    'phoneNumber' => 'Telephone',
+                    'zipCode' => 'Postcode',
+                    'locality' => 'City',
+                    'street' => 'street',
+                );
+
+                $billingAddress = $quote->getBillingAddress();
+                foreach ($identityParameterMap as $source => $target) {
+                    if (!isset($identity->$source)) {
+                        continue;
+                    }
+                    $method = 'set' . $target;
+                    $billingAddress->$method($identity->$source);
+                }
+
+                $billingAddress->save();
+            }
         } catch (Exception $e) {
             $result = $e->getMessage();
         }
