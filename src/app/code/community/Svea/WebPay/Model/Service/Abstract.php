@@ -69,7 +69,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     ->setLocality($order->getBillingAddress()->getCity())
                     ->setIpAddress($_SERVER['SERVER_ADDR'])//try getRemoteIp()
                     ->setPhoneNumber($order->getBillingAddress()->getTelephone());
-        if ($countryCode == "DE" || $countryCode == "NL") {
+            if ($countryCode == "DE" || $countryCode == "NL") {
                 $item = $item->setBirthDate($additionalInfo['svea_birthYear'], $additionalInfo['svea_birthMonth'], $additionalInfo['svea_birthDay']);
             }
             if ($countryCode == "NL") {
@@ -90,13 +90,11 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
     public function authorize(Varien_Object $payment, $amount)
     {
         $order = $payment->getOrder();
-         // Object created in validate()
+        // Object created in validate()
         $sveaObject = $order->getData('svea_payment_request');
         $sveaObject = $this->_choosePayment($sveaObject);
 
         $response = $sveaObject->doRequest();
-
-
 
         if ($response->accepted == 1) {
             $successMessage = Mage::helper('svea_webpay')->__('authorize_success %s', $response->sveaOrderId);
