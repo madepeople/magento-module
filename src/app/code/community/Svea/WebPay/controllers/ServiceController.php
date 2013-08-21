@@ -16,6 +16,12 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
     {
         $ssn = $this->getRequest()->getParam('ssn');
         $countryCode = $this->getRequest()->getParam('cc');
+        if (empty($countryCode)) {
+            $countryCode = Mage::getSingleton('checkout/session')
+                    ->getQuote()
+                    ->getBillingAddress()
+                    ->getCountry();
+        }
 
         // Credentials
         $conf = Mage::getStoreConfig('payment/svea_invoice');
