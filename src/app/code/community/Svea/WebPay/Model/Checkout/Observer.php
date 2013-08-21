@@ -91,4 +91,22 @@ class Svea_WebPay_Model_Checkout_Observer
         }
         return $payment;
     }
+
+    /**
+     * Add the possibility to reactivate the quote right after the order has
+     * been placed, so the cart isn't emptied until the order is fulfilled
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function reactivateQuoteBeforeGateway(Varien_Event_Observer $observer)
+    {
+        $quote = $observer->getEvent()->getQuote();
+        $method = $quote->getPayment()->getMethod();
+
+        if (!Mage::getStoreConfig('payment/' . $method . '/clear_cart_on_fulfillment')) {
+            return;
+        }
+
+        $quote->setIsActive(true);
+    }
 }
