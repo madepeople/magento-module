@@ -27,7 +27,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
         </div>
     </li>
 
-    <!-- If Nordic countries show SSN input field -->
+    <!-- If Nordic countries show, show SSN input field -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
         <li>
             <label for="payment_form_<?php echo $_code ?>_ssn" class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') . ":"; ?></label>
@@ -105,7 +105,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
         </li>
         <li>
             <div id="payment-method-buttons-container" class="buttons-set">
-                <button class="button" id="getAddress" href="#"><span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span></button>
+                <button class="button" id="getAddress" onclick="sveaGetAddress();" type="button"><span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span></button>
             </div>
         </li>
     <?php endif; ?>
@@ -134,8 +134,7 @@ if (currentCountry == 'NL' || currentCountry == 'DE') {
 }
 
 //Get Addresses
-$("getAddress").observe("click", function(e) {
-
+function sveaGetAddress(e) {
     // Set vars
     var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
             type = $("payment_form_<?php echo $_code ?>_customerType").value,
@@ -157,7 +156,7 @@ $("getAddress").observe("click", function(e) {
 
             // Show dropdown if company, show only text if private customer
             if (json.customerIdentity.length > 1) {
-                var selectBox = "<select id='<?php echo $_code ?>_addressSelector'>";
+                var selectBox = "<select id='<?php echo $_code ?>_addressSelector' name='payment[<?php echo $_code ?>_addressSelector]'>";
 
                 json.customerIdentity.each(function(item) {
                     selectBox += "<option value='" + item.addressSelector + "'>" + item.firstName + " " + item.lastName + ", " + item.street + ", " + item.zipCode + " " + item.locality;
@@ -187,5 +186,5 @@ $("getAddress").observe("click", function(e) {
             }
         }
     });
-});
+};
 </script>
