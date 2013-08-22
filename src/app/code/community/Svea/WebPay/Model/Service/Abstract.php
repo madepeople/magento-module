@@ -42,7 +42,6 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
 
         if ($company) {
             $item = Item::companyCustomer();
-
             $item = $item->setEmail($order->getBillingAddress()->getEmail())
                     ->setCompanyName($order->getBillingAddress()->getCompany())
                     ->setStreetAddress($street, $houseNo)
@@ -52,11 +51,10 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     ->setPhoneNumber($order->getBillingAddress()->getTelephone());
 
             if ($countryCode == "DE" || $countryCode == "NL") {
-
                 $item = $item->setVatNumber($additionalInfo['svea_vatNo']);
             } else {
                 $item = $item->setNationalIdNumber($additionalInfo['svea_ssn']);
-                $item = $item->setAddressSelector($additionalInfo['addressSelector']);
+                $item = $item->setAddressSelector($additionalInfo['svea_addressSelector']);
             }
             $svea = $svea->addCustomerDetails($item);
         } else {
@@ -67,9 +65,10 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     ->setStreetAddress($street, $houseNo)
                     ->setZipCode($order->getBillingAddress()->getPostcode())
                     ->setLocality($order->getBillingAddress()->getCity())
-                    ->setIpAddress($_SERVER['SERVER_ADDR'])//try getRemoteIp()
+                    ->setIpAddress($_SERVER['SERVER_ADDR']) // This doesn't cut it for reverse proxies
                     ->setPhoneNumber($order->getBillingAddress()->getTelephone());
-        if ($countryCode == "DE" || $countryCode == "NL") {
+
+            if ($countryCode == "DE" || $countryCode == "NL") {
                 $item = $item->setBirthDate($additionalInfo['svea_birthYear'], $additionalInfo['svea_birthMonth'], $additionalInfo['svea_birthDay']);
             }
             if ($countryCode == "NL") {
@@ -90,13 +89,11 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
     public function authorize(Varien_Object $payment, $amount)
     {
         $order = $payment->getOrder();
-         // Object created in validate()
+        // Object created in validate()
         $sveaObject = $order->getData('svea_payment_request');
         $sveaObject = $this->_choosePayment($sveaObject);
 
         $response = $sveaObject->doRequest();
-
-
 
         if ($response->accepted == 1) {
             $successMessage = Mage::helper('svea_webpay')->__('authorize_success %s', $response->sveaOrderId);

@@ -97,7 +97,7 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
         </li>
         <li>
             <div id="payment-method-buttons-container" class="buttons-set">
-                <button class="button" id="getAddressPP" type="button"><span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span></button>
+                <button class="button" id="getAddressPP" onclick="sveaGetAddressPP();" type="button"><span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span></button>
             </div>
         </li>
     <?php endif; ?>
@@ -105,7 +105,7 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
 <script>
 
 // Get addresses
-$("getAddressPP").observe("click", function(e) {
+function sveaGetAddressPP(e) {
 
     // Set vars
     var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
@@ -134,5 +134,5 @@ $("getAddressPP").observe("click", function(e) {
             $("sveaPaymentPlanShowAddresses").insert(adress);
         }
     });
-});
+};
 </script>

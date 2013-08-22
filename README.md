@@ -77,5 +77,8 @@ We can recommend the following certificate providers:
 * InfraSec:  infrasec.se
 * VeriSign : verisign.com
 
+### Addresses
+The Service integration method differentiates between a street and a c/o address. Since Magento only has support for multiple street lines but not their purpose, we can't validate and transfer the coAddress parameter to the Customer object.
+
 ## Deployment and version control
 If you keep your Magento installation version-controlled, make sure that your /.gitignore has an entry for keeping the files inside /media/svea/*, otherwise deployment using tools like Capistrano won't include payment logotypes and loading images.
