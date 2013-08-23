@@ -7,7 +7,7 @@ Supported countries are
 
 ## Before installation
 ### **If you are upgrading from a previous version of this module, please contact Svea before installing to set your account settings correct.**
-    
+
 1. You will not be able to Invoice the old orders after the upgrade, so make sure they are already invoiced. Alternatively invoice them from Svea admin and invoice offline in Magento.
 2. Deactivate the paymentmethods from your stores administration in System->Configuration->Payment Methods
 	* Set all payment methods to *Enabled: No*
@@ -57,6 +57,10 @@ When direct bank (or card in Denmark) is choosen, the customer will be redirecte
 
 ###Currency
 Make sure you have the same currency set in your store as you account settings at Svea for Invoice and PartPayment.
+
+###Error messages
+The error message sent from our systems are translated into your language. If you want to change them with more instructions of what to do when something goes bad, you can manually change it in the csv-files.
+ex.[**swedish**] https://github.com/sveawebpay/magento-module/blob/master/src/app/locale/sv_SE/Svea_WebPay.csv
 
 ####Cache
 Mace sure to clear the cache in your store under System->Cache management.
