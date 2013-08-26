@@ -51,6 +51,9 @@ The module lets you create Invoices, refund and cancel orders. If you choose **A
 Notice that for Sveas systems the customer can only place orders for the same country as the store config.
 If you have customers from different countries we recommend you have different store views with the different configvalues.
 
+####Payment plan
+Setting up for the first time, you must press the Update-button from the store configuration, to get the alternative campaigns. Update when needed. The Update-button is only visible in the Store View Scope.
+
 ###Card and Direct
 When card is choosen in the checkout, the customer will be redirected directly to our card payment provider for all our countries except from Denmark.
 When direct bank (or card in Denmark) is choosen, the customer will be redirected to Svea WebPay PayPage. After payments completed, the customer will be redirected back to the store.
