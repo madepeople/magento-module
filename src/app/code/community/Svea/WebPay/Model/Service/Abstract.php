@@ -34,7 +34,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         $company = isset($additionalInfo['svea_customerType']) ? $additionalInfo['svea_customerType'] : FALSE;
         $address = $order->getBillingAddress()->getStreetFull();
 
-        preg_match('!( [^0-9]*)(.*)!', $address, $houseNoArr);
+        preg_match('!([^0-9]*)(.*)!', $address, $houseNoArr);
         $houseNo = $houseNoArr[2];
 
         preg_match('((.*)([^0-9])(.[^0-9]))', $address, $streetArr);
