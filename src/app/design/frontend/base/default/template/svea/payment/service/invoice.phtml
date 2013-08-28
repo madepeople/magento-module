@@ -15,7 +15,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
     </li>
     <li>
         <label for=""></label>
-        <?php echo Mage::getStoreConfig("payment/$_code/invoice_info"); ?>
+        <?php echo(nl2br(Mage::getStoreConfig("payment/$_code/invoice_info"))); ?>
     </li>
     <li>
         <label for="svea_customerType"><?php echo Mage::helper('svea_webpay')->__('customer_type') . ":"; ?></label>

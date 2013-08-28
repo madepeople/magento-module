@@ -15,5 +15,5 @@ $_logoName = ($_code == "svea_cardpayment") ? "card" : "directbank";
         "></li>
 
     <!-- Show info about payment method entered by admin, if any -->
-    <li><?php echo Mage::getStoreConfig("payment/$_code/redirect_info"); ?></li>
+    <li><?php echo(nl2br(Mage::getStoreConfig("payment/$_code/redirect_info"))); ?></li>
 </ul>
