@@ -72,7 +72,7 @@
                         </secretword_prod>
                         <redirect_info translate="label">
                             <label>Info Text</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>textarea</frontend_type>
                             <sort_order>8</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -162,7 +162,7 @@
                         </secretword_prod>
                         <redirect_info translate="label">
                             <label>Info Text</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>textarea</frontend_type>
                             <sort_order>8</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -322,7 +322,7 @@
                         </max_order_total>
                         <invoice_info translate="label">
                             <label>Info Text</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>textarea</frontend_type>
                             <sort_order>15</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -456,7 +456,7 @@
                         </max_order_total>
                         <paymentplan_info translate="label">
                             <label>Info Text</label>
-                            <frontend_type>text</frontend_type>
+                            <frontend_type>textarea</frontend_type>
                             <sort_order>15</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>

@@ -4,8 +4,16 @@ $_code = $this->getMethodCode();
 $_logoName = ($_code == "svea_cardpayment") ? "card" : "directbank";
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
-    <li><img src="<?php echo Mage::getBaseUrl("media") . "svea/$_lang/svea_$_logoName.png"; ?>"></li>
+    <li><img src="
+        <?php
+        if($_logoName == "directbank"){
+             echo Mage::getBaseUrl("media") . "svea/$_lang/svea_directbank.png";
+        }else{
+            echo  Mage::getBaseUrl("media") . "svea/visaMastercard.png";
+        }
+        ?>
+        "></li>
 
     <!-- Show info about payment method entered by admin, if any -->
-    <li><?php echo Mage::getStoreConfig("payment/$_code/redirect_info"); ?></li>
+    <li><?php echo(nl2br(Mage::getStoreConfig("payment/$_code/redirect_info"))); ?></li>
 </ul>

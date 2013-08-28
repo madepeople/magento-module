@@ -7,7 +7,7 @@ Supported countries are
 
 ## Before installation
 ### **If you are upgrading from a previous version of this module, please contact Svea before installing to set your account settings correct.**
-    
+
 1. You will not be able to Invoice the old orders after the upgrade, so make sure they are already invoiced. Alternatively invoice them from Svea admin and invoice offline in Magento.
 2. Deactivate the paymentmethods from your stores administration in System->Configuration->Payment Methods
 	* Set all payment methods to *Enabled: No*
@@ -51,12 +51,19 @@ The module lets you create Invoices, refund and cancel orders. If you choose **A
 Notice that for Sveas systems the customer can only place orders for the same country as the store config.
 If you have customers from different countries we recommend you have different store views with the different configvalues.
 
+####Payment plan
+Setting up for the first time, you must press the Update-button from the store configuration, to get the alternative campaigns. Update when needed. The Update-button is only visible in the Store View Scope.
+
 ###Card and Direct
 When card is choosen in the checkout, the customer will be redirected directly to our card payment provider for all our countries except from Denmark.
 When direct bank (or card in Denmark) is choosen, the customer will be redirected to Svea WebPay PayPage. After payments completed, the customer will be redirected back to the store.
 
 ###Currency
 Make sure you have the same currency set in your store as you account settings at Svea for Invoice and PartPayment.
+
+###Error messages
+The error message sent from our systems are translated into your language. If you want to change them with more instructions of what to do when something goes bad, you can manually change it in the csv-files.
+ex.[**swedish**] https://github.com/sveawebpay/magento-module/blob/master/src/app/locale/sv_SE/Svea_WebPay.csv
 
 ####Cache
 Mace sure to clear the cache in your store under System->Cache management.
