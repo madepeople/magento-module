@@ -34,17 +34,14 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         $company = isset($additionalInfo['svea_customerType']) ? $additionalInfo['svea_customerType'] : FALSE;
         $address = $order->getBillingAddress()->getStreetFull();
 
-        preg_match('!([^0-9]*)(.*)!', $address, $houseNoArr);
-        $houseNo = $houseNoArr[2];
-
-        preg_match('((.*)([^0-9])(.[^0-9]))', $address, $streetArr);
-        $street = $streetArr[0];
+        //Seperates the street from the housenumber according to testcases
+        preg_match('/^(?:\s)*([0-9]*[A-Za-z]*\s*[A-Za-z]+)(?:\s*)([0-9]*\s*[A-Za-z]*[^\s])?(?:\s)*$/',$address, $addressArray);
 
         if ($company) {
             $item = Item::companyCustomer();
             $item = $item->setEmail($order->getBillingAddress()->getEmail())
                     ->setCompanyName($order->getBillingAddress()->getCompany())
-                    ->setStreetAddress($street, $houseNo)
+                    ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($order->getBillingAddress()->getPostcode())
                     ->setLocality($order->getBillingAddress()->getCity())
                     ->setIpAddress($_SERVER['SERVER_ADDR'])
@@ -62,7 +59,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             $item = $item->setNationalIdNumber($additionalInfo['svea_ssn'])
                     ->setEmail($order->getBillingAddress()->getEmail())
                     ->setName($order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
-                    ->setStreetAddress($street, $houseNo)
+                    ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($order->getBillingAddress()->getPostcode())
                     ->setLocality($order->getBillingAddress()->getCity())
                     ->setIpAddress($_SERVER['SERVER_ADDR']) // This doesn't cut it for reverse proxies
