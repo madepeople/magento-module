@@ -69,7 +69,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         $orderTotal = $quote->getGrandTotal() - $quote->getShippingAmount();
-        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection();
+        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection()
+                ->setOrder('contractlength',  Varien_Data_Collection::SORT_ORDER_ASC);
 
         $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams();
 
@@ -84,7 +85,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
-
         return (object) $paramsArray;
     }
 
