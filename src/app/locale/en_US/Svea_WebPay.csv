@@ -2,7 +2,7 @@
 "invoice_info","Svea Invoice"
 "paymentplan_info","Svea paymentplan"
 "redirect","Redirecting..."
-"from_about","From about"
+"from_about","From"
 "authorize_success %s","Order is created, Svea Order id: %s"
 "unit","unit"
 "customer_type","Type"

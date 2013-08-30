@@ -2,7 +2,7 @@
 "invoice_info","Svea Faktura"
 "paymentplan_info","Svea Delbetal"
 "redirect","Omdirigering..."
-"from_about","Fra ca."
+"from_about","Fra"
 "authorize_success %s","Ordre er oprettet, Svea Order id: %s"
 "unit","st"
 "customer_type","Type"
