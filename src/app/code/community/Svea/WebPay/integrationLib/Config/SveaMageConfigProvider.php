@@ -18,9 +18,9 @@ class SveaMageConfigProvider implements ConfigurationProvider{
     public function getEndPoint($type) {
         $type = strtoupper($type);
         if($type == "HOSTED"){
-            return $this->values['test'] ? SveaConfig::SWP_TEST_URL : SveaConfig::SWP_PROD_URL;
+            return $this->values['test'] ? Svea\SveaConfig::SWP_TEST_URL : Svea\SveaConfig::SWP_PROD_URL;
         }elseif($type == "INVOICE" || $type == "PAYMENTPLAN"){
-            return $this->values['test'] ? SveaConfig::SWP_TEST_WS_URL: SveaConfig::SWP_PROD_WS_URL;
+            return $this->values['test'] ? Svea\SveaConfig::SWP_TEST_WS_URL: Svea\SveaConfig::SWP_PROD_WS_URL;
         }  else {
            throw new Exception('Invalid type: '.$type.' Accepted values: INVOICE, PAYMENTPLAN or HOSTED.');
         }
