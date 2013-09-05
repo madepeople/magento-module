@@ -69,8 +69,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         $orderTotal = $quote->getGrandTotal() - $quote->getShippingAmount();
-        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection()
-                ->setOrder('contractlength',  Varien_Data_Collection::SORT_ORDER_ASC);
+        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection();
 
         $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams();
 
@@ -85,6 +84,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                 }
             }
         }
+
         return (object) $paramsArray;
     }
 
@@ -136,9 +136,9 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $countryCode = $order->getBillingAddress()->getCountryId();
         // Add invoiced items
         foreach ($invoice->getAllItems() as $item) {
-            // Check for product type in order to set bundled and configured products right
             $orderItem = $item->getOrderItem();
-            if ($orderItem->getProductType() !== Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
+            //Do not include the Bundle as product. Only it's products.
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
                 continue;
             }
 
@@ -244,7 +244,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
         foreach ($creditMemo->getAllItems() as $item) {
             $orderItem = $item->getOrderItem();
-            if ($orderItem->getProductType() !== Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
+            //Do not include the Bundle as product. Only it's products.
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
                 continue;
             }
 
