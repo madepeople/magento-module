@@ -2,7 +2,7 @@
 "invoice_info","Svea Lasku"
 "paymentplan_info","Svea Osamaksu"
 "redirect","Uudelleen ohjaus käynnissä..."
-"from_about","Alkaen n. "
+"from_about","Alkaen"
 "authorize_success %s","Tilaus luotu, Svean tilausnro: %s"
 "unit","yksikkö"
 "customer_type","Tyyppi"

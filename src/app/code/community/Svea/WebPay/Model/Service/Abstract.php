@@ -89,7 +89,6 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         // Object created in validate()
         $sveaObject = $order->getData('svea_payment_request');
         $sveaObject = $this->_choosePayment($sveaObject);
-
         $response = $sveaObject->doRequest();
 
         if ($response->accepted == 1) {
@@ -108,16 +107,11 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             $payment->setTransactionId($response->sveaOrderId)
                     ->setIsTransactionClosed(false)
                     ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
-            $order->save();
         } else {
             $errorMessage = $response->errormessage;
             $statusCode = $response->resultcode;
             $errorTranslated = Mage::helper('svea_webpay')->responseCodes($statusCode, $errorMessage);
-            if ($order->canCancel()) {
-                $order->addStatusToHistory($order->getStatus(), $errorTranslated, false);
-                $order->cancel();
-                $order->save();
-            }
+            $order->addStatusToHistory($order->getStatus(), $errorTranslated, false);
 
             return Mage::throwException($errorTranslated);
         }

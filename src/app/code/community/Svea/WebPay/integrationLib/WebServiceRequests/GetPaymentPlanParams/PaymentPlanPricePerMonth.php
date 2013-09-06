@@ -1,4 +1,5 @@
 <?php
+namespace Svea;
 
 require_once SVEA_REQUEST_DIR . '/WebServiceRequests/svea_soap/SveaSoapConfig.php';
 require_once SVEA_REQUEST_DIR . '/Config/SveaConfig.php';
@@ -18,16 +19,17 @@ class PaymentPlanPricePerMonth {
         return $this->values;
     }
 
-    private function calculate($price, $params){
+    private function calculate($price, $params) {
         if (!empty($params)) {
             foreach ($params->campaignCodes as $key => $value) {
-                if($price >= $value->fromAmount && $price <= $value->toAmount){
-                                   $pair = array();
-                $pair['pricePerMonth'] = $price * $value->monthlyAnnuityFactor + $value->notificationFee;
-                foreach ($value as $key => $val) {
-                   if($key == "campaignCode"){
-                        $pair[$key] = $val;
-                    }
+                if ($price >= $value->fromAmount && $price <= $value->toAmount) {
+                    $pair = array();
+                    $pair['pricePerMonth'] = $price * $value->monthlyAnnuityFactor + $value->notificationFee;
+                    foreach ($value as $key => $val) {
+                        if ($key == "campaignCode") {
+                            $pair[$key] = $val;
+                        }
+
                     if($key == "description"){
                         $pair[$key] = $val;
                     }
@@ -35,9 +37,7 @@ class PaymentPlanPricePerMonth {
                 }
                 array_push($this->values, $pair);
                 }
-
             }
         }
     }
-
 }

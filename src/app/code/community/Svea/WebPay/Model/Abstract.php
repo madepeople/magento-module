@@ -47,15 +47,15 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         //Get Request and billing addres
         $svea = $order->getData('svea_payment_request');
         $billingAddress = $order->getBillingAddress();
-        
+
         //Build the rows for request
         foreach ($order->getAllItems() as $item) {
-            
-            //Check for product type in order to set bundled and configured products right
-            if($item->getProductType() !== Mage_Catalog_Model_Product_Type::TYPE_SIMPLE){
-                   continue;    
-            }    
-            
+
+            //Do not include the Bundle as product. Only it's products.
+            if($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE){
+                continue;
+            }
+
             //Set price amounts in regards to above
             if (($parentItem = $item->getParentItem()) !== null) {
                 $price = $parentItem->getPrice();
@@ -65,7 +65,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                 $priceInclTax = $item->getPriceInclTax();
             }
 
-            
+
             $orderRow = Item::orderRow()
                     ->setArticleNumber($item->getProductId())
                     ->setQuantity(get_class($item) == 'Mage_Sales_Model_Quote_Item' ? $item->getQty() : $item->getQtyOrdered())
@@ -76,25 +76,28 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                     ->setAmountIncVat($priceInclTax);
 
             $svea->addOrderRow($orderRow);
-            
+
         }
 
         // Shipping
         if ($order->getShippingAmount() > 0) {
-            
+
             $shippingIncVat = $order->getShippingAmount() + $order->getShippingTaxAmount();
             $shippingFee = Item::shippingFee()
-                    ->setName($order->getShippingDescription())
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setName($order->getShippingMethod())
+                    ->setDescription($order->getShippingDescription())
                     ->setAmountExVat($order->getShippingAmount())
                     ->setAmountIncVat($shippingIncVat);
 
             $svea->addFee($shippingFee);
-            
+
         }
 
         // Discount
         if (abs($order->getDiscountAmount()) > 0) {
             $discountRow = Item::fixedDiscount()
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setAmountIncVat(abs($order->getDiscountAmount()))
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'));
 
@@ -104,6 +107,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         // Gift cards
         if (abs($order->getGiftCardsAmount()) > 0) {
             $giftCardRow = Item::fixedDiscount()
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setAmountIncVat(abs($order->getGiftCardsAmount()))
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'));
 
@@ -116,20 +120,21 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
 
         if ($paymentFee > 0) {
             $invoiceFeeRow = Item::invoiceFee()
-                    ->setDescription(Mage::helper('svea_webpay')->__('invoice_fee'))
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
                     ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
                     ->setAmountIncVat($paymentFee);
 
             $svea->addFee($invoiceFeeRow);
         }
-        
-        
-        
+
+
+
         $svea->setCountryCode($billingAddress->getCountryId())
                 ->setClientOrderNumber($order->getIncrementId())
                 ->setOrderDate(date("Y-m-d"))
                 ->setCurrency($order->getOrderCurrencyCode());
-        
+
         return $svea;
     }
 
@@ -140,7 +145,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
      */
     public function validate()
     {
-        
+
         $paymentInfo = $this->getInfoInstance();
         if ($paymentInfo instanceof Mage_Sales_Model_Order_Payment) {
             $order = $paymentInfo->getOrder();

@@ -136,9 +136,9 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $countryCode = $order->getBillingAddress()->getCountryId();
         // Add invoiced items
         foreach ($invoice->getAllItems() as $item) {
-            // Check for product type in order to set bundled and configured products right
             $orderItem = $item->getOrderItem();
-            if ($orderItem->getProductType() !== Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
+            //Do not include the Bundle as product. Only it's products.
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
                 continue;
             }
 
@@ -172,7 +172,9 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $shippingIncVat = $invoice->getShippingAmount() + $invoice->getShippingTaxAmount();
 
             $shippingFee = Item::shippingFee()
-                    ->setName($invoice->getShippingDescription())
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setName($invoice->getShippingMethod())
+                    ->setDescription($invoice->getShippingDescription())
                     ->setAmountExVat($invoice->getShippingAmount())
                     ->setAmountIncVat($shippingIncVat);
 
@@ -192,8 +194,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         if (abs($order->getGiftCardsAmount())) {
             $giftCardRow = Item::fixedDiscount()
                     ->setAmountIncVat(abs($order->getGiftCardsAmount()))
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setName("Presentkort");
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'));
 
             $sveaObject->addDiscount($giftCardRow);
         }
@@ -206,7 +207,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
         if ($paymentFee > 0 && $invoiced == 0) {
             $invoiceFee = Item::invoiceFee()
-                    ->setDescription(Mage::helper('svea_webpay')->__('invoice_fee'))
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
                     ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
                     ->setAmountIncVat($paymentFee);
 
@@ -244,7 +246,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
         foreach ($creditMemo->getAllItems() as $item) {
             $orderItem = $item->getOrderItem();
-            if ($orderItem->getProductType() !== Mage_Catalog_Model_Product_Type::TYPE_SIMPLE) {
+            //Do not include the Bundle as product. Only it's products.
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
                 continue;
             }
 
@@ -278,7 +281,9 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $shippingIncVat = $creditMemo->getShippingAmount() + $creditMemo->getShippingTaxAmount();
 
             $shippingFee = Item::shippingFee()
-                    ->setName($creditMemo->getShippingDescription())
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setName($creditMemo->getShippingMethod())
+                    ->setDescription($creditMemo->getShippingDescription())
                     ->setAmountExVat($creditMemo->getShippingAmount())
                     ->setAmountIncVat($shippingIncVat);
 
@@ -294,6 +299,15 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $sveaObject->addDiscount($discountRow);
         }
 
+        //Gift cards
+        if (abs($creditMemo->getGiftCardsAmount()) > 0) {
+            $giftCardRow = Item::fixedDiscount()
+                    ->setAmountIncVat(abs($creditMemo->getGiftCardsAmount()))
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'));
+
+            $sveaObject->addDiscount($giftCardRow);
+        }
+
         // Invoice fee
         $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
         $adjustmentFee = $creditMemo->getAdjustmentPositive();
@@ -302,7 +316,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
         if ($paymentFee > 0 && $refunded == 0 && $paymentFee == $adjustmentFee) {
             $invoiceFee = Item::invoiceFee()
-                    ->setDescription(Mage::helper('svea_webpay')->__('invoice_fee'))
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
                     ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
                     ->setAmountIncVat($paymentFee);
 
