@@ -11,29 +11,7 @@ Supported countries are
 1. You will not be able to Invoice the old orders after the upgrade, so make sure they are already invoiced. Alternatively invoice them from Svea admin and invoice offline in Magento.
 2. Deactivate the paymentmethods from your stores administration in System->Configuration->Payment Methods
 	* Set all payment methods to *Enabled: No*
-3. Deactivate the module by changing true to false in the files:
-	* app/etc/modules/SveaWebPay_Common.xml
-	* app/etc/modules/SveaWebPay_Hosted.xml
-	* app/etc/modules/SveaWebPay_HostedG.xml
-	* app/etc/modules/SveaWebPay_Webservice.xml
-
-```xml
-<config>
-	<modules>
-		<SveaWebPay_Webservice>
-                <!-- Change true to false here -->
-			<active>false</active>
-			<codePool>community</codePool>
-			<depends>
-				<Mage_Payment />
-				<SveaWebPay_Common />
-			</depends>
-		</SveaWebPay_Webservice>
-	</modules>
-</config>
-```
-
-4. Install the new module
+3. Install the new module
 5. Configure settings
 
 Please make sure the extensions *SOAP* and *OPENSSL* is aktivated for PHP. Also make sure to clean the cache of the store after installation and configuration is done.
