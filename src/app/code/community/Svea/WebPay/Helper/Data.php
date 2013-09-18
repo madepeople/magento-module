@@ -141,6 +141,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
                 continue;
             }
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+                continue;
+            }
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_GROUPED) {
+                continue;
+            }
 
             if (!$item->getQty()) {
                 continue;
@@ -248,6 +254,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $orderItem = $item->getOrderItem();
             //Do not include the Bundle as product. Only it's products.
             if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
+                continue;
+            }
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+                continue;
+            }
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_GROUPED) {
                 continue;
             }
 
