@@ -55,6 +55,12 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             if($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE){
                 continue;
             }
+            if($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE){
+                continue;
+            }
+            if($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_GROUPED){
+                continue;
+            }
 
             //Set price amounts in regards to above
             if (($parentItem = $item->getParentItem()) !== null) {
