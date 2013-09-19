@@ -1,10 +1,9 @@
 <_>
-   <form_key>aqmHNwJZF7hdrNBR</form_key>
+   <form_key>ZSJbgA2dRGJ4XtRh</form_key>
    <name>Svea_WebPay</name>
-   <channel>community</channel>
+   <channel>Community</channel>
    <version_ids>
       <version_ids>2</version_ids>
-      <version_ids>1</version_ids>
    </version_ids>
    <summary>SveaWebPay payment module</summary>
    <description>Svea WebPay payment module. For invoice, paymentplan, card and directpayments.
@@ -17,21 +16,24 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
    </description>
    <license>Apache License, Version 2.0</license>
    <license_uri/>
-   <version>4.0.4</version>
+   <version>4.0.7</version>
    <stability>stable</stability>
    <notes>N/A</notes>
    <authors>
       <name>
          <name>Svea Ekonomi AB</name>
+         <name>Jonathan Selander</name>
       </name>
       <user>
          <user>SveaWebPay</user>
+         <user>jonathan_made</user>
       </user>
       <email>
          <email>support-webpay@sveawebpay.se</email>
+         <email>jonathan@madepeople.se</email>
       </email>
    </authors>
-   <depends_php_min>5.2.0</depends_php_min>
+   <depends_php_min>5.3.0</depends_php_min>
    <depends_php_max>6.0.0</depends_php_max>
    <depends>
       <package>
@@ -48,7 +50,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
             <max/>
          </max>
          <files>
-            <files>                                                                                              </files>
+            <files>                                                                                                      </files>
          </files>
       </package>
       <extension>
