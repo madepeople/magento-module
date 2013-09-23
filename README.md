@@ -39,6 +39,17 @@ When direct bank (or card in Denmark) is choosen, the customer will be redirecte
 ###Currency
 Make sure you have the same currency set in your store as you account settings at Svea for Invoice and PartPayment.
 
+###Discounts
+The module currently only supports "Fixed amount discount on whole cart", with the same taxclass on all products.
+#####Settings on discount:
+1. Apply    =   Fixed amount discount on whole cart
+2. Discount Amount   =   The total discount amount on cart incl. tax
+
+#####Configuration/Sales/Tax/Calculations Settings:
+1. Apply customer tax = After discount
+2. Apply discount on prices = Including tax
+
+
 ###Error messages
 The error message sent from our systems are translated into your language. If you want to change them with more instructions of what to do when something goes bad, you can manually change it in the csv-files.
 ex.[**swedish**] https://github.com/sveawebpay/magento-module/blob/master/src/app/locale/sv_SE/Svea_WebPay.csv
