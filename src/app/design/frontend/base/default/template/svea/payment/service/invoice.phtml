@@ -121,7 +121,6 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 //Change customer type
 
 var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
-var customerType = 0;
     $("payment_form_<?php echo $_code ?>_customerType_0").on("change", function(e) {
         customerType = $(this).value;
         if (currentCountry == 'NL' || currentCountry == 'DE') {
