@@ -119,7 +119,6 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 <script>
 
 //Change customer type
-
 var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
     $("payment_form_<?php echo $_code ?>_customerType_0").on("change", function(e) {
         customerType = $(this).value;
@@ -176,9 +175,9 @@ var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
 //Get Addresses
 function sveaGetAddress(e) {
     // Set vars
-    var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
-            type = customerType,
-            loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+    var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
+    var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+    var type = $$('input:checked[type=radio][name=payment[svea_invoice_customerType]]')[0].value;
 
     // Show Loader
     $("sveaInvoiceShowAddresses").update().insert(loader);

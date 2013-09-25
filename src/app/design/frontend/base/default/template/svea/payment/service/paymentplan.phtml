@@ -108,8 +108,8 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
 function sveaGetAddressPP(e) {
 
     // Set vars
-    var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
-        loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+    var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
+    var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
 
     // Show Loader
     $("sveaPaymentPlanShowAddresses").update().insert(loader);
