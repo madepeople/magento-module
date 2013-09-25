@@ -138,6 +138,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         foreach ($invoice->getAllItems() as $item) {
             $orderItem = $item->getOrderItem();
             //Do not include the Bundle as product. Only it's products.
+
             if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
                 continue;
             }
@@ -153,7 +154,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             // Set price amounts in regards to above
-            if (($parentItem = $item->getParentItem()) !== null) {
+            if (($parentItem = $orderItem->getParentItem()) !== null) {
                 $price = $parentItem->getPrice();
                 $priceInclTax = $parentItem->getPriceInclTax();
             } else {
@@ -267,7 +268,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                 continue;
             }
 
-            if (($parentItem = $item->getParentItem()) !== null) {
+            if (($parentItem = $orderItem->getParentItem()) !== null) {
                 $price = $parentItem->getPrice();
                 $priceInclTax = $parentItem->getPriceInclTax();
             } else {

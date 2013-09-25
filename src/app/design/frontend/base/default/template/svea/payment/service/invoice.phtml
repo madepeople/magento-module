@@ -119,7 +119,6 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 <script>
 
 //Change customer type
-
 var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
     $("payment_form_<?php echo $_code ?>_customerType_0").on("change", function(e) {
         customerType = $(this).value;
@@ -176,9 +175,9 @@ var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
 //Get Addresses
 function sveaGetAddress(e) {
     // Set vars
-    var ssn = $("payment_form_<?php echo $_code ?>_ssn").value,
-            type = customerType,
-            loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+    var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
+    var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+    var type = $$('input:checked[type=radio][name=payment[svea_invoice_customerType]]')[0].value;
 
     // Show Loader
     $("sveaInvoiceShowAddresses").update().insert(loader);
@@ -199,7 +198,7 @@ function sveaGetAddress(e) {
                 var selectBox = "<select id='<?php echo $_code ?>_addressSelector' name='payment[<?php echo $_code ?>_addressSelector]'>";
 
                 json.customerIdentity.each(function(item) {
-                    selectBox += "<option value='" + item.addressSelector + "'>" + item.firstName + " " + item.lastName + ", " + item.street + ", " + item.zipCode + " " + item.locality;
+                    selectBox += "<option value='" + item.addressSelector + "'>" + item.fullName + ", " + item.street + ", " + item.zipCode + " " + item.locality;
                     +"</option>";
                 });
 
@@ -207,8 +206,13 @@ function sveaGetAddress(e) {
 
                 $("sveaInvoiceShowAddresses").insert(selectBox);
             } else {
-                var adress = json.customerIdentity[0].firstName + " " +
-                        json.customerIdentity[0].lastName + "<br>" +
+                if(json.customerIdentity[0].fullName == null){
+                    var name =  json.customerIdentity[0].firstName + " " +
+                        json.customerIdentity[0].lastName + "<br>";
+                }else{
+                    var name = json.customerIdentity[0].fullName + "<br>";
+                }
+                var adress = name +
                         json.customerIdentity[0].street + "<br>" +
                         json.customerIdentity[0].zipCode + " " +
                         json.customerIdentity[0].locality;
