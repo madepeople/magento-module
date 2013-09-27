@@ -70,10 +70,15 @@ class Svea_WebPay_Model_Checkout_Observer
             $payment
                     ->setAdditionalInformation('svea_birthYear', $data[$method . '_birthYear']);
         }
-        if (isset($data[$method . '_customerType'])) {
-            $payment
-                    ->setAdditionalInformation('svea_customerType', $data[$method . '_customerType']);
+        if($method == "svea_paymentplan"){
+             $payment->setAdditionalInformation('svea_customerType', "0");
+        }  else {
+             if (isset($data[$method . '_customerType'])) {
+            $payment->setAdditionalInformation('svea_customerType', $data[$method . '_customerType']);
+            }
         }
+
+
         if (isset($data[$method . '_vatNo'])) {
             $payment
                     ->setAdditionalInformation('svea_vatNo', $data[$method . '_vatNo']);
