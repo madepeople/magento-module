@@ -31,7 +31,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         $svea = parent::getSveaPaymentObject($order, $additionalInfo);
         //Add more customer info
         $countryCode = $order->getBillingAddress()->getCountryId();
-        $company = isset($additionalInfo['svea_customerType']) ? $additionalInfo['svea_customerType'] : FALSE;
+        $company = $additionalInfo['svea_customerType'];
         $address = $order->getBillingAddress()->getStreetFull();
 
         //Seperates the street from the housenumber according to testcases
@@ -39,7 +39,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         preg_match($pattern, $address, $addressArray);
         if( !array_key_exists( 2, $addressArray ) ) { $addressArray[2] = ""; } //fix for addresses w/o housenumber
 
-        if ($company) {
+        if ($company == "1") {
             $item = Item::companyCustomer();
             $item = $item->setEmail($order->getBillingAddress()->getEmail())
                     ->setCompanyName($order->getBillingAddress()->getCompany())
