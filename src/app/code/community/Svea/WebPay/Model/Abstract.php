@@ -38,6 +38,19 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
     /**
      * Add values and rows to Svea CreateOrder object
      *
+     * Configurable products:
+     *  Calculate prices using the parent price, to take price variations into concern
+     *
+     * Simple products:
+     *  Just use their prices as is
+     *
+     * Bundle products:
+     *  Use the simple associated product prices, but we need to know that the
+     *  parent of the simple product is actually a bundle product
+     *
+     * Grouped products:
+     *  These are treated the same way as simple products
+     *
      * @param type $order
      * @param type $additionalInfo
      * @return type Svea CreateOrder object
@@ -51,26 +64,25 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         //Build the rows for request
         foreach ($order->getAllItems() as $item) {
 
-            //Do not include the Bundle as product. Only it's products.
-            if($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE){
-                continue;
-            }
-            if($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE){
-                continue;
-            }
-            if($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_GROUPED){
+            // Do not include the Bundle as product. Only it's products.
+            if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE
+                    || $item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;
             }
 
-            //Set price amounts in regards to above
-            if (($parentItem = $item->getParentItem()) !== null) {
-                $price = $parentItem->getPrice();
-                $priceInclTax = $parentItem->getPriceInclTax();
-            } else {
-                $price = $item->getPrice();
-                $priceInclTax = $item->getPriceInclTax();
-            }
+            // Default to the item price
+            $price = $item->getPrice();
+            $priceInclTax = $item->getPriceInclTax();
 
+            $parentItem = $item->getParentItem();
+            if ($parentItem) {
+                switch ($parentItem->getProductType()) {
+                    case Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE:
+                        $price = $parentItem->getPrice();
+                        $priceInclTax = $parentItem->getPriceInclTax();
+                        break;
+                }
+            }
 
             $orderRow = Item::orderRow()
                     ->setArticleNumber($item->getProductId())
