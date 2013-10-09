@@ -63,8 +63,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
 
         //Build the rows for request
         foreach ($order->getAllItems() as $item) {
-
-            // Do not include the Bundle as product. Only it's products.
             if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE
                     || $item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;

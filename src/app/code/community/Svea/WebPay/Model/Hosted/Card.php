@@ -28,9 +28,9 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
             $sveaObject = $sveaObject->usePayPageCardOnly()
                     ->setPayPageLanguage(Mage::helper('svea_webpay')->__('lang_code'));
         } else {
-            $sveaObject = $sveaObject->usePaymentMethod(PaymentMethod::KORTCERT);
+            $sveaObject = $sveaObject->usePaymentMethod(Svea\PaymentMethod::KORTCERT);
         }
-        
+
         $paymentFormPrep = $sveaObject->setReturnUrl(Mage::getUrl("svea_webpay/hosted/responseCard"))
                 ->setCancelUrl(Mage::getUrl("checkout/cart/"));
 
