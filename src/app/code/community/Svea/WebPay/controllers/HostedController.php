@@ -67,7 +67,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
     private function responseAction($request, $conf)
     {
         $sveaConf = new SveaMageConfigProvider($conf);
-        $response = new SveaResponse($request, "", $sveaConf);
+        $response = new Svea\SveaResponse($request, "", $sveaConf);
 
         $order = Mage::getModel('sales/order')
                 ->loadByIncrementId($response->response->clientOrderNumber);
