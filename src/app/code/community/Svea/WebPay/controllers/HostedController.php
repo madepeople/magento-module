@@ -1,7 +1,6 @@
 <?php
 
 require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Includes.php';
-
 class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
 {
 
@@ -67,7 +66,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
     private function responseAction($request, $conf)
     {
         $sveaConf = new SveaMageConfigProvider($conf);
-        $response = new Svea\SveaResponse($request, "", $sveaConf);
+        $response = new SveaResponse($request, "", $sveaConf);
 
         $order = Mage::getModel('sales/order')
                 ->loadByIncrementId($response->response->clientOrderNumber);
