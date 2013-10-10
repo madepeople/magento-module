@@ -9,6 +9,7 @@
  * @copyright (c) 2013, SveaWebPay (Svea Ekonomi AB)
  *
  */
+require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Includes.php';
 class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
 {
     protected $_code = 'svea_cardpayment';
@@ -28,7 +29,7 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
             $sveaObject = $sveaObject->usePayPageCardOnly()
                     ->setPayPageLanguage(Mage::helper('svea_webpay')->__('lang_code'));
         } else {
-            $sveaObject = $sveaObject->usePaymentMethod(Svea\PaymentMethod::KORTCERT);
+            $sveaObject = $sveaObject->usePaymentMethod(PaymentMethod::KORTCERT);
         }
 
         $paymentFormPrep = $sveaObject->setReturnUrl(Mage::getUrl("svea_webpay/hosted/responseCard"))
