@@ -5,12 +5,31 @@
             <version>4.1.0</version>
         </Svea_WebPay>
     </modules>
+    <frontend>
+        <secure_url>
+            <svea_webpay>/svea_webpay</svea_webpay>
+        </secure_url>
+        <routers>
+            <svea_webpay>
+                <use>standard</use>
+                <args>
+                    <module>Svea_WebPay</module>
+                    <frontName>svea_webpay</frontName>
+                </args>
+            </svea_webpay>
+        </routers>
+    </frontend>
     <global>
         <models>
             <svea_webpay>
                 <class>Svea_WebPay_Model</class>
             </svea_webpay>
         </models>
+        <blocks>
+            <svea_webpay>
+                <class>Svea_WebPay_Block</class>
+            </svea_webpay>
+        </blocks>
     </global>
     <default>
         <payment>

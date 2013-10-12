@@ -17,6 +17,25 @@ class Svea_WebPay_Model_Payment_Service_Invoice extends Svea_WebPay_Model_Paymen
     protected $_canManageRecurringProfiles = false;
 
     protected $_code = 'svea_invoice';
+    protected $_formBlockType = 'svea_webpay/payment_service_invoice';
 
+    public function authorize(Varien_Object $payment, $amount)
+    {
+        return parent::authorize($payment, $amount);
+    }
 
+    public function capture(Varien_Object $payment, $amount)
+    {
+        return parent::capture($payment, $amount);
+    }
+
+    public function refund(Varien_Object $payment, $amount)
+    {
+        return parent::refund($payment, $amount);
+    }
+
+    public function void(Varien_Object $payment)
+    {
+        return parent::void($payment);
+    }
 }
