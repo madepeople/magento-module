@@ -16,6 +16,49 @@ abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstr
     protected $_isGateway = true;
 
     /**
+     * There is a chance that Magento rounds prices differently from the
+     * integration package, resulting in the small difference in the final
+     * total amount. We handle this right now by simply adding an extra row
+     * for the difference, throwing an exception if it exceeds 1000 (, in which case
+     * we probably need to add a special case for a 3rd party module.
+     *
+     * @param type $order
+     * @param type $additionalInfo
+     */
+    public function getSveaPaymentObject($order, $additionalInfo = null)
+    {
+        $svea = parent::getSveaPaymentObject($order, $additionalInfo);
+
+        $grandTotal = $order->getGrandTotal();
+        $formatter = new Svea\HostedRowFormatter();
+        $rows = $formatter->formatRows($svea);
+        $sveaGrandTotal = $formatter->formatTotalAmount($rows);
+
+        $diff = ((int)bcmul($grandTotal, 100))-$sveaGrandTotal;
+        if ($diff) {
+            if (abs($diff) > 1000) {
+                Mage::throwException('The difference between the amount calculated at Svea WebPay and Magento exceeds 10. This must be a bug, please contact support');
+            }
+
+            $diff = $diff/100;
+
+            $differenceRow = Item::orderRow()
+                    ->setArticleNumber('magento_difference')
+                    ->setQuantity(1)
+                    ->setName('Magento <-> Svea rounding difference')
+                    ->setDescription('A workaround for the possible rounding difference due to tax calculation')
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setAmountExVat((float)$diff)
+                    ->setVatPercent(1) // Bogus placeholder
+                    ;
+
+            $svea->addOrderRow($differenceRow);
+        }
+
+        return $svea;
+    }
+
+    /**
      * Attempt to accept a payment that is under review
      *
      * @param Mage_Payment_Model_Info $payment
@@ -36,7 +79,7 @@ abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstr
     {
         return Mage::getUrl($this->_sveaUrl);
     }
-    
+
     abstract protected function _choosePayment($sveaObject, $addressSelector = NULL);
 
     /**

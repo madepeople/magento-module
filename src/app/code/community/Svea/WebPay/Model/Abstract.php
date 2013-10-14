@@ -88,16 +88,16 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
 
             $orderRow = Item::orderRow()
                     ->setArticleNumber($item->getProductId())
-                    ->setQuantity(get_class($item) == 'Mage_Sales_Model_Quote_Item' ? $item->getQty() : $item->getQtyOrdered())
+                    ->setQuantity(get_class($item) == 'Mage_Sales_Model_Quote_Item' ? (int)$item->getQty() : (int)$item->getQtyOrdered())
                     ->setName($item->getName())
                     ->setDescription($item->getShortDescription())
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setVatPercent((int)$taxPercent);
 
             if (Mage::getStoreConfig('tax/calculation/price_includes_tax', $storeId)) {
-                $orderRow->setAmountIncVat($priceInclTax);
+                $orderRow->setAmountIncVat((float)$priceInclTax);
             } else {
-                $orderRow->setAmountExVat($price);
+                $orderRow->setAmountExVat((float)$price);
             }
 
             $svea->addOrderRow($orderRow);
@@ -118,7 +118,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName($order->getShippingMethod())
                     ->setDescription($order->getShippingDescription())
-                    ->setAmountExVat($order->getShippingAmount());
+                    ->setAmountExVat((float)$order->getShippingAmount());
 
             $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
             $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
