@@ -21,7 +21,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      */
     protected function _validateAmount($svea, $amount)
     {
-        $diff = Mage::helper('svea_webpay')->getAmountDifference($svea, $amount);
+        $diff = $this->getAmountDifference($svea, $amount);
         if ($diff) {
             throw new Mage_Payment_Exception('The by Svea calculated grand total differs from Magento by ' . ($diff/100) . '. This is most likely caused by a bug or misconfiguration.');
         }
@@ -182,5 +182,21 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                 ->setCurrency($order->getOrderCurrencyCode());
 
         return $svea;
+    }
+
+    public function getAmountDifference($svea, $amount)
+    {
+        if ($this instanceof Svea_WebPay_Model_Payment_Service_Abstract) {
+            // @TODO - Implement something that can handle these kinds of
+            // differences, it's not entirely super epic that the two different
+            // row formatters have completely different interfaces
+            return 0; // Assume no difference, lol
+        } else {
+            $formatter = new Svea\HostedRowFormatter();
+            $rows = $formatter->formatRows($svea);
+            $sveaGrandTotal = $formatter->formatTotalAmount($rows);
+        }
+
+        return ((int)bcmul($amount, 100))-$sveaGrandTotal;
     }
 }

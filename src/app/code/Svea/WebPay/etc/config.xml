@@ -35,6 +35,22 @@
                 <class>Svea_WebPay_Helper</class>
             </svea_webpay>
         </helpers>
+        <fieldsets>
+            <sales_convert_quote_payment>
+                <svea_invoice>
+                    <to_order_payment>*</to_order_payment>
+                </svea_invoice>
+                <svea_paymentplan>
+                    <to_order_payment>*</to_order_payment>
+                </svea_paymentplan>
+                <svea_hosted_card>
+                    <to_order_payment>*</to_order_payment>
+                </svea_hosted_card>
+                <svea_hosted_direct>
+                    <to_order_payment>*</to_order_payment>
+                </svea_hosted_direct>
+            </sales_convert_quote_payment>
+        </fieldsets>
     </global>
     <default>
         <payment>

@@ -3,7 +3,8 @@
 /**
  * @author jonathan@madepeople.se
  */
-class Svea_WebPay_Model_Payment_Service_Invoice extends Svea_WebPay_Model_Payment_Abstract
+class Svea_WebPay_Model_Payment_Service_Invoice
+    extends Svea_WebPay_Model_Payment_Service_Abstract
 {
     protected $_canAuthorize = true;
     protected $_canCapture = true;
@@ -22,11 +23,11 @@ class Svea_WebPay_Model_Payment_Service_Invoice extends Svea_WebPay_Model_Paymen
     public function authorize(Varien_Object $payment, $amount)
     {
         $svea = $this->_initializeSveaOrder($payment->getOrder());
-        $svea->useInvoicePayment();
+        $request = $svea->useInvoicePayment();
 
         $this->_validateAmount($svea, $amount);
 
-        $response = $svea->doRequest();
+        $response = $request->doRequest();
         if ($response->accepted == 1) {
             $rawDetails = array();
             foreach ($response as $key => $val) {
