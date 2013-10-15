@@ -1,5 +1,5 @@
 src/app/code/Svea/*                                     app/code/community/Svea/
-src/lib/*                                               lib/
+src/lib/*                                               lib/Svea/
 src/js/*                                                js/
 src/app/design/frontend/template/*                      app/design/frontend/base/default/template/
 src/app/etc/modules/*                                   app/etc/modules/

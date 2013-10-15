@@ -7,7 +7,43 @@ abstract class Svea_WebPay_Block_Payment_Abstract
     extends Mage_Payment_Block_Form
 {
     /**
+     * It's always a good idea to have the customer type in templates
+     *
+     * @return string
+     */
+    public function getCustomerType()
+    {
+        $method = $this->getMethod();
+        $paymentInfo = $method->getInfoInstance();
+
+        $company = ($paymentInfo instanceof Mage_Sales_Model_Order_Payment)
+                ? trim($paymentInfo->getOrder()->getBillingAddress()->getCompany())
+                : trim($paymentInfo->getQuote()->getBillingAddress()->getCompany());
+
+        return (empty($company))
+                ? Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL
+                : Svea_WebPay_Helper_Data::TYPE_COMPANY;
+    }
+
+    /**
+     * We need the country in templates to make decisions about addresses and
+     * stuff
+     *
+     * @return string
+     */
+    public function getCountry()
+    {
+        $method = $this->getMethod();
+        $paymentInfo = $method->getInfoInstance();
+
+        return ($paymentInfo instanceof Mage_Sales_Model_Order_Payment)
+                ? $paymentInfo->getOrder()->getBillingAddress()->getCountryId()
+                : $paymentInfo->getQuote()->getBillingAddress()->getCountryId();
+    }
+
+    /**
      * Loads the svea.js file and instantiates the svea payment object
+     *
      * @return string
      */
     protected function _toHtml()

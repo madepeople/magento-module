@@ -11,6 +11,7 @@ var Svea = Class.create({
     config: {
         baseUrl: null,
     },
+    _requestRunning: false,
 
     initialize: function (config)
     {
@@ -39,26 +40,40 @@ var Svea = Class.create({
          */
         function updateBillingAddressForm(obj)
         {
-            alert('Implement me');
+            var billingAddress = obj['_billing_address'], element;
+            for (var key in billingAddress) {
+                $$('[name=billing[' + key + ']]').each(function (element) {
+                    element.value = billingAddress[key];
+                    element.setValue(billingAddress[key]);
+                });
+            }
+        }
+
+        if (this._requestRunning) {
+            return;
         }
 
         var url = this.config.baseUrl + 'svea_webpay/utility/getaddress';
         var data = {
-            'ssn': $F('payment_' + method + '_ssn')
+            'ssn': $F('payment_' + method + '_ssn'),
+            'customer_type': $$("input:checked[type=radio][name*='customer_type']")[0].value,
+            'country': $F('payment_' + method + '_country'),
+            'method': method.replace(/svea_/, '')
         };
 
+        this._requestRunning = true;
         new Ajax.Request(url, {
             parameters: data,
-            onComplete: function (transport) {
+            onComplete: (function (transport) {
+                this._requestRunning = false;
                 var obj = transport.responseJSON;
-                if (obj.error) {
+                if (obj.errormessage && obj.errormessage.length) {
                     // TODO: Error handling
-                    alert(obj.error);
+                    alert(obj.errormessage);
                     return;
                 }
-
                 updateBillingAddressForm(obj);
-            }
+            }).bind(this)
         });
     }
 });

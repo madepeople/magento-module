@@ -30,6 +30,11 @@
                 <class>Svea_WebPay_Block</class>
             </svea_webpay>
         </blocks>
+        <helpers>
+            <svea_webpay>
+                <class>Svea_WebPay_Helper</class>
+            </svea_webpay>
+        </helpers>
     </global>
     <default>
         <payment>
