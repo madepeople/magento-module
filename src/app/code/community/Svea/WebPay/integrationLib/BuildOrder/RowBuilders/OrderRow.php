@@ -21,7 +21,7 @@ class OrderRow {
     /**
      * Optional
      * @param string $articleNumberAsString
-     * @return \OrderRow
+     * @return Svea\OrderRow
      */
     public function setArticleNumber($articleNumberAsString) {
         $this->articleNumber = $articleNumberAsString;
@@ -31,7 +31,7 @@ class OrderRow {
     /**
      * Required
      * @param int $quantityAsInt
-     * @return \OrderRow
+     * @return Svea\OrderRow
      */
     public function setQuantity($quantityAsInt) {
         $this->quantity = $quantityAsInt;
@@ -41,7 +41,7 @@ class OrderRow {
     /**
      * Optional
      * @param string $unitAsString
-     * @return \OrderRow
+     * @return Svea\OrderRow
      */
     public function setUnit($unitAsString) {
         $this->unit = $unitAsString;
@@ -49,9 +49,11 @@ class OrderRow {
     }
 
     /**
-     * Optional
+     * Precisely two of these values must be set in the WebPayItem object:  AmountExVat, AmountIncVat or VatPercent for Orderrow. 
+     * Use functions setAmountExVat(), setAmountIncVat() or setVatPercent().
+     * 
      * @param float $AmountAsFloat
-     * @return \OrderRow
+     * @return Svea\OrderRow
      */
     public function setAmountExVat($AmountAsFloat) {
         $this->amountExVat = $AmountAsFloat;
@@ -59,9 +61,11 @@ class OrderRow {
     }
     
     /**
-     * Optional
+     * Precisely two of these values must be set in the WebPayItem object:  AmountExVat, AmountIncVat or VatPercent for Orderrow. 
+     * Use functions setAmountExVat(), setAmountIncVat() or setVatPercent().
+     * 
      * @param float $AmountAsFloat
-     * @return \OrderRow
+     * @return Svea\OrderRow
      */
     public function setAmountIncVat($AmountAsFloat) {
         $this->amountIncVat = $AmountAsFloat;
@@ -71,7 +75,7 @@ class OrderRow {
     /**
      * Optional
      * @param string $nameAsString
-     * @return \OrderRow
+     * @return Svea\OrderRow
      */
     public function setName($nameAsString) {
         $this->name = $nameAsString;
@@ -81,7 +85,7 @@ class OrderRow {
     /**
      * Optional
      * @param string $descriptionAsString
-     * @return \OrderRow
+     * @return Svea\OrderRow
      */
     public function setDescription($descriptionAsString) {
         $this->description = $descriptionAsString;
@@ -89,19 +93,21 @@ class OrderRow {
     }
 
     /**
-     * Optional
-     * @param int $percentAsInt
-     * @return \OrderRow
+     * Precisely two of these values must be set in the WebPayItem object:  AmountExVat, AmountIncVat or VatPercent for Orderrow. 
+     * Use functions setAmountExVat(), setAmountIncVat() or setVatPercent().
+     * 
+     * @param int $vatPercentAsInt
+     * @return Svea\OrderRow
      */
-    public function setVatPercent($percentAsInt) {
-        $this->vatPercent = $percentAsInt;
+    public function setVatPercent($vatPercentAsInt) {
+        $this->vatPercent = $vatPercentAsInt;
         return $this;
     }
 
     /**
      * Optional
      * @param int $discountPercentAsInteger
-     * @return \OrderRow
+     * @return Svea\OrderRow
      */
     public function setDiscountPercent($discountPercentAsInteger) {
         $this->discountPercent = $discountPercentAsInteger;
