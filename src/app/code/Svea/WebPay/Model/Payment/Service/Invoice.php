@@ -20,22 +20,35 @@ class Svea_WebPay_Model_Payment_Service_Invoice
     protected $_code = 'svea_invoice';
     protected $_formBlockType = 'svea_webpay/payment_service_invoice';
 
+    protected function _sveaResponseToArray($response)
+    {
+        $result = array();
+        foreach ($response as $key => $val) {
+            if (!is_string($key) || is_object($val)) {
+                continue;
+            }
+            $result[$key] = $val;
+        }
+        return $result;
+    }
+
     public function authorize(Varien_Object $payment, $amount)
     {
-        $svea = $this->_initializeSveaOrder($payment->getOrder());
-        $request = $svea->useInvoicePayment();
+        $sveaConfig = $this->_getSveaConfig();
+        $svea = WebPay::createOrder($sveaConfig);
+        $order = $payment->getOrder();
 
+        $this->_initializeSveaOrder($svea, $order);
+        $this->_addItems($svea, $order);
+        $this->_addTotals($svea, $order);
+//        $this->_addPaymentFee($svea, $order);
         $this->_validateAmount($svea, $amount);
 
+        $request = $svea->useInvoicePayment();
         $response = $request->doRequest();
+
         if ($response->accepted == 1) {
-            $rawDetails = array();
-            foreach ($response as $key => $val) {
-                if (!is_string($key) || is_object($val)) {
-                    continue;
-                }
-                $rawDetails[$key] = $val;
-            }
+            $rawDetails = $this->_sveaResponseToArray($response);
             $payment->setTransactionId($response->sveaOrderId)
                     ->setIsTransactionClosed(false)
                     ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
@@ -52,8 +65,43 @@ class Svea_WebPay_Model_Payment_Service_Invoice
 
     public function capture(Varien_Object $payment, $amount)
     {
-        throw new Exception('implement me');
-        return parent::capture($payment, $amount);
+        $sveaOrderId = $payment->getParentTransactionId();
+        if (empty($sveaOrderId)) {
+            Mage::throwException('Missing Svea invoice id, cannot capture');
+        }
+
+        $order = $payment->getOrder();
+        $invoice = $order->getCurrentInvoice();
+
+        $sveaConfig = $this->_getSveaConfig();
+        $svea = WebPay::deliverOrder($sveaConfig);
+
+        $this->_initializeSveaOrder($svea, $invoice);
+        $this->_addItems($svea, $invoice);
+        $this->_addTotals($svea, $invoice);
+//        $this->_addPaymentFee($svea, $order);
+        $this->_validateAmount($svea, $amount);
+
+        $svea->setInvoiceDistributionType($this->getConfigData('distribution_type'));
+        $svea->setOrderId($sveaOrderId);
+        Mage::throwException('$errorTranslated');
+        $response = $svea->deliverInvoiceOrder()
+                ->doRequest();
+
+        if ($response->accepted == 1) {
+            $rawDetails = $this->_sveaResponseToArray($response);
+            $payment->setTransactionId($response->invoiceId)
+                    ->setIsTransactionClosed(false)
+                    ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
+        } else {
+            $errorTranslated = Mage::helper('svea_webpay')->getErrorMessage(
+                    $response->resultcode,
+                    $response->errormessage);
+
+            Mage::throwException($errorTranslated);
+        }
+
+        return $this;
     }
 
     public function refund(Varien_Object $payment, $amount)

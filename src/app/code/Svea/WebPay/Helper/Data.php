@@ -42,4 +42,23 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
         return $country;
     }
+
+    /**
+     * Construct a translated error message from locale definitions
+     *
+     * @param int $code
+     * @param string $message
+     * @return string
+     */
+    public function getErrorMessage($code, $message)
+    {
+        $errorMessage = $this->__('Error_' . $code, $code);
+
+        if (preg_match('/^Error/', $errorMessage)) {
+            $errorMessage = $this->__('Error_error', $code . ' : ' . $message);
+        }
+
+        return $errorMessage;
+    }
+
 }

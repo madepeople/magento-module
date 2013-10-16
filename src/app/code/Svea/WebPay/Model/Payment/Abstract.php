@@ -44,19 +44,30 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      * Grouped products:
      *  These are treated the same way as simple products
      *
+     * @param Svea\CreateOrder $svea
+     * @param object $object  An order, Invoice, Creditmemo, etc
      * @return Svea\CreateOrder
      */
-    protected function _initializeSveaOrder($order)
+    protected function _addItems($svea, $object)
     {
-        $sveaConfig = $this->_getSveaConfig();
-        $svea = WebPay::createOrder($sveaConfig);
-        $storeId = $order->getStoreId();
+        $storeId = $object->getStoreId();
 
-        foreach ($order->getAllItems() as $item) {
+        foreach ($object->getAllItems() as $item) {
             // Do not include the Bundle as product. Only its products.
             if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE
                     || $item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;
+            }
+
+            switch (get_class($item)) {
+                case 'Mage_Sales_Model_Order_Item':
+                    $qty = $item->getQtyOrdered();
+                    break;
+                default:
+                    $qty = $item->getQty();
+                    // We only need the qty from the child item
+                    $item = $item->getOrderItem();
+                    break;
             }
 
             // Default to the current item price
@@ -75,10 +86,6 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                 }
             }
 
-            $qty = get_class($item) === 'Mage_Sales_Model_Quote_Item'
-                    ? $item->getQty()
-                    : $item->getQtyOrdered();
-
             $row = Item::orderRow();
             $row->setArticleNumber($item->getProductId())
                     ->setQuantity((int)$qty)
@@ -96,26 +103,20 @@ abstract class Svea_WebPay_Model_Payment_Abstract
             $svea->addOrderRow($row);
         }
 
-        // We send tax percentages to Svea because it seems the most reliable
-        // way of handling amounts
-        $store = Mage::app()->getStore($storeId);
-        $taxCalculationModel = Mage::getSingleton('tax/calculation');
-        $request = $taxCalculationModel->getRateRequest(
-                $order->getShippingAddress(),
-                $order->getBillingAddress(),
-                null,
-                $store);
+        return $this;
+    }
 
-        // Shipping, giftcards and discounts needs to be separate rows, use the
-        // quote totals to determine what to print and exclude values that
-        // are already included from other places
-        $quoteId = $order->getQuoteId();
+    protected function _addTotalsFromQuote($svea, $object)
+    {
+        $quoteId = $object->getQuoteId();
         $quote = Mage::getModel('sales/quote')->load($quoteId);
         $quote->collectTotals();
 
-        $totalsToExclude = array('grand_total', 'subtotal', 'tax', 'klarna_tax');
+        $totals = $quote->getTotals();
+        $totalsToExclude = array('grand_total', 'subtotal', 'tax',
+            'klarna_tax', 'svea_invoice_fee');
 
-        foreach ($quote->getTotals() as $code => $total) {
+        foreach ($totals as $code => $total) {
             if (in_array($code, $totalsToExclude)) {
                 continue;
             }
@@ -127,7 +128,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                     $discountRow = Item::fixedDiscount()
                             ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                             ->setName($total->getTitle())
-                            ->setAmountIncVat(abs($order->getDiscountAmount()));
+                            ->setAmountIncVat(abs($object->getDiscountAmount()));
 
                     $svea->addDiscount($discountRow);
                     break;
@@ -135,37 +136,9 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                     // We have to somehow make sure that we use the correctly
                     // calculated value, we can't rely on the shipping tax
                     // being part of the quote totals
-                    $shippingFee = Item::shippingFee()
-                            ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                            ->setName($order->getShippingMethod())
-                            ->setDescription($order->getShippingDescription())
-                            ->setAmountExVat((float)$order->getShippingAmount());
-
-                    $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
-                    $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
-                    if (empty($rate)) {
-                        throw new Mage_Payment_Exception('The shipping fee needs a tax rate for Svea Invoice to work.');
-                    }
-                    $shippingFee->setVatPercent((int)$rate);
-
-                    $svea->addFee($shippingFee);
                     break;
-//                case 'svea_invoice_fee':
-//                    // The payment fee should be fetched from the totals, not
-//                    // additional_information
-//                    $paymentFee = $order->getPayment()->getAdditionalInformation('svea_payment_fee');
-//                    $paymentFeeTaxAmount = $order->getPayment()->getAdditionalInformation('svea_payment_fee_tax_amount');
-//
-//                    $invoiceFeeRow = Item::invoiceFee()
-//                            ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-//                            ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-//                            ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
-//                            ->setAmountIncVat($paymentFee);
-//
-//                    $svea->addFee($invoiceFeeRow);
-//                    break;
                 default:
-                    Mage::log($total->getCode() . ' is currently not handled');
+                    Mage::log($total->getCode() . ' is currently not handled in Svea _addTotals()');
                     Mage::dispatchEvent('svea_initialize_total_row', array(
                         'svea' => $svea,
                         'total' => $svea
@@ -174,14 +147,89 @@ abstract class Svea_WebPay_Model_Payment_Abstract
             }
         }
 
-        $createdAt = date('Y-m-d', strtotime($order->getCreatedAt()));
-        $data = $this->getInfoInstance()->getData($this->getCode());
-        $svea->setCountryCode($data['country'])
-                ->setClientOrderNumber($order->getIncrementId())
-                ->setOrderDate($createdAt)
-                ->setCurrency($order->getOrderCurrencyCode());
+        return $this;
+    }
 
-        return $svea;
+    protected function _addShippingRow($svea, $object)
+    {
+        // We send tax percentages to Svea because it seems the most reliable
+        // way of handling amounts
+        $storeId = $object->getStoreId();
+        $store = Mage::app()->getStore($storeId);
+        $taxCalculationModel = Mage::getSingleton('tax/calculation');
+        $request = $taxCalculationModel->getRateRequest(
+                $object->getShippingAddress(),
+                $object->getBillingAddress(),
+                null,
+                $store);
+
+        $shippingFee = Item::shippingFee()
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setName($object->getShippingMethod())
+                ->setDescription($object->getShippingDescription())
+                ->setAmountExVat((float)$object->getShippingAmount());
+
+        $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
+        $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
+        if (empty($rate)) {
+            throw new Mage_Payment_Exception('The shipping fee needs a tax rate for Svea Invoice to work.');
+        }
+        $shippingFee->setVatPercent((int)$rate);
+
+        $svea->addFee($shippingFee);
+    }
+
+    /**
+     */
+    protected function _addTotals($svea, $object)
+    {
+        $rootNode = Mage::getConfig()->getNode('global/svea/totals');
+        foreach ($rootNode->children() as $node) {
+            $node = (string)$node;
+            list($model, $method) = explode('::', $node);
+            if ($model === 'self') {
+                $this->$method($object);
+            } else {
+                Mage::getModel($model)->$method($object);
+            }
+        }
+
+        Mage::dispatchEvent('svea_initialize_total_rows', array(
+            'svea' => $svea,
+            'object' => $object
+        ));
+
+        return $this;
+    }
+
+    protected function _initializeSveaOrder($svea, $object)
+    {
+        $data = $this->getInfoInstance()->getData($this->getCode());
+        $svea->setCountryCode($data['country']);
+
+        return $this;
+    }
+
+    protected function _addPaymentFee($svea, $object)
+    {
+        if (!($object instanceof Mage_Sales_Model_Order)) {
+            $object = $object->getOrder();
+        }
+
+        // The payment fee should be fetched from the totals, not
+        // additional_information
+        $paymentFee = $object->getPayment()->getAdditionalInformation('svea_payment_fee');
+        $paymentFeeTaxAmount = $object->getPayment()->getAdditionalInformation('svea_payment_fee_tax_amount');
+
+        $invoiceFeeRow = Item::invoiceFee()
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
+                ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
+                ->setAmountIncVat($paymentFee);
+
+        $svea->addFee($invoiceFeeRow);
+
+        return $this;
     }
 
     public function getAmountDifference($svea, $amount)

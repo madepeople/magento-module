@@ -6,14 +6,23 @@
 abstract class Svea_WebPay_Model_Payment_Service_Abstract
     extends Svea_WebPay_Model_Payment_Abstract
 {
-    protected function _initializeSveaOrder($order)
+    protected function _initializeSveaOrder($svea, $order)
     {
-        $svea = parent::_initializeSveaOrder($order);
+        parent::_initializeSveaOrder($svea, $order);
+        if (!($svea instanceof Svea\CreateOrderBuilder)) {
+            return $this;
+        }
+
+        $createdAt = date('Y-m-d', strtotime($order->getCreatedAt()));
         $data = $this->getInfoInstance()->getData($this->getCode());
         $countryCode = $data['country'];
         $customerType = $data['customer_type'];
         $address = $order->getBillingAddress();
         $street = $address->getStreetFull();
+        $svea->setClientOrderNumber($order->getIncrementId())
+                ->setOrderDate($createdAt)
+                ->setCurrency($order->getOrderCurrencyCode());
+
 
         // Jesus christ, please, what, how, can we remove this stuff below?
         //

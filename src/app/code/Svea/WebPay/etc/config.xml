@@ -18,7 +18,27 @@
                 </args>
             </svea_webpay>
         </routers>
+        <translate>
+            <modules>
+                <Svea_WebPay>
+                    <files>
+                        <default>Svea_WebPay.csv</default>
+                    </files>
+                </Svea_WebPay>
+            </modules>
+        </translate>
     </frontend>
+    <adminhtml>
+        <translate>
+            <modules>
+                <Svea_WebPay>
+                    <files>
+                        <default>Svea_WebPay.csv</default>
+                    </files>
+                </Svea_WebPay>
+            </modules>
+        </translate>
+    </adminhtml>
     <global>
         <models>
             <svea_webpay>
@@ -35,6 +55,17 @@
                 <class>Svea_WebPay_Helper</class>
             </svea_webpay>
         </helpers>
+        <events>
+            <sales_order_payment_capture>
+                <observers>
+                    <set_current_invoice_on_order>
+                        <type>singleton</type>
+                        <class>svea_webpay/observer</class>
+                        <method>setCurrentInvoiceOnOrder</method>
+                    </set_current_invoice_on_order>
+                </observers>
+            </sales_order_payment_capture>
+        </events>
         <fieldsets>
             <sales_convert_quote_payment>
                 <svea_invoice>
@@ -51,6 +82,11 @@
                 </svea_hosted_direct>
             </sales_convert_quote_payment>
         </fieldsets>
+        <svea>
+            <totals>
+                <shipping_amount>self::_addShippingRow</shipping_amount>
+            </totals>
+        </svea>
     </global>
     <default>
         <payment>
@@ -60,6 +96,7 @@
                 <title>Svea Invoice</title>
                 <test>1</test>
                 <payment_action>authorize</payment_action>
+                <distribution_type>EMAIL</distribution_type>
             </svea_invoice>
         </payment>
     </default>
