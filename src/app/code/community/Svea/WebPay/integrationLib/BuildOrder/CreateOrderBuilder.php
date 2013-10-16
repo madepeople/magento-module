@@ -6,21 +6,21 @@ require_once SVEA_REQUEST_DIR . '/Includes.php';
 /**
  * Continue OrderBuilder by using Create Order functions.
  * End by choosing paymenttype.
- * @author Anneli Halld'n, Daniel Brolund for Svea Webpay
+ * @author Anneli Halld'n, Daniel Brolund, Kristian Grossman-Madsen for Svea Webpay
  * @package BuildOrder/CreateOrder
 */
 class CreateOrderBuilder {
 
     /**
-     * @var Array Rows containing Product rows
+     * @var array<OrderRow> Array Rows containing Product rows
      */
     public $orderRows = array();
     /**
-     * @var Array ShippingFeeRows containing shippingFee rows
+     * @var array<ShippingFee> Array ShippingFeeRows containing shippingFee rows
      */
     public $shippingFeeRows = array();
     /**
-     * @var  Array InvoiceFeeRows containing invoiceFee rows
+     * @var array<InvoiceFee> Array InvoiceFeeRows containing invoiceFee rows
      */
     public $invoiceFeeRows = array();
     /**
@@ -28,11 +28,11 @@ class CreateOrderBuilder {
      */
     public $testmode = false;
     /**
-     * @var type Array of FixedDiscountRows from class FixedDiscountBuilder
+     * @var array<FixedDiscount> Array of FixedDiscountRows from class FixedDiscount
      */
     public $fixedDiscountRows = array();
     /**
-     * @var type Array of RelativeDiscountRows from class RelativeDiscountBuilder
+     * @var array<RelativeDiscount> Array of RelativeDiscountRows from class RelativeDiscountBuilder
      */
     public $relativeDiscountRows = array();
     /**
@@ -51,15 +51,19 @@ class CreateOrderBuilder {
      * @var type String.
      */
     public $countryCode;
+
     /**
-     * @var type Date time
+     * ISO 8601 date, as produced by php date('c'): 2004-02-12T15:19:21+00:00, also accepts date in format "2004-02-12"
+     * @var string time, ISO 8601 date
      */
     public $orderDate;
+
     /**
      * Ex: "SEK", "EUR"
      * @var type String
      */
     public $currency;
+
     /**
      * @var Your customer Reference number
      */
@@ -68,6 +72,7 @@ class CreateOrderBuilder {
     /**
      * @var Instance of class SveaConfig
      */
+
     public $conf;
     /**
      *
@@ -101,8 +106,7 @@ class CreateOrderBuilder {
     }
     
     /**
-     * New!
-     * @param type $orderRow
+     * @param OrderRow $orderRow
      * @return \CreateOrderBuilder
      */
     public function addOrderRow($itemOrderRowObject) {
@@ -117,7 +121,6 @@ class CreateOrderBuilder {
     }
 
     /**
-     * New!
      * @param type $itemFeeObject
      * @return \CreateOrderBuilder
      */
@@ -126,14 +129,16 @@ class CreateOrderBuilder {
             foreach ($itemFeeObject as $row) {
                 if (get_class($row) == "Svea\ShippingFee") {
                      array_push($this->shippingFeeRows, $row);
-                } else {
+                } 
+                if (get_class($row) == "Svea\InvoiceFee") {
                      array_push($this->invoiceFeeRows, $row);
                 }
             }
         } else {
              if (get_class($itemFeeObject) == "Svea\ShippingFee") {
                      array_push($this->shippingFeeRows, $itemFeeObject);
-            } else {
+            }
+             if (get_class($itemFeeObject) == "Svea\InvoiceFee") {
                  array_push($this->invoiceFeeRows, $itemFeeObject);
             }
         }
@@ -142,7 +147,6 @@ class CreateOrderBuilder {
     }
     
     /**
-     * New!
      * @param type $itemDiscounObject
      * @return \CreateOrderBuilder
      */
@@ -151,15 +155,18 @@ class CreateOrderBuilder {
             foreach ($itemDiscounObject as $row) {
                 if (get_class($row) == "Svea\FixedDiscount") {
                     array_push($this->fixedDiscountRows, $row);
-                } else {
+                } 
+                if (get_class($row) == "Svea\RelativeDiscount") {
                     array_push($this->relativeDiscountRows, $row);
                 }
 
             }
-        } else {
+        } 
+        else {
             if (get_class($itemDiscounObject) == "Svea\FixedDiscount") {
                 array_push($this->fixedDiscountRows, $itemDiscounObject);
-            } else {
+            }
+            if (get_class($itemDiscounObject) == "Svea\RelativeDiscount") {
                 array_push($this->relativeDiscountRows, $itemDiscounObject);
             }
        }
@@ -181,8 +188,7 @@ class CreateOrderBuilder {
      * @return \createOrder
      */
     public function setCurrency($currencyAsString) {
-        $currency = trim($currencyAsString);
-        $currency = strtoupper($currency);
+        $currency = strtoupper( trim($currencyAsString) );
         $this->currency = $currency;
         return $this;
     }

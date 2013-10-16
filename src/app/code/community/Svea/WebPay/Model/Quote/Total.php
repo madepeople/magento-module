@@ -62,16 +62,19 @@ class Svea_WebPay_Model_Quote_Total
                 if ($taxClassId > 0) {
                     $handlingFee = $handlinFeeInclVat;
 
-                    $address->setTaxAmount($address->getTaxAmount() + $handlingFeeTaxAmount);
-                    $address->setBaseTaxAmount($address->getBaseTaxAmount() + $handlingFeeTaxAmount);
+                    $address->setExtraTaxAmount($address->getExtraTaxAmount() + $handlingFeeTaxAmount);
+                    $address->setBaseExtraTaxAmount($address->getBaseExtraTaxAmount() + $handlingFeeTaxAmount);
+//                    $address->setTaxAmount($address->getTaxAmount() + $handlingFeeTaxAmount);
+//                    $address->setBaseTaxAmount($address->getBaseTaxAmount() + $handlingFeeTaxAmount);
                 } else {
                     $handlingFee = $handlinFeeExclVat;
                 }
 
-                $address->setBaseGrandTotal($address->getBaseGrandTotal() + $handlingFee);
-                $address->setGrandTotal($address->getGrandTotal() + $handlingFee);
+                $address->setBaseGrandTotal($address->getBaseGrandTotal() + $handlinFeeExclVat);
+                $address->setGrandTotal($address->getGrandTotal() + $handlinFeeExclVat);
 
                 $address->setPaymentFee($handlingFee);
+                $address->setPaymentFeeExclVat($handlinFeeExclVat);
             }
         }
 
