@@ -192,7 +192,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
 
     protected function _addShippingRow($svea, $object, $code = null)
     {
-        $value = $object->getData($code);
+        $value = $object->getShippingAmount();
         if (empty($value)) {
             return;
         }
