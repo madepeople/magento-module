@@ -61,10 +61,13 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         $svea = $order->getData('svea_payment_request');
         $billingAddress = $order->getBillingAddress();
         $storeId = $order->getStoreId();
+        $store = Mage::app()->getStore($storeId);
+        $taxCalculationModel = Mage::getSingleton('tax/calculation');
+        $taxConfig = Mage::getSingleton('tax/config');
 
         //Build the rows for request
         foreach ($order->getAllItems() as $item) {
-            // Do not include the Bundle as product. Only it's products.
+            // Do not include the Bundle as product. Only its products.
             if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE
                     || $item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;
@@ -95,7 +98,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setVatPercent((int)$taxPercent);
 
-            if (Mage::getStoreConfig('tax/calculation/price_includes_tax', $storeId)) {
+            if ($taxConfig->priceIncludesTax($storeId)) {
                 $orderRow->setAmountIncVat((float)$priceInclTax);
             } else {
                 $orderRow->setAmountExVat((float)$price);
@@ -104,8 +107,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             $svea->addOrderRow($orderRow);
         }
 
-        $store = Mage::app()->getStore($storeId);
-        $taxCalculationModel = Mage::getSingleton('tax/calculation');
         $request = $taxCalculationModel->getRateRequest(
                 $order->getShippingAddress(),
                 $order->getBillingAddress(),
@@ -124,8 +125,8 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
             $shippingFee->setVatPercent((int)$rate);
 
-            if (Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_INCLUDES_TAX, $storeId)) {
-                $shippingFee->setAmountIncVat($order->getShippingAmount());
+            if ($taxConfig->shippingPriceIncludesTax($storeId)) {
+                $shippingFee->setAmountIncVat($order->getShippingInclTax());
             } else {
                 $shippingFee->setAmountExVat($order->getShippingAmount());
             }
