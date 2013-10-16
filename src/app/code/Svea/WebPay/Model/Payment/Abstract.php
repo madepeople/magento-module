@@ -150,8 +150,53 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         return $this;
     }
 
-    protected function _addShippingRow($svea, $object)
+    protected function _addInvoiceFeeRow($svea, $object, $code = null)
     {
+        $value = $object->getData($code);
+        if (empty($value)) {
+            return;
+        }
+
+        if (!($object instanceof Mage_Sales_Model_Order)) {
+            $object = $object->getOrder();
+        }
+
+        // The payment fee should be fetched from the totals, not
+        // additional_information
+        $paymentFee = $object->getPayment()->getAdditionalInformation('svea_payment_fee');
+        $paymentFeeTaxAmount = $object->getPayment()->getAdditionalInformation('svea_payment_fee_tax_amount');
+
+        $invoiceFeeRow = Item::invoiceFee()
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
+                ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
+                ->setAmountIncVat($paymentFee);
+
+        $svea->addFee($invoiceFeeRow);
+    }
+
+    protected function _addDiscountRow($svea, $object, $code = null)
+    {
+        $value = $object->getData($code);
+        if (empty($value)) {
+            return;
+        }
+
+        $discountRow = Item::fixedDiscount()
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setName(Mage::helper('svea_webpay')->__('Discount'))
+                ->setAmountIncVat(abs($object->getDiscountAmount()));
+
+        $svea->addDiscount($discountRow);
+    }
+
+    protected function _addShippingRow($svea, $object, $code = null)
+    {
+        $value = $object->getData($code);
+        if (empty($value)) {
+            return;
+        }
+
         // We send tax percentages to Svea because it seems the most reliable
         // way of handling amounts
         $storeId = $object->getStoreId();
@@ -175,7 +220,6 @@ abstract class Svea_WebPay_Model_Payment_Abstract
             throw new Mage_Payment_Exception('The shipping fee needs a tax rate for Svea Invoice to work.');
         }
         $shippingFee->setVatPercent((int)$rate);
-
         $svea->addFee($shippingFee);
     }
 
@@ -188,9 +232,9 @@ abstract class Svea_WebPay_Model_Payment_Abstract
             $node = (string)$node;
             list($model, $method) = explode('::', $node);
             if ($model === 'self') {
-                $this->$method($object);
+                $this->$method($svea, $object, "$node");
             } else {
-                Mage::getModel($model)->$method($object);
+                Mage::getModel($model)->$method($svea, $object, "$node");
             }
         }
 
@@ -206,28 +250,6 @@ abstract class Svea_WebPay_Model_Payment_Abstract
     {
         $data = $this->getInfoInstance()->getData($this->getCode());
         $svea->setCountryCode($data['country']);
-
-        return $this;
-    }
-
-    protected function _addPaymentFee($svea, $object)
-    {
-        if (!($object instanceof Mage_Sales_Model_Order)) {
-            $object = $object->getOrder();
-        }
-
-        // The payment fee should be fetched from the totals, not
-        // additional_information
-        $paymentFee = $object->getPayment()->getAdditionalInformation('svea_payment_fee');
-        $paymentFeeTaxAmount = $object->getPayment()->getAdditionalInformation('svea_payment_fee_tax_amount');
-
-        $invoiceFeeRow = Item::invoiceFee()
-                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-                ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
-                ->setAmountIncVat($paymentFee);
-
-        $svea->addFee($invoiceFeeRow);
 
         return $this;
     }

@@ -3,7 +3,7 @@
 /**
  * @author jonathan@madepeople.se
  */
-class Svea_WebPay_System_Config_Source_Payment_Distributiontype
+class Svea_WebPay_Model_System_Config_Source_Payment_Distributiontype
 {
     /**
      * The merchant can choose whether or not to send the invoice with normal

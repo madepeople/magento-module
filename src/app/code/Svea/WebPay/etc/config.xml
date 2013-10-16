@@ -85,6 +85,9 @@
         <svea>
             <totals>
                 <shipping_amount>self::_addShippingRow</shipping_amount>
+                <discount_amount>self::_addDiscountRow</discount_amount>
+                <gift_cards_amount>self::_addDiscountRow</gift_cards_amount>
+                <svea_invoice_fee>self::_addInvoiceFeeRow</svea_invoice_fee>
             </totals>
         </svea>
     </global>

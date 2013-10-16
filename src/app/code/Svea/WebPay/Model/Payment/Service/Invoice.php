@@ -41,7 +41,6 @@ class Svea_WebPay_Model_Payment_Service_Invoice
         $this->_initializeSveaOrder($svea, $order);
         $this->_addItems($svea, $order);
         $this->_addTotals($svea, $order);
-//        $this->_addPaymentFee($svea, $order);
         $this->_validateAmount($svea, $amount);
 
         $request = $svea->useInvoicePayment();
@@ -79,12 +78,11 @@ class Svea_WebPay_Model_Payment_Service_Invoice
         $this->_initializeSveaOrder($svea, $invoice);
         $this->_addItems($svea, $invoice);
         $this->_addTotals($svea, $invoice);
-//        $this->_addPaymentFee($svea, $order);
         $this->_validateAmount($svea, $amount);
 
         $svea->setInvoiceDistributionType($this->getConfigData('distribution_type'));
         $svea->setOrderId($sveaOrderId);
-        Mage::throwException('$errorTranslated');
+
         $response = $svea->deliverInvoiceOrder()
                 ->doRequest();
 
