@@ -45,36 +45,38 @@ class Svea_WebPay_Model_Quote_Total
             $taxClassId = $this->paymentMethod->getConfigData('handling_fee_tax_class');
 
             if ($fee > 0) {
-                $handlinFeeInclVat = $fee;
+                $handlingFeeInclVat = $fee;
                 $taxRequest = new Varien_Object();
                 $taxRequest->setProductClassId($taxClassId);
                 $taxRequest->setCustomerClassId($this->address->getQuote()->getCustomerTaxClassId());
                 $taxRequest->setCountryId($this->address->getQuote()->getShippingAddress()->getCountry());
                 $percent = Mage::getSingleton('tax/calculation')->getRate($taxRequest);
 
-
                 $taxRate = $percent / 100;
-                $handlingFeeTaxAmount = $handlinFeeInclVat - ($handlinFeeInclVat / (1 + $taxRate));
-                $handlinFeeExclVat = $handlinFeeInclVat - $handlingFeeTaxAmount;
+                $handlingFeeTaxAmount = $handlingFeeInclVat - ($handlingFeeInclVat / (1 + $taxRate));
+                $handlingFeeExclVat = $handlingFeeInclVat - $handlingFeeTaxAmount;
 
                 $handlingFee = 0;
-
                 if ($taxClassId > 0) {
-                    $handlingFee = $handlinFeeInclVat;
+                    $handlingFee = $handlingFeeInclVat;
 
                     $address->setExtraTaxAmount($address->getExtraTaxAmount() + $handlingFeeTaxAmount);
                     $address->setBaseExtraTaxAmount($address->getBaseExtraTaxAmount() + $handlingFeeTaxAmount);
-//                    $address->setTaxAmount($address->getTaxAmount() + $handlingFeeTaxAmount);
-//                    $address->setBaseTaxAmount($address->getBaseTaxAmount() + $handlingFeeTaxAmount);
                 } else {
-                    $handlingFee = $handlinFeeExclVat;
+                    $handlingFee = $handlingFeeExclVat;
                 }
 
-                $address->setBaseGrandTotal($address->getBaseGrandTotal() + $handlinFeeExclVat);
-                $address->setGrandTotal($address->getGrandTotal() + $handlinFeeExclVat);
+                $taxConfig = Mage::getSingleton('tax/config');
+                if ($taxConfig->applyTaxAfterDiscount()) {
+                    $address->setBaseGrandTotal($address->getBaseGrandTotal() + $handlingFeeExclVat);
+                    $address->setGrandTotal($address->getGrandTotal() + $handlingFeeExclVat);
+                } else {
+                    $address->setBaseGrandTotal($address->getBaseGrandTotal() + $handlingFee);
+                    $address->setGrandTotal($address->getGrandTotal() + $handlingFee);
+                }
 
                 $address->setPaymentFee($handlingFee);
-                $address->setPaymentFeeExclVat($handlinFeeExclVat);
+                $address->setPaymentFeeExclVat($handlingFeeExclVat);
             }
         }
 
