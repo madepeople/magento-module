@@ -65,7 +65,8 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         $taxCalculationModel = Mage::getSingleton('tax/calculation');
         $taxConfig = Mage::getSingleton('tax/config');
 
-        //Build the rows for request
+        // Build the rows for request
+        $totalDiscount = 0;
         foreach ($order->getAllItems() as $item) {
             // Do not include the Bundle as product. Only its products.
             if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE
@@ -103,6 +104,11 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             } else {
                 $orderRow->setAmountExVat((float)$price);
             }
+
+//            if ($item->getDiscountAmount()) {
+//                $percent = ($item->getDiscountAmount()/($priceInclTax*$qty))*100;
+//                $orderRow->setDiscountPercent((int)$percent);
+//            }
 
             $svea->addOrderRow($orderRow);
         }
