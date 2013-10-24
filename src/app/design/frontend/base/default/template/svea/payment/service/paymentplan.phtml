@@ -75,19 +75,18 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
         </li>
     <?php endif; ?>
 
-    <li>&nbsp;</li>
-
     <!-- Show stored payment plan params -->
     <li id="showPaymentPlanParams">
         <div id="sveaPaymentPlanShowParams" style="display:inline-block;">
+            <select>
             <?php $_i = 0; foreach ($_resultParams as $_campaign): $_i++; ?>
-                <?php $_selected = ($_i === 1) ? "checked='checked'" : "" ?>
-                <label></label><input type="radio" name="payment[<?php echo $_code ?>_campaign]" <?php echo $_selected ?> value="<?php echo $_campaign->campaincode; ?>"> <?php echo $_campaign->description; ?> - <?php echo $_campaign->monthlyamount . " " . $_currency . "/" . Mage::helper('svea_webpay')->__('month') ?><br>
+                <?php $_selected = ($_i === 1) ? "selected" : "" ?>
+                <option name="payment[<?php echo $_code ?>_campaign]" <?php echo $_selected ?> value="<?php echo $_campaign->campaincode; ?>"> <?php echo $_campaign->description; ?></option>
             <?php endforeach ?>
+            </select><br>
+            Din månadskostnad:  <?php echo $_campaign->monthlyamount . " " . $_currency . "/" . Mage::helper('svea_webpay')->__('month') ?>
         </div>
     </li>
-
-    <li>&nbsp;</li>
 
     <!-- Hide get address button for FI, NL and DE -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO'))): ?>
