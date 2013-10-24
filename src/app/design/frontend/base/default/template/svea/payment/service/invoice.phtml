@@ -19,9 +19,15 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
     </li>
     <li>
         <label for="svea_customerType"><?php echo Mage::helper('svea_webpay')->__('customer_type') . ":"; ?></label>
-        <div class="input-box">
-            <input type="radio" id="payment_form_<?php echo $_code ?>_customerType_0" name="payment[<?php echo $_code ?>_customerType]" value="0" checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
-            <input type="radio" id="payment_form_<?php echo $_code ?>_customerType_1" name="payment[<?php echo $_code ?>_customerType]" value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
+        <div class="input-box customer-type">
+            <label>
+                <input type="radio" id="payment_form_<?php echo $_code ?>_customerType_0" name="payment[<?php echo $_code ?>_customerType]" value="0" checked>
+                <?php echo Mage::helper('svea_webpay')->__('private'); ?>
+            </label>
+            <label>
+                <input type="radio" id="payment_form_<?php echo $_code ?>_customerType_1" name="payment[<?php echo $_code ?>_customerType]" value="1">
+                <?php echo Mage::helper('svea_webpay')->__('company'); ?>
+            </label>
             <!--
             <select class="" id="payment_form_<?php echo $_code ?>_customerType" name="payment[<?php echo $_code ?>_customerType]">
                 <option value="0"><?php echo Mage::helper('svea_webpay')->__('private'); ?></option>
