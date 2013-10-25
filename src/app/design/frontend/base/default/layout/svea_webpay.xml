@@ -12,4 +12,10 @@
             <block type="svea_webpay/payment_hosted_redirect_direct" name="svea_hosted_redirect_direct"/>
         </reference>
     </svea_webpay_hosted_redirectdirect>
+
+    <streamcheckout_index_index>
+        <reference name="billing_before">
+            <block type="core/template" name="ssn_customer_type" template="svea/checkout/"/>
+        </reference>
+    </streamcheckout_index_index>
 </layout>
