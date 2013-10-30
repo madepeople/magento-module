@@ -14,6 +14,7 @@ require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Inclu
  */
 class Svea_WebPay_Model_Paymentplan extends Mage_Core_Model_Abstract
 {
+
     protected function _construct()
     {
         $this->_init('svea_webpay/paymentplan');
@@ -31,18 +32,18 @@ class Svea_WebPay_Model_Paymentplan extends Mage_Core_Model_Abstract
                 break;
             case 'website':
                 $paymentMethodConfig = Mage::app()->getWebsite($id)
-                    ->getConfig('payment/svea_paymentplan');
+                        ->getConfig('payment/svea_paymentplan');
                 break;
             default:
                 $paymentMethodConfig = Mage::getStoreConfig('payment/svea_paymentplan');
                 break;
         }
-        
+
         $conf = new SveaMageConfigProvider($paymentMethodConfig);
         $sveaObject = WebPay::getPaymentPlanParams($conf);
         $response = $sveaObject->setCountryCode('SE')
                 ->doRequest();
-        
+
         if ($response->accepted == 1) {
             return $this->formatResponse($response);
         } else {
@@ -62,8 +63,12 @@ class Svea_WebPay_Model_Paymentplan extends Mage_Core_Model_Abstract
             default:
                 $storeId = 0;
         }
-        
+
         $paramArray = $this->getPaymentPlanParams($id, $scope);
+        if (!is_array($paramArray)) {
+            Mage::throwException($paramArray);
+        }
+
         foreach ($paramArray as $campaignData) {
             try {
                 Mage::getModel("svea_webpay/paymentplan")
@@ -124,4 +129,5 @@ class Svea_WebPay_Model_Paymentplan extends Mage_Core_Model_Abstract
         }
         return $result;
     }
+
 }
