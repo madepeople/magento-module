@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Finish Svea Payment Object for Card specific values
  *
@@ -10,10 +11,13 @@
  *
  */
 require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Includes.php';
+
 class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
 {
+
     protected $_code = 'svea_cardpayment';
     protected $_sveaUrl = 'svea_webpay/hosted/redirectcard';
+    protected $_formBlockType = 'svea_webpay/payment_hosted_card';
 
     /**
      *
@@ -37,4 +41,5 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
 
         return $paymentFormPrep;
     }
+
 }
