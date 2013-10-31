@@ -70,11 +70,11 @@ class Svea_WebPay_Model_Checkout_Observer
             $payment
                     ->setAdditionalInformation('svea_birthYear', $data[$method . '_birthYear']);
         }
-        if($method == "svea_paymentplan"){
-             $payment->setAdditionalInformation('svea_customerType', "0");
-        }  else {
-             if (isset($data[$method . '_customerType'])) {
-            $payment->setAdditionalInformation('svea_customerType', $data[$method . '_customerType']);
+        if ($method == "svea_paymentplan") {
+            $payment->setAdditionalInformation('svea_customerType', "0");
+        } else {
+            if (isset($data[$method . '_customerType'])) {
+                $payment->setAdditionalInformation('svea_customerType', $data[$method . '_customerType']);
             }
         }
 
@@ -116,4 +116,19 @@ class Svea_WebPay_Model_Checkout_Observer
 
         $quote->setIsActive(true);
     }
+
+    /**
+     * In Stream Checkout we display the SSN form as part of the address form
+     * instead of the payment selection block
+     *
+     * @param Varien_Event_Observer $observer
+     */
+    public function hideSveaMethods(Varien_Event_Observer $observer)
+    {
+        $methods = $observer->getMethods();
+        $methodsArray = $methods->getData();
+        $methodsArray[] = 'svea_invoice';
+        $methods->setData($methodsArray);
+    }
+
 }
