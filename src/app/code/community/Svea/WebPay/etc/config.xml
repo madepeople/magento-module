@@ -214,15 +214,6 @@
                     </reactivate_quote_before_gateway>
                 </observers>
             </sales_model_service_quote_submit_after>
-            <streamcheckout_payment_methods_hide>
-                <observers>
-                    <hide_svea_methods>
-                        <type>singleton</type>
-                        <class>svea_webpay/checkout_observer</class>
-                        <method>hideSveaMethods</method>
-                    </hide_svea_methods>
-                </observers>
-            </streamcheckout_payment_methods_hide>
         </events>
     </frontend>
 

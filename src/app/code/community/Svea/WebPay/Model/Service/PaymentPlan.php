@@ -14,13 +14,14 @@ require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Inclu
  */
 class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Abstract
 {
+
     protected $_code = 'svea_paymentplan';
     protected $_formBlockType = 'svea_webpay/payment_service_paymentPlan';
     protected $_canCapturePartial = false;
 
     /**
      * Take the PaymentPlan path in Create Order object
-     * 
+     *
      * @param type $sveaObject
      * @return type
      */
@@ -38,7 +39,7 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
 
     /**
      * For Svea, Deliver order
-     * 
+     *
      * @param Varien_Object $payment
      * @param float $amount
      * @return type
@@ -47,14 +48,14 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
     {
         //Alternative: $sveaOrderId = $payment->getTransactionId(), comes with -capture
         $sveaOrderId = $this->getInfoInstance()
-                ->getAdditionalInformation('svea_order_id');
+            ->getAdditionalInformation('svea_order_id');
         if (empty($sveaOrderId)) {
             if (!$this->getConfigData('autodeliver')) {
                 $errorTranslated = Mage::helper('svea_webpay')->responseCodes("", 'no_orderid');
                 Mage::throwException($errorTranslated);
             }
             $sveaOrderId = $this->getInfoInstance()
-                    ->getAdditionalInformation('svea_order_id');
+                ->getAdditionalInformation('svea_order_id');
         }
         $order = $payment->getOrder();
         $countryCode = $order->getBillingAddress()->getCountryId();
@@ -62,17 +63,17 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
         $conf = new SveaMageConfigProvider($paymentMethodConfig);
         $sveaObject = WebPay::deliverOrder($conf);
         $response = $sveaObject
-                ->setCountryCode($countryCode)
-                ->setOrderId($sveaOrderId)
-                ->deliverPaymentPlanOrder()
-                ->doRequest();
+            ->setCountryCode($countryCode)
+            ->setOrderId($sveaOrderId)
+            ->deliverPaymentPlanOrder()
+            ->doRequest();
 
         if ($response->accepted == 1) {
             $successMessage = Mage::helper('svea_webpay')->__('delivered');
             $order->addStatusToHistory($this->getConfigData('paid_order_status'), $successMessage, false);
             $payment->setIsTransactionClosed(false);
             $paymentInfo = $this->getInfoInstance();
-            $paymentInfo->setAdditionalInformation('svea_invoice_id', $response->invoiceId);
+            $paymentInfo->setAdditionalInformation('svea_invoice_id', $response->contractNumber);
             $order->save();
         } else {
             $errorMessage = $response->errormessage;
@@ -90,7 +91,7 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
 
     /**
      * End close order request
-     * 
+     *
      * @param type $sveaObject
      * @return type Svea Create order response
      */
@@ -99,11 +100,11 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
         return $sveaObject->closePaymentPlanOrder()
                 ->doRequest();
     }
-    
+
     /**
      * We shouldn't display PaymentPlan as an option if there are no payment
      * plans available
-     * 
+     *
      * @param Mage_Sales_Model_Quote $quote
      */
     public function isAvailable($quote = null)
@@ -111,8 +112,9 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
         if (!parent::isAvailable($quote)) {
             return false;
         }
-        
+
         $paymentPlans = Mage::helper('svea_webpay')->getPaymentPlanParams($quote);
-        return count((array)$paymentPlans) > 0;
+        return count((array) $paymentPlans) > 0;
     }
+
 }

@@ -21,7 +21,7 @@ class Svea_WebPay_Model_Checkout_Observer
     public function addSveaData(Varien_Event_Observer $observer)
     {
         $payment = $observer->getEvent()
-                ->getPayment();
+            ->getPayment();
         $data = $observer->getEvent()->getInput();
         $payment = $this->_addAdditionalInfoToPayment($data, $payment);
 
@@ -54,47 +54,42 @@ class Svea_WebPay_Model_Checkout_Observer
     protected function _addAdditionalInfoToPayment($data, $payment)
     {
         $method = $data['method'];
-        if (isset($data[$method . '_ssn'])) {
-            $payment
-                    ->setAdditionalInformation('svea_ssn', $data[$method . '_ssn']);
+        if (!empty($data[$method])) {
+            $data = $data[$method];
         }
-        if (isset($data[$method . '_birthDay'])) {
-            $payment
-                    ->setAdditionalInformation('svea_birthDay', $data[$method . '_birthDay']);
+        if (isset($data['ssn'])) {
+            $payment->setAdditionalInformation('svea_ssn', $data['ssn']);
         }
-        if (isset($data[$method . '_birthMonth'])) {
-            $payment
-                    ->setAdditionalInformation('svea_birthMonth', $data[$method . '_birthMonth']);
+        if (isset($data['birthDay'])) {
+            $payment->setAdditionalInformation('svea_birthDay', $data['birthDay']);
         }
-        if (isset($data[$method . '_birthYear'])) {
-            $payment
-                    ->setAdditionalInformation('svea_birthYear', $data[$method . '_birthYear']);
+        if (isset($data['birthMonth'])) {
+            $payment->setAdditionalInformation('svea_birthMonth', $data['birthMonth']);
         }
+        if (isset($data['birthYear'])) {
+            $payment->setAdditionalInformation('svea_birthYear', $data['birthYear']);
+        }
+
         if ($method == "svea_paymentplan") {
             $payment->setAdditionalInformation('svea_customerType', "0");
         } else {
-            if (isset($data[$method . '_customerType'])) {
-                $payment->setAdditionalInformation('svea_customerType', $data[$method . '_customerType']);
+            if (isset($data['customerType'])) {
+                $payment->setAdditionalInformation('svea_customerType', $data['customerType']);
             }
         }
 
-
-        if (isset($data[$method . '_vatNo'])) {
-            $payment
-                    ->setAdditionalInformation('svea_vatNo', $data[$method . '_vatNo']);
+        if (isset($data['vatNo'])) {
+            $payment->setAdditionalInformation('svea_vatNo', $data['vatNo']);
         }
-        if (isset($data[$method . '_initials'])) {
-            $payment
-                    ->setAdditionalInformation('svea_initials', $data[$method . '_initials']);
+        if (isset($data['initials'])) {
+            $payment->setAdditionalInformation('svea_initials', $data['initials']);
         }
-        if (isset($data[$method . '_addressSelector'])) {
-            $payment
-                    ->setAdditionalInformation('svea_addressSelector', $data[$method . '_addressSelector']);
+        if (isset($data['addressSelector'])) {
+            $payment->setAdditionalInformation('svea_addressSelector', $data['addressSelector']);
         }
 
-        if (isset($data[$method . '_campaign'])) {
-            $payment
-                    ->setAdditionalInformation('svea_campaign', $data[$method . '_campaign']);
+        if (isset($data['campaign'])) {
+            $payment->setAdditionalInformation('svea_campaign', $data['campaign']);
         }
         return $payment;
     }
@@ -115,20 +110,6 @@ class Svea_WebPay_Model_Checkout_Observer
         }
 
         $quote->setIsActive(true);
-    }
-
-    /**
-     * In Stream Checkout we display the SSN form as part of the address form
-     * instead of the payment selection block
-     *
-     * @param Varien_Event_Observer $observer
-     */
-    public function hideSveaMethods(Varien_Event_Observer $observer)
-    {
-        $methods = $observer->getMethods();
-        $methodsArray = $methods->getData();
-        $methodsArray[] = 'svea_invoice';
-        $methods->setData($methodsArray);
     }
 
 }
