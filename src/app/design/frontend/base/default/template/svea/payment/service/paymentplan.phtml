@@ -10,10 +10,6 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
     <li>
         <label for=""></label>
-        <img src="<?php echo Mage::getBaseUrl("media") . "svea/$_lang/svea_paymentplan.png"; ?>">
-    </li>
-    <li>
-        <label for=""></label>
         <?php echo(nl2br(Mage::getStoreConfig("payment/$_code/paymentplan_info"))); ?>
     </li>
 
@@ -89,7 +85,7 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
     </li>
 
     <!-- Hide get address button for FI, NL and DE -->
-    <?php if (in_array($_country, array('SE', 'DK', 'NO'))): ?>
+<?php if (in_array($_country, array('SE', 'DK', 'NO'))): ?>
         <li id="showPaymentPlanAddressBox">
             <label for="sveaPaymentPlanShowAddresses"><?php echo Mage::helper('svea_webpay')->__('invoice_address') . ":"; ?></label>
             <div id="sveaPaymentPlanShowAddresses" style="display:inline-block;"></div>
@@ -99,38 +95,38 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
                 <button class="button" id="getAddressPP" onclick="sveaGetAddressPP();" type="button"><span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span></button>
             </div>
         </li>
-    <?php endif; ?>
+<?php endif; ?>
 </ul>
 <script>
 
 // Get addresses
-function sveaGetAddressPP(e) {
+    function sveaGetAddressPP(e) {
 
-    // Set vars
-    var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
-    var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+        // Set vars
+        var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
+        var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
 
-    // Show Loader
-    $("sveaPaymentPlanShowAddresses").update().insert(loader);
+        // Show Loader
+        $("sveaPaymentPlanShowAddresses").update().insert(loader);
 
-    new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>svea_webpay/service/getAddresses', {
-        parameters: {ssn: ssn, type: 0, cc: "<?php echo $_country; ?>"},
-        onSuccess: function(transport) {
-            var json = transport.responseText.evalJSON();
-            $("sveaLoader").remove();
+        new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>svea_webpay/service/getAddresses', {
+            parameters: {ssn: ssn, type: 0, cc: "<?php echo $_country; ?>"},
+            onSuccess: function(transport) {
+                var json = transport.responseText.evalJSON();
+                $("sveaLoader").remove();
 
-            if (json.accepted === false) {
-                $("sveaPaymentPlanShowAddresses").update("<span style='color:red'>" + json.errormessage + "</span>");
-                return;
-            }
+                if (json.accepted === false) {
+                    $("sveaPaymentPlanShowAddresses").update("<span style='color:red'>" + json.errormessage + "</span>");
+                    return;
+                }
 
-            var adress = json.customerIdentity[0].firstName + " " +
-                    json.customerIdentity[0].lastName + "<br>" +
-                    json.customerIdentity[0].street + "<br>" +
-                    json.customerIdentity[0].zipCode + " " +
-                    json.customerIdentity[0].locality;
+                var adress = json.customerIdentity[0].firstName + " " +
+                        json.customerIdentity[0].lastName + "<br>" +
+                        json.customerIdentity[0].street + "<br>" +
+                        json.customerIdentity[0].zipCode + " " +
+                        json.customerIdentity[0].locality;
 
-            $("sveaPaymentPlanShowAddresses").insert(adress);
+                $("sveaPaymentPlanShowAddresses").insert(adress);
 
                 //For onestep checkouts, check if fields visible and auto-fill
                 if ($("billing:firstname").visible()) {
@@ -140,7 +136,8 @@ function sveaGetAddressPP(e) {
                     $("billing:city").value = json.customerIdentity[0].locality;
                     $("billing:postcode").value = json.customerIdentity[0].zipCode;
                 }
-        }
-    });
-};
+            }
+        });
+    }
+    ;
 </script>

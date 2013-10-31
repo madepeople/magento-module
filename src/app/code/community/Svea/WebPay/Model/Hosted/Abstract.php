@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Main class for Hosted payments as Card and Direct payment
  *
@@ -11,8 +12,8 @@
  */
 abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstract
 {
+
     protected $_canReviewPayment = true;
-    protected $_formBlockType = 'svea_webpay/payment_hosted';
     protected $_isGateway = true;
 
     /**
@@ -36,7 +37,7 @@ abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstr
     {
         return Mage::getUrl($this->_sveaUrl);
     }
-    
+
     abstract protected function _choosePayment($sveaObject, $addressSelector = NULL);
 
     /**
@@ -76,4 +77,5 @@ abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstr
 
         return parent::validate();
     }
+
 }
