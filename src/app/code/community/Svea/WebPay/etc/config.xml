@@ -179,7 +179,7 @@
 
         <layout>
             <updates>
-                <svea_webpay>
+                <svea_webpay module="Svea_WebPay">
                     <file>svea_webpay.xml</file>
                 </svea_webpay>
             </updates>
