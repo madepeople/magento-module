@@ -12,8 +12,10 @@
  */
 class Svea_WebPay_Model_Hosted_Direct extends Svea_WebPay_Model_Hosted_Abstract
 {
+
     protected $_code = 'svea_directpayment';
     protected $_sveaUrl = 'svea_webpay/hosted/redirectdirect';
+    protected $_formBlockType = 'svea_webpay/payment_hosted_direct';
 
     /**
      * @param type $sveaObject
@@ -29,4 +31,5 @@ class Svea_WebPay_Model_Hosted_Direct extends Svea_WebPay_Model_Hosted_Abstract
 
         return $paymentFormPrep;
     }
+
 }

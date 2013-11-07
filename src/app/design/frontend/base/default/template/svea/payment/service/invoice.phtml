@@ -11,10 +11,6 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
     <li>
         <label for=""></label>
-        <img src="<?php echo Mage::getBaseUrl("media") . "svea/$_lang/svea_invoice.png"; ?>">
-    </li>
-    <li>
-        <label for=""></label>
         <?php echo(nl2br(Mage::getStoreConfig("payment/$_code/invoice_info"))); ?>
     </li>
     <li>
@@ -102,8 +98,8 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
     <li>&nbsp;</li>
 
-    <!-- Hide get address button for FI, NL and DE -->
-    <?php if (in_array($_country, array('SE', 'DK', 'NO'))): ?>
+    <!-- Hide get address button for FI, NL, NO and DE -->
+    <?php if (in_array($_country, array('SE', 'DK'))): ?>
         <li id="showInvoiceAddressBox">
             <label for="sveaInvoiceShowAddressest"><?php echo Mage::helper('svea_webpay')->__('invoice_address') . ":"; ?></label>
             <div id="sveaInvoiceShowAddresses" style="display:inline-block;"></div>
@@ -119,7 +115,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 <script>
 
 //Change customer type
-var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
+    var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
     $("payment_form_<?php echo $_code ?>_customerType_0").on("change", function(e) {
         customerType = $(this).value;
         if (currentCountry == 'NL' || currentCountry == 'DE') {
@@ -135,13 +131,13 @@ var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
                 });
             }
         } else {
-             if ($(this).value == 1) {
-                 $("label_<?php echo $_code ?>_ssn_customerType_0").hide();
-                 $("label_<?php echo $_code ?>_ssn_customerType_1").show();
-             }else{
+            if ($(this).value == 1) {
+                $("label_<?php echo $_code ?>_ssn_customerType_0").hide();
+                $("label_<?php echo $_code ?>_ssn_customerType_1").show();
+            } else {
                 $("label_<?php echo $_code ?>_ssn_customerType_1").hide();
                 $("label_<?php echo $_code ?>_ssn_customerType_0").show();
-             }
+            }
 
         }
     });
@@ -160,75 +156,76 @@ var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
                 });
             }
         } else {
-             if ($(this).value == 1) {
-                 $("label_<?php echo $_code ?>_ssn_customerType_0").hide();
-                 $("label_<?php echo $_code ?>_ssn_customerType_1").show();
-             }else{
+            if ($(this).value == 1) {
+                $("label_<?php echo $_code ?>_ssn_customerType_0").hide();
+                $("label_<?php echo $_code ?>_ssn_customerType_1").show();
+            } else {
                 $("label_<?php echo $_code ?>_ssn_customerType_1").hide();
                 $("label_<?php echo $_code ?>_ssn_customerType_0").show();
-             }
+            }
 
         }
     });
 
 
 //Get Addresses
-function sveaGetAddress(e) {
-    // Set vars
-    var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
-    var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
-    var type = $$('input:checked[type=radio][name=payment[svea_invoice_customerType]]')[0].value;
+    function sveaGetAddress(e) {
+        // Set vars
+        var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
+        var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+        var type = $$('input:checked[type=radio][name=payment[svea_invoice_customerType]]')[0].value;
 
-    // Show Loader
-    $("sveaInvoiceShowAddresses").update().insert(loader);
+        // Show Loader
+        $("sveaInvoiceShowAddresses").update().insert(loader);
 
-    new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>svea_webpay/service/getAddresses', {
-        parameters: {ssn: ssn, type: type, cc: "<?php echo $_country; ?>"},
-        onSuccess: function(transport) {
-            var json = transport.responseText.evalJSON();
-            $("sveaLoader").remove();
+        new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>svea_webpay/service/getAddresses', {
+            parameters: {ssn: ssn, type: type, cc: "<?php echo $_country; ?>"},
+            onSuccess: function(transport) {
+                var json = transport.responseText.evalJSON();
+                $("sveaLoader").remove();
 
-            if (json.accepted == false) {
-                $("sveaInvoiceShowAddresses").update("<span style='color:red'>" + json.errormessage + "</span>");
-                return;
-            }
-
-            // Show dropdown if company, show only text if private customer
-            if (json.customerIdentity.length > 1) {
-                var selectBox = "<select id='<?php echo $_code ?>_addressSelector' name='payment[<?php echo $_code ?>_addressSelector]'>";
-
-                json.customerIdentity.each(function(item) {
-                    selectBox += "<option value='" + item.addressSelector + "'>" + item.fullName + ", " + item.street + ", " + item.zipCode + " " + item.locality;
-                    +"</option>";
-                });
-
-                selectBox += "</select>";
-
-                $("sveaInvoiceShowAddresses").insert(selectBox);
-            } else {
-                if(json.customerIdentity[0].fullName == null){
-                    var name =  json.customerIdentity[0].firstName + " " +
-                        json.customerIdentity[0].lastName + "<br>";
-                }else{
-                    var name = json.customerIdentity[0].fullName + "<br>";
+                if (json.accepted == false) {
+                    $("sveaInvoiceShowAddresses").update("<span style='color:red'>" + json.errormessage + "</span>");
+                    return;
                 }
-                var adress = name +
-                        json.customerIdentity[0].street + "<br>" +
-                        json.customerIdentity[0].zipCode + " " +
-                        json.customerIdentity[0].locality;
 
-                $("sveaInvoiceShowAddresses").insert(adress)
+                // Show dropdown if company, show only text if private customer
+                if (json.customerIdentity.length > 1) {
+                    var selectBox = "<select id='<?php echo $_code ?>_addressSelector' name='payment[<?php echo $_code ?>_addressSelector]'>";
 
-                //For onestep checkouts, check if fields visible and auto-fill
-                if ($("billing:firstname").visible()) {
-                    $("billing:firstname").value = json.customerIdentity[0].firstName;
-                    $("billing:lastname").value = json.customerIdentity[0].lastName;
-                    $("billing:street1").value = json.customerIdentity[0].street;
-                    $("billing:city").value = json.customerIdentity[0].locality;
-                    $("billing:postcode").value = json.customerIdentity[0].zipCode;
+                    json.customerIdentity.each(function(item) {
+                        selectBox += "<option value='" + item.addressSelector + "'>" + item.fullName + ", " + item.street + ", " + item.zipCode + " " + item.locality;
+                        +"</option>";
+                    });
+
+                    selectBox += "</select>";
+
+                    $("sveaInvoiceShowAddresses").insert(selectBox);
+                } else {
+                    if (json.customerIdentity[0].fullName == null) {
+                        var name = json.customerIdentity[0].firstName + " " +
+                                json.customerIdentity[0].lastName + "<br>";
+                    } else {
+                        var name = json.customerIdentity[0].fullName + "<br>";
+                    }
+                    var adress = name +
+                            json.customerIdentity[0].street + "<br>" +
+                            json.customerIdentity[0].zipCode + " " +
+                            json.customerIdentity[0].locality;
+
+                    $("sveaInvoiceShowAddresses").insert(adress)
+
+                    //For onestep checkouts, check if fields visible and auto-fill
+                    if ($("billing:firstname").visible()) {
+                        $("billing:firstname").value = json.customerIdentity[0].firstName;
+                        $("billing:lastname").value = json.customerIdentity[0].lastName;
+                        $("billing:street1").value = json.customerIdentity[0].street;
+                        $("billing:city").value = json.customerIdentity[0].locality;
+                        $("billing:postcode").value = json.customerIdentity[0].zipCode;
+                    }
                 }
             }
-        }
-    });
-};
+        });
+    }
+    ;
 </script>

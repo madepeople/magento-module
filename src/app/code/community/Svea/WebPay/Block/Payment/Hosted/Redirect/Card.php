@@ -14,6 +14,7 @@ require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Inclu
  */
 class Svea_WebPay_Block_Payment_Hosted_Redirect_Card extends Mage_Core_Block_Template
 {
+
     protected $_template = 'svea/payment/hosted/redirect.phtml';
 
     public function getFormHtml()
@@ -28,4 +29,5 @@ class Svea_WebPay_Block_Payment_Hosted_Redirect_Card extends Mage_Core_Block_Tem
 
         return $paymentForm->htmlFormFieldsAsArray;
     }
+
 }
