@@ -159,7 +159,7 @@
                         </sort_order>
                         <distribution_type translate="label">
                             <label>Invoice Distribution Type</label>
-                            <comment>How the customer will receive the invoice. "Post" means they get normal letter, "E-mail" mean they get it e-mailed. This must be the same as your account settings at Svea.</comment>
+                            <comment>How the customer will receive the invoice. "Post" means they get normal letter, "E-mail" means they get it e-mailed. This must be the same as your account settings at Svea.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>svea_webpay/system_config_source_payment_distributiontype</source_model>
                             <sort_order>140</sort_order>
