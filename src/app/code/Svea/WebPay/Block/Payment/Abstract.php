@@ -14,15 +14,22 @@ abstract class Svea_WebPay_Block_Payment_Abstract
     public function getCustomerType()
     {
         $method = $this->getMethod();
-        $paymentInfo = $method->getInfoInstance();
-
-        $company = ($paymentInfo instanceof Mage_Sales_Model_Order_Payment)
-                ? trim($paymentInfo->getOrder()->getBillingAddress()->getCompany())
-                : trim($paymentInfo->getQuote()->getBillingAddress()->getCompany());
-
-        return (empty($company))
-                ? Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL
-                : Svea_WebPay_Helper_Data::TYPE_COMPANY;
+        $infoInstance = $method->getInfoInstance();
+        $methodInfo = $infoInstance->getAdditionalInformation($method->getCode());
+        return $methodInfo['customer_type'];
+    }
+    
+    /**
+     * Previously entered (and saved) SSN getters
+     * 
+     * @return string
+     */
+    public function getSsn()
+    {
+        $method = $this->getMethod();
+        $infoInstance = $method->getInfoInstance();
+        $methodInfo = $infoInstance->getAdditionalInformation($method->getCode());
+        return $methodInfo['ssn'];
     }
 
     /**

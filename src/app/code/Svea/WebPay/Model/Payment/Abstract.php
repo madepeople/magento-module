@@ -6,6 +6,26 @@
 abstract class Svea_WebPay_Model_Payment_Abstract
     extends Mage_Payment_Model_Method_Abstract
 {
+    /**
+     * This saves our extra custom data in the database so we can re-use it
+     * when the customer for instance enters a SSN and then goes away and back
+     * to the checkout. Why isn't this the Magento default?
+     * 
+     * @param Varien_Object $data
+     * @return \Svea_WebPay_Model_Payment_Abstract
+     */
+    public function assignData($data)
+    {
+        if (is_object($data)) {
+            $data = $data->toArray();
+        }
+        if (!empty($data) && isset($data[$this->_code])) {
+            $this->getInfoInstance()->setAdditionalInformation($this->_code,
+                    $data[$this->_code]);
+        }
+        return parent::assignData($data);
+    }
+
     protected function _getSveaConfig()
     {
         return new Svea_WebPay_Svea_MagentoProvider($this);
