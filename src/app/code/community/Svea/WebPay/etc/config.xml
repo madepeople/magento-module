@@ -62,8 +62,6 @@
                 <totals>
                     <svea_handling_fee>
                         <class>svea_webpay/quote_total</class>
-                        <after>subtotal,discount,shipping</after>
-                        <before>grand_total</before>
                     </svea_handling_fee>
                 </totals>
             </quote>
@@ -242,6 +240,12 @@
     </adminhtml>
 
     <default>
+        <sales>
+            <!-- Used by the quote to sort totals -->
+            <totals_sort>
+                <svea_handling_fee>15</svea_handling_fee>
+            </totals_sort>
+        </sales>
         <payment>
             <svea_cardpayment>
                 <active>0</active>
