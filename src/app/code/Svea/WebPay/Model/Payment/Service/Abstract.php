@@ -1,11 +1,22 @@
 <?php
 
 /**
+ * This contains all methods that are shared between the service payment
+ * methods, such as initialization of stuff.
+ *
  * @author jonathan@madepeople.se
  */
 abstract class Svea_WebPay_Model_Payment_Service_Abstract
     extends Svea_WebPay_Model_Payment_Abstract
 {
+    /**
+     * Initialize the Svea order object with the basic information such as
+     * address, customer type, SSN, currency etc
+     *
+     * @param CreateOrderBuilder $svea
+     * @param object $order
+     * @return \Svea_WebPay_Model_Payment_Service_Abstract|\CreateOrderBuilder
+     */
     protected function _initializeSveaOrder($svea, $order)
     {
         parent::_initializeSveaOrder($svea, $order);

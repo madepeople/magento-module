@@ -10,7 +10,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      * This saves our extra custom data in the database so we can re-use it
      * when the customer for instance enters a SSN and then goes away and back
      * to the checkout. Why isn't this the Magento default?
-     * 
+     *
      * @param Varien_Object $data
      * @return \Svea_WebPay_Model_Payment_Abstract
      */
@@ -26,6 +26,11 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         return parent::assignData($data);
     }
 
+    /**
+     * Svea integration package config getter
+     *
+     * @return \Svea_WebPay_Svea_MagentoProvider
+     */
     protected function _getSveaConfig()
     {
         return new Svea_WebPay_Svea_MagentoProvider($this);
@@ -126,6 +131,15 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         return $this;
     }
 
+    /**
+     * In the case of a quote we add the different rows to the svea object
+     * from the quote totals. It sucks a bit that the order object isn't
+     * structured in this way as well
+     *
+     * @param object $svea
+     * @param object $object  Quote
+     * @return \Svea_WebPay_Model_Payment_Abstract
+     */
     protected function _addTotalsFromQuote($svea, $object)
     {
         $quoteId = $object->getQuoteId();
@@ -170,6 +184,14 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         return $this;
     }
 
+    /**
+     * Adds the invoice fee row to the Svea object
+     *
+     * @param object $svea
+     * @param object $object  Order or quote
+     * @param string $code
+     * @return void
+     */
     protected function _addInvoiceFeeRow($svea, $object, $code = null)
     {
         $value = $object->getData($code);
@@ -195,6 +217,14 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         $svea->addFee($invoiceFeeRow);
     }
 
+    /**
+     * Adds a discount row to the svea object
+     *
+     * @param object $svea
+     * @param object $object  Order or quote
+     * @param string $code
+     * @return void
+     */
     protected function _addDiscountRow($svea, $object, $code = null)
     {
         $value = $object->getData($code);
@@ -210,6 +240,15 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         $svea->addDiscount($discountRow);
     }
 
+    /**
+     * Adds the shipping information to the Svea order object
+     *
+     * @param object $svea
+     * @param object $object  Order or quote
+     * @param string $code
+     * @return void
+     * @throws Mage_Payment_Exception
+     */
     protected function _addShippingRow($svea, $object, $code = null)
     {
         $value = $object->getShippingAmount();
@@ -244,6 +283,11 @@ abstract class Svea_WebPay_Model_Payment_Abstract
     }
 
     /**
+     * Add totals values (rows) to the Svea object
+     *
+     * @param object $svea
+     * @param object $object  Order or quote
+     * @return \Svea_WebPay_Model_Payment_Abstract
      */
     protected function _addTotals($svea, $object)
     {
@@ -266,6 +310,13 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         return $this;
     }
 
+    /**
+     * Initialize the Svea order object
+     *
+     * @param object $svea
+     * @param object $object
+     * @return \Svea_WebPay_Model_Payment_Abstract
+     */
     protected function _initializeSveaOrder($svea, $object)
     {
         $data = $this->getInfoInstance()->getData($this->getCode());
