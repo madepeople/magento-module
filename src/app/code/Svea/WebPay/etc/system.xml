@@ -3,40 +3,6 @@
     <sections>
         <payment>
             <groups>
-<!--                <svea_configuration>
-                    <label>Svea WebPay Account Configuration</label>
-                    <sort_order>672</sort_order>
-                    <show_in_default>1</show_in_default>
-                    <show_in_website>1</show_in_website>
-                    <show_in_store>1</show_in_store>
-                    <fields>
-                        <merchant_id translate="label">
-                            <label>Merchant ID</label>
-                            <comment>"Merchant ID", "Secret Word - Test" and "Secret Word - Production" are used with the Card and Direct Payment methods.</comment>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>40</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </merchant_id>
-                        <secretword_test translate="label">
-                            <label>Secret Word - Test</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>50</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </secretword_test>
-                        <secretword_prod translate="label">
-                            <label>Secret Word - Production</label>
-                            <frontend_type>text</frontend_type>
-                            <sort_order>60</sort_order>
-                            <show_in_default>1</show_in_default>
-                            <show_in_website>1</show_in_website>
-                            <show_in_store>1</show_in_store>
-                        </secretword_prod>
-                    </fields>
-                </svea_configuration>-->
                 <svea_invoice translate="label">
                     <label>Svea WebPay Invoice</label>
                     <sort_order>673</sort_order>
