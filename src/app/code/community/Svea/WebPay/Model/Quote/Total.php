@@ -66,14 +66,8 @@ class Svea_WebPay_Model_Quote_Total
                     $handlingFee = $handlingFeeExclVat;
                 }
 
-                $taxConfig = Mage::getSingleton('tax/config');
-                if ($taxConfig->applyTaxAfterDiscount()) {
-                    $address->setBaseGrandTotal($address->getBaseGrandTotal() + $handlingFeeExclVat);
-                    $address->setGrandTotal($address->getGrandTotal() + $handlingFeeExclVat);
-                } else {
-                    $address->setBaseGrandTotal($address->getBaseGrandTotal() + $handlingFee);
-                    $address->setGrandTotal($address->getGrandTotal() + $handlingFee);
-                }
+                $address->setBaseGrandTotal($address->getBaseGrandTotal() + $handlingFeeExclVat);
+                $address->setGrandTotal($address->getGrandTotal() + $handlingFeeExclVat);
 
                 $address->setPaymentFee($handlingFee);
                 $address->setPaymentFeeExclVat($handlingFeeExclVat);
