@@ -62,6 +62,8 @@
                 <totals>
                     <svea_handling_fee>
                         <class>svea_webpay/quote_total</class>
+                        <before>discount</before>
+                        <after>tax</after>
                     </svea_handling_fee>
                 </totals>
             </quote>
