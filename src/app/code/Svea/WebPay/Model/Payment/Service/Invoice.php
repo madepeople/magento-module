@@ -23,25 +23,6 @@ class Svea_WebPay_Model_Payment_Service_Invoice
     protected $_formBlockType = 'svea_webpay/payment_service_invoice';
 
     /**
-     * Convert the object returned from Svea to an array because it's easier
-     * to handle and store
-     *
-     * @param object $response
-     * @return array
-     */
-    protected function _sveaResponseToArray($response)
-    {
-        $result = array();
-        foreach ($response as $key => $val) {
-            if (!is_string($key) || is_object($val)) {
-                continue;
-            }
-            $result[$key] = $val;
-        }
-        return $result;
-    }
-
-    /**
      * Authorize payment for later capture
      *
      * @param Varien_Object $payment

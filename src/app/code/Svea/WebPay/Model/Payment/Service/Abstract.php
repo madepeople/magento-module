@@ -9,6 +9,26 @@
 abstract class Svea_WebPay_Model_Payment_Service_Abstract
     extends Svea_WebPay_Model_Payment_Abstract
 {
+
+    /**
+     * Convert the object returned from Svea to an array because it's easier
+     * to handle and store
+     *
+     * @param object $response
+     * @return array
+     */
+    protected function _sveaResponseToArray($response)
+    {
+        $result = array();
+        foreach ($response as $key => $val) {
+            if (!is_string($key) || is_object($val)) {
+                continue;
+            }
+            $result[$key] = $val;
+        }
+        return $result;
+    }
+
     /**
      * Initialize the Svea order object with the basic information such as
      * address, customer type, SSN, currency etc
@@ -71,7 +91,7 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
                     ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($address->getPostcode())
                     ->setLocality($address->getCity())
-                    ->setIpAddress($_SERVER['SERVER_ADDR']) // This doesn't cut it for reverse proxies
+                    ->setIpAddress(Mage::helper('core/http')->getRemoteAddr(true))
                     ->setPhoneNumber($address->getTelephone());
 
             if ($countryCode == "DE" || $countryCode == "NL") {
