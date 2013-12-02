@@ -13,6 +13,7 @@ class Svea_WebPay_Model_Creditmemo_Total_Paymentfee
 {
     public function collect(Mage_Sales_Model_Order_Creditmemo $creditMemo)
     {
+        return;
         if ($creditMemo->getOrder()->hasCreditmemos() != 0) {
             return $creditMemo;
         }

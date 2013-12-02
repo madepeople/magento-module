@@ -4,9 +4,9 @@
  * in the order_view totals block in /admin. It's important to realize that
  * this code doesn't *calculate* anything, it simply makes sure that the
  * payment fee is displayed correctly.
- * 
+ *
  * The class is used for orders, invoices and creditmemos.
- * 
+ *
  * @see Svea_WebPay_Model_Adminhtml_Observer
  */
 class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
@@ -29,7 +29,7 @@ class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
 
         $basePaymentFee = $payment->getAdditionalInformation('base_payment_fee')
                 ? : $paymentFee;
-        
+
         $label = Mage::helper('svea_webpay')->__('invoice_fee');
 
         $total = new Varien_Object(array(
@@ -40,7 +40,7 @@ class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
         ));
 
         $this->getParentBlock()
-                ->addTotal($total, 'last');
+                ->addTotal($total, 'shipping');
 
         return $this;
     }

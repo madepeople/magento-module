@@ -62,22 +62,11 @@
                 <totals>
                     <svea_handling_fee>
                         <class>svea_webpay/quote_total</class>
-                        <before>discount</before>
                         <after>tax</after>
+                        <before>grand_total</before>
                     </svea_handling_fee>
                 </totals>
             </quote>
-
-            <!-- Order admin -->
-            <order>
-                <totals>
-                    <svea_handling_fee>
-                        <class>svea_webpay/order_total_paymentfee</class>
-                        <after>subtotal,discount,shipping</after>
-                        <before>tax,grand_total</before>
-                    </svea_handling_fee>
-                </totals>
-            </order>
 
             <!-- Refund admin -->
             <order_creditmemo>
@@ -93,10 +82,24 @@
                 <totals>
                     <svea_handling_fee>
                         <class>svea_webpay/invoice_total_paymentfee</class>
+                        <after>tax</after>
                     </svea_handling_fee>
                 </totals>
             </order_invoice>
         </sales>
+
+        <pdf>
+            <totals>
+                <svea_handling_fee translate="title">
+                    <title>invoice_fee</title>
+                    <model>svea_webpay/sales_order_pdf_total_paymentfee</model>
+                    <source_field>payment_fee</source_field>
+                    <font_size>7</font_size>
+                    <display_zero>0</display_zero>
+                    <sort_order>450</sort_order>
+                </svea_handling_fee>
+            </totals>
+        </pdf>
 
         <fieldsets>
             <sales_convert_quote_address>

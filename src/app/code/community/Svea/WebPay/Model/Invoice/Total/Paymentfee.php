@@ -4,6 +4,7 @@ class Svea_WebPay_Model_Invoice_Total_Paymentfee extends Mage_Sales_Model_Order_
 {
     public function collect(Mage_Sales_Model_Order_Invoice $invoice)
     {
+        return $this;
         if ($invoice->getOrder()->hasInvoices() != 0) {
             return $this;
         }
@@ -20,7 +21,10 @@ class Svea_WebPay_Model_Invoice_Total_Paymentfee extends Mage_Sales_Model_Order_
         // Add tax
         if ($paymentFeeTaxAmount > 0) {
             $paymentFee -= $paymentFeeTaxAmount;
+            $invoice->setTaxAmount($invoice->getTaxAmount() + $paymentFeeTaxAmount);
             $invoice->setBaseTaxAmount($invoice->getBaseTaxAmount() + $paymentFeeTaxAmount);
+            $invoice->setSubtotal($invoice->getSubtotal() - $paymentFeeTaxAmount);
+            $invoice->setBaseSubtotal($invoice->getBaseSubtotal() - $paymentFeeTaxAmount);
         }
 
         $invoice->setGrandTotal($invoice->getGrandTotal() + $paymentFee);
