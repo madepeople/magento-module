@@ -87,8 +87,6 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
 
         if ($response->response->accepted == 1) {
             $payment = $order->getPayment();
-
-
             $payment->addTransaction(Mage_Payment_Model_Method_Abstract::ACTION_AUTHORIZE_CAPTURE);
             $payment->setPreparedMessage('Order has been paid at Svea.')
                     ->setTransactionId($response->response->transactionId)
@@ -105,6 +103,14 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
 
             $payment->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
             $payment->registerCaptureNotification($response->response->amount);
+
+            $newOrderStatus = $order->getPayment()
+                ->getMethodInstance()
+                ->getConfigData('new_order_status');
+
+            if (!empty($newOrderStatus)) {
+                $order->setStatus($newOrderStatus);
+            }
 
             $order->sendNewOrderEmail();
             $order->save();
