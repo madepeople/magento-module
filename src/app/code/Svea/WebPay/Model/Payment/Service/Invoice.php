@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Implementation of the Svea WebPay invoice method.
+ *
  * @author jonathan@madepeople.se
  */
 class Svea_WebPay_Model_Payment_Service_Invoice
@@ -20,18 +22,14 @@ class Svea_WebPay_Model_Payment_Service_Invoice
     protected $_code = 'svea_invoice';
     protected $_formBlockType = 'svea_webpay/payment_service_invoice';
 
-    protected function _sveaResponseToArray($response)
-    {
-        $result = array();
-        foreach ($response as $key => $val) {
-            if (!is_string($key) || is_object($val)) {
-                continue;
-            }
-            $result[$key] = $val;
-        }
-        return $result;
-    }
-
+    /**
+     * Authorize payment for later capture
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     * @return \Svea_WebPay_Model_Payment_Service_Invoice
+     * @throws Mage_Payment_Exeption
+     */
     public function authorize(Varien_Object $payment, $amount)
     {
         $sveaConfig = $this->_getSveaConfig();
@@ -62,6 +60,14 @@ class Svea_WebPay_Model_Payment_Service_Invoice
         return $this;
     }
 
+    /**
+     * Capture a previously authorized payment, this means we activate the
+     * actual invoice so we can charge a customer
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     * @return \Svea_WebPay_Model_Payment_Service_Invoice
+     */
     public function capture(Varien_Object $payment, $amount)
     {
         $sveaOrderId = $payment->getParentTransactionId();
@@ -102,12 +108,27 @@ class Svea_WebPay_Model_Payment_Service_Invoice
         return $this;
     }
 
+    /**
+     * Refund a previously captured invoice
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     * @return \Svea_WebPay_Model_Payment_Service_Invoice
+     * @throws Exception
+     */
     public function refund(Varien_Object $payment, $amount)
     {
         throw new Exception('implement me');
         return parent::refund($payment, $amount);
     }
 
+    /**
+     * Void (cancel) an authorized payment
+     *
+     * @param Varien_Object $payment
+     * @return \Svea_WebPay_Model_Payment_Service_Invoice
+     * @throws Exception
+     */
     public function void(Varien_Object $payment)
     {
         throw new Exception('implement me');
