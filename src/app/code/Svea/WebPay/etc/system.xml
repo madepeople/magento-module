@@ -37,8 +37,15 @@
                         </secretword_prod>
                     </fields>
                 </svea_configuration>-->
+                <svea_webpay translate="label">
+                    <label>Svea WebPay</label>
+                    <sort_order>672</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                </svea_webpay>
                 <svea_invoice translate="label">
-                    <label>Svea WebPay Invoice</label>
+                    <label>Svea WebPay Invoice Settings</label>
                     <sort_order>673</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
