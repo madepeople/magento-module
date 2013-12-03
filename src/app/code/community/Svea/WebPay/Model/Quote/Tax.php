@@ -16,10 +16,6 @@ class Svea_WebPay_Model_Quote_Tax
             return $this;
         }
 
-        if ($address->getAddressType() != "shipping") {
-            return $this;
-        }
-
         $items = $address->getAllItems();
         if (!count($items)) {
             return $this;
@@ -32,11 +28,6 @@ class Svea_WebPay_Model_Quote_Tax
         $methodInstance = $address->getQuote()
             ->getPayment()
             ->getMethodInstance();
-
-        $handlingFee = $methodInstance->getConfigData('handling_fee');
-        if (empty($handlingFee)) {
-            return $this;
-        }
 
         $custTaxClassId = $address->getQuote()->getCustomerTaxClassId();
         $store = $address->getQuote()->getStore();

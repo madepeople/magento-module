@@ -62,9 +62,14 @@
                 <totals>
                     <svea_handling_fee>
                         <class>svea_webpay/quote_total</class>
+                        <after>shipping</after>
+                        <before>tax</before>
+                    </svea_handling_fee>
+                    <svea_handling_fee_tax>
+                        <class>svea_webpay/quote_total</class>
                         <after>tax</after>
                         <before>grand_total</before>
-                    </svea_handling_fee>
+                    </svea_handling_fee_tax>
                 </totals>
             </quote>
 
