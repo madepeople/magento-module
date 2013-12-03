@@ -1,7 +1,7 @@
 "lang_code","sv"
 "invoice_info","Svea faktura"
 "paymentplan_info","Svea delbetalning"
-"redirect","Vidarebefodrar..."
+"redirect","För säker betalning skickas du nu vidare till vår betalleverantör Svea WebPay."
 "from_about","Från"
 "authorize_success %s","Lyckad betalning, Svea Order id: %s"
 "unit","st"
