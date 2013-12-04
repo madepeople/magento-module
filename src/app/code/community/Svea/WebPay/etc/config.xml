@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Svea_WebPay>
-            <version>4.0.11</version>
+            <version>4.0.12</version>
         </Svea_WebPay>
     </modules>
     <global>
@@ -61,13 +61,13 @@
                 <!-- For checkout + cart -->
                 <totals>
                     <svea_handling_fee>
-                        <class>svea_webpay/quote_total</class>
-                        <after>shipping</after>
-                        <before>tax</before>
+                        <class>svea_webpay/quote_total_paymentfee</class>
+                        <after>subtotal,freeshipping,msrp</after>
+                        <before>shipping,grand_total</before>
                     </svea_handling_fee>
                     <svea_handling_fee_tax>
-                        <class>svea_webpay/quote_total</class>
-                        <after>tax</after>
+                        <class>svea_webpay/quote_total_tax</class>
+                        <after>svea_handling_fee,tax_shipping,discount,msrp,tax</after>
                         <before>grand_total</before>
                     </svea_handling_fee_tax>
                 </totals>

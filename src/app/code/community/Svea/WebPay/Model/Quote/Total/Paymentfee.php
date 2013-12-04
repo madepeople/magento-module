@@ -1,6 +1,6 @@
 <?php
 
-class Svea_WebPay_Model_Quote_Total extends Mage_Sales_Model_Quote_Address_Total_Abstract
+class Svea_WebPay_Model_Quote_Total_Paymentfee extends Mage_Sales_Model_Quote_Address_Total_Abstract
 {
     public function __construct()
     {
@@ -9,8 +9,14 @@ class Svea_WebPay_Model_Quote_Total extends Mage_Sales_Model_Quote_Address_Total
 
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
+        parent::collect($address);
+        
         $address->setPaymentFee(0);
-        $address->setPaymentFeeExclVat(0);
+        $address->setBasePaymentFee(0);
+        $address->setPaymentFeeTax(0);
+        $address->setBasePaymentFeeTax(0);
+        $this->_setAmount(0)
+            ->_setBaseAmount(0);
 
         $collection = $address->getQuote()->getPaymentsCollection();
         if ($collection->count() <= 0
@@ -31,11 +37,15 @@ class Svea_WebPay_Model_Quote_Total extends Mage_Sales_Model_Quote_Address_Total
             ->getPayment()
             ->getMethodInstance();
 
-        $handlingFee = $methodInstance->getConfigData('handling_fee');
-        if (empty($handlingFee)) {
+        $baseHandlingFee = $methodInstance->getConfigData('handling_fee');
+        if (empty($baseHandlingFee)) {
             return $this;
         }
-
+  
+        $handlingFee = $address->getQuote()->getStore()->convertPrice($baseHandlingFee, false);
+        $address->setPaymentFee($handlingFee);
+        $address->setBasePaymentFee($baseHandlingFee);
+        
         $custTaxClassId = $address->getQuote()->getCustomerTaxClassId();
         $store = $address->getQuote()->getStore();
 
@@ -49,18 +59,20 @@ class Svea_WebPay_Model_Quote_Total extends Mage_Sales_Model_Quote_Address_Total
         );
 
         $taxClassId = $methodInstance->getConfigData('handling_fee_tax_class');
-        if (empty($taxClassId)) {
-            return $this;
-        }
-
-        $handlingFeeTax = 0;
-        $handlingFeeBaseTax = 0;
-
+        
         $rate = $taxCalculationModel->getRate($request->setProductClassId($taxClassId));
         if ($rate) {
-            $handlingFeeTax = $store->roundPrice($InvoiceTax);
-            $handlingFeeBaseTax = $store->roundPrice($InvoiceBaseTax);
+            $handlingFeeTax = $taxCalculationModel->calcTaxAmount($address->getPaymentFee(), $rate, true, false);
+            $baseHandlingFeeTax = $taxCalculationModel->calcTaxAmount($address->getBasePaymentFee(), $rate, true, false);
+            
+            $address->setPaymentFeeTax($handlingFeeTax);
+            $address->setBasePaymentFeeTax($baseHandlingFeeTax);
         }
+
+        $this->_setAmount($handlingFee - $address->getPaymentFeeTax())
+            ->_setBaseAmount($baseHandlingFee - $address->getBasePaymentFeeTax());
+
+        return $this;
     }
 
     public function fetch(Mage_Sales_Model_Quote_Address $address)
