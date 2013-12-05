@@ -207,8 +207,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Invoice fee
-        $paymentFee = $invoice->getOrder()->getSveaPaymentFeeAmount();
-        $paymentFeeInclTax = $invoice->getOrder()->getSveaPaymentFeeInclTax();
+        $paymentFee = $invoice->getSveaPaymentFeeAmount();
+        $paymentFeeInclTax = $invoice->getSveaPaymentFeeInclTax();
         $invoiced = $invoice->getOrder()->getSveaPaymentFeeInvoiced();
 
         if ($paymentFee > 0 && $invoiced == 0) {
@@ -311,7 +311,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $sveaObject->addDiscount($discountRow);
         }
 
-        //Gift cards
+        // Gift cards
         if (abs($creditMemo->getGiftCardsAmount()) > 0) {
             $giftCardRow = Item::fixedDiscount()
                     ->setAmountIncVat(abs($creditMemo->getGiftCardsAmount()))
@@ -321,21 +321,22 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Invoice fee
-        $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
-        $adjustmentFee = $creditMemo->getAdjustmentPositive();
-        $paymentFeeTaxAmount = $payment->getAdditionalInformation('svea_payment_fee_tax_amount');
-        $refunded = $payment->getAdditionalInformation('svea_payment_fee_refunded');
-
-        if ($paymentFee > 0 && $refunded == 0 && $paymentFee == $adjustmentFee) {
+        $paymentFee = $creditMemo->getSveaPaymentFeeAmount();
+        $paymentFeeInclTax = $creditMemo->getSveaPaymentFeeInclTax();
+        $refunded = $creditMemo->getOrder()->getSveaPaymentFeeRefunded();
+        if ($paymentFee > 0 && $refunded == 0) {
             $invoiceFee = Item::invoiceFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-                    ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
-                    ->setAmountIncVat($paymentFee);
+                    ->setAmountExVat($paymentFee)
+                    ->setAmountIncVat($paymentFeeInclTax);
 
             $sveaObject = $sveaObject->addFee($invoiceFee);
-            $payment->setAdditionalInformation('svea_payment_fee_refunded', 1);
-        } else if ($adjustmentFee > 0) {
+            $creditMemo->getOrder()->setSveaPaymentFeeRefunded($paymentFeeInclTax);
+        }
+
+        $adjustmentFee = $creditMemo->getAdjustmentPositive();
+        if ($adjustmentFee > 0) {
             $invoiceAdjustment = Item::invoiceFee()
                     ->setVatPercent(0)
                     ->setAmountIncVat($adjustmentFee);

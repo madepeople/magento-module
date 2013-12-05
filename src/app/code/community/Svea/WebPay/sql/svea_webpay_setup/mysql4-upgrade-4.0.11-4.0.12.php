@@ -37,6 +37,13 @@ $installer->run("
     ALTER TABLE {$this->getTable('sales/invoice')} ADD base_svea_payment_fee_amount decimal(12,4) DEFAULT NULL COMMENT 'Base Svea Payment Fee Amount';
     ALTER TABLE {$this->getTable('sales/invoice')} ADD base_svea_payment_fee_tax_amount decimal(12,4) DEFAULT NULL COMMENT 'Base Svea Payment Fee Tax Amount';
     ALTER TABLE {$this->getTable('sales/invoice')} ADD base_svea_payment_fee_incl_tax decimal(12,4) DEFAULT NULL COMMENT 'Base Svea Payment Fee Incl Tax';
+
+    ALTER TABLE {$this->getTable('sales/creditmemo')} ADD svea_payment_fee_amount decimal(12,4) DEFAULT NULL COMMENT 'Svea Payment Fee Amount';
+    ALTER TABLE {$this->getTable('sales/creditmemo')} ADD svea_payment_fee_tax_amount decimal(12,4) DEFAULT NULL COMMENT 'Svea Payment Fee Tax Amount';
+    ALTER TABLE {$this->getTable('sales/creditmemo')} ADD svea_payment_fee_incl_tax decimal(12,4) DEFAULT NULL COMMENT 'Svea Payment Fee Incl Tax';
+    ALTER TABLE {$this->getTable('sales/creditmemo')} ADD base_svea_payment_fee_amount decimal(12,4) DEFAULT NULL COMMENT 'Base Svea Payment Fee Amount';
+    ALTER TABLE {$this->getTable('sales/creditmemo')} ADD base_svea_payment_fee_tax_amount decimal(12,4) DEFAULT NULL COMMENT 'Base Svea Payment Fee Tax Amount';
+    ALTER TABLE {$this->getTable('sales/creditmemo')} ADD base_svea_payment_fee_incl_tax decimal(12,4) DEFAULT NULL COMMENT 'Base Svea Payment Fee Incl Tax';
 ");
 
 $installer->endSetup();

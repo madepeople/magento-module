@@ -73,25 +73,26 @@
                 </totals>
             </quote>
 
+            <!-- Invoice admin -->
+            <order_invoice>
+                <totals>
+                    <svea_payment_fee>
+                        <class>svea_webpay/invoice_total_paymentfee</class>
+                        <after>subtotal,shipping,cost,tax</after>
+                        <before>grand_total</before>
+                    </svea_payment_fee>
+                </totals>
+            </order_invoice>
+
             <!-- Refund admin -->
             <order_creditmemo>
                 <totals>
                     <svea_payment_fee>
                         <class>svea_webpay/creditmemo_total_paymentfee</class>
+                        <after>subtotal,wee,discount,shipping,cost_total,grand_total,tax</after>
                     </svea_payment_fee>
                 </totals>
             </order_creditmemo>
-
-            <order_invoice>
-                <!-- Invoice admin -->
-                <totals>
-                    <svea_payment_fee>
-                        <class>svea_webpay/invoice_total_paymentfee</class>
-                        <after>subtotal,shipping,tax</after>
-                        <before>grand_total</before>
-                    </svea_payment_fee>
-                </totals>
-            </order_invoice>
         </sales>
 
         <pdf>

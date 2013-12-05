@@ -22,18 +22,24 @@ class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
             return;
         }
 
-        if ($this->getParentBlock() instanceof Mage_Adminhtml_Block_Sales_Order_Invoice_Totals) {
-            if ($order->getSveaPaymentFeeInvoiced()) {
+        $parentBlock = $this->getParentBlock();
+        if ($parentBlock instanceof Mage_Adminhtml_Block_Sales_Order_Invoice_Totals) {
+            if (!$parentBlock->getInvoice()->getId() && $order->getSveaPaymentFeeInvoiced()) {
                 return;
             }
-        } else if ($this->getParentBlock() instanceof Mage_Adminhtml_Block_Sales_Order_Creditmemo_Totals) {
-            if ($order->getSveaPaymentFeeRefunded() == $order->getSveaPaymentFeeInclTax()) {
+            $source = $parentBlock->getInvoice();
+        } else if ($parentBlock instanceof Mage_Adminhtml_Block_Sales_Order_Creditmemo_Totals) {
+            if (!$parentBlock->getCreditmemo()->getId() && $order->getSveaPaymentFeeRefunded() == $order->getSveaPaymentFeeInclTax()) {
                 return;
             }
+            $source = $parentBlock->getCreditmemo();
+        } else {
+            $source = $order;
         }
 
-        $paymentFee = $order->getSveaPaymentFeeInclTax();
-        $basePaymentFee = $order->getBaseSveaPaymentFeeInclTax();
+        $paymentFee = $source->getSveaPaymentFeeInclTax();
+        $basePaymentFee = $source->getBaseSveaPaymentFeeInclTax();
+
         if (empty($paymentFee)) {
             return;
         }
