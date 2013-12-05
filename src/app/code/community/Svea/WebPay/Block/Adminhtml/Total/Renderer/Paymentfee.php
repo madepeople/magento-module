@@ -14,21 +14,29 @@ class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
 {
     public function initTotals()
     {
-        $payment = $this->getParentBlock()
-                ->getOrder()
-                ->getPayment();
+        $order = $this->getParentBlock()
+                ->getOrder();
+        $payment = $order->getPayment();
 
         if (!preg_match('/svea_invoice/', $payment->getMethod())) {
             return;
         }
 
-        $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
+        if ($this->getParentBlock() instanceof Mage_Adminhtml_Block_Sales_Order_Invoice_Totals) {
+            if ($order->getSveaPaymentFeeInvoiced()) {
+                return;
+            }
+        } else if ($this->getParentBlock() instanceof Mage_Adminhtml_Block_Sales_Order_Creditmemo_Totals) {
+            if ($order->getSveaPaymentFeeRefunded() == $order->getSveaPaymentFeeInclTax()) {
+                return;
+            }
+        }
+
+        $paymentFee = $order->getSveaPaymentFeeInclTax();
+        $basePaymentFee = $order->getBaseSveaPaymentFeeInclTax();
         if (empty($paymentFee)) {
             return;
         }
-
-        $basePaymentFee = $payment->getAdditionalInformation('base_payment_fee')
-                ? : $paymentFee;
 
         $label = Mage::helper('svea_webpay')->__('invoice_fee');
 
@@ -40,7 +48,7 @@ class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
         ));
 
         $this->getParentBlock()
-                ->addTotal($total, 'shipping');
+                ->addTotal($total, 'shipping_incl');
 
         return $this;
     }

@@ -181,7 +181,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $shippingFee = Item::shippingFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName($invoice->getShippingMethod())
-                    ->setDescription($invoice->getShippingDescription())
+                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription())
                     ->setAmountExVat($invoice->getShippingAmount())
                     ->setAmountIncVat($shippingIncVat);
 
@@ -207,20 +207,19 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Invoice fee
-        $payment = $invoice->getOrder()->getPayment();
         $paymentFee = $invoice->getOrder()->getSveaPaymentFeeAmount();
-        $paymentFeeTaxAmount = $invoice->getOrder()->getSveaPaymentFeeTaxAmount();
+        $paymentFeeInclTax = $invoice->getOrder()->getSveaPaymentFeeInclTax();
         $invoiced = $invoice->getOrder()->getSveaPaymentFeeInvoiced();
 
         if ($paymentFee > 0 && $invoiced == 0) {
             $invoiceFee = Item::invoiceFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-                    ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
-                    ->setAmountIncVat($paymentFee);
+                    ->setAmountExVat($paymentFee)
+                    ->setAmountIncVat($paymentFeeInclTax);
 
             $sveaObject->addFee($invoiceFee);
-            $payment->setAdditionalInformation('svea_payment_fee_invoiced', 1);
+            $invoice->getOrder()->setSveaPaymentFeeInvoiced($paymentFeeInclTax);
         }
 
         $sveaObject = $sveaObject->setCountryCode($countryCode)

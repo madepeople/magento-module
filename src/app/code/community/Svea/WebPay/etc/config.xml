@@ -76,19 +76,20 @@
             <!-- Refund admin -->
             <order_creditmemo>
                 <totals>
-                    <svea_handling_fee>
+                    <svea_payment_fee>
                         <class>svea_webpay/creditmemo_total_paymentfee</class>
-                    </svea_handling_fee>
+                    </svea_payment_fee>
                 </totals>
             </order_creditmemo>
 
             <order_invoice>
                 <!-- Invoice admin -->
                 <totals>
-                    <svea_handling_fee>
+                    <svea_payment_fee>
                         <class>svea_webpay/invoice_total_paymentfee</class>
-                        <after>tax</after>
-                    </svea_handling_fee>
+                        <after>subtotal,shipping,tax</after>
+                        <before>grand_total</before>
+                    </svea_payment_fee>
                 </totals>
             </order_invoice>
         </sales>
@@ -114,12 +115,18 @@
                 <svea_payment_fee_tax_amount>
                     <to_order>*</to_order>
                 </svea_payment_fee_tax_amount>
+                <svea_payment_fee_incl_tax>
+                    <to_order>*</to_order>
+                </svea_payment_fee_incl_tax>
                 <base_svea_payment_fee_amount>
                     <to_order>*</to_order>
                 </base_svea_payment_fee_amount>
                 <base_svea_payment_fee_tax_amount>
                     <to_order>*</to_order>
                 </base_svea_payment_fee_tax_amount>
+                <base_svea_payment_fee_incl_tax>
+                    <to_order>*</to_order>
+                </base_svea_payment_fee_incl_tax>
             </sales_convert_quote_address>
         </fieldsets>
 
@@ -245,7 +252,7 @@
         <sales>
             <!-- Used by the quote to sort totals -->
             <totals_sort>
-                <svea_handling_fee>15</svea_handling_fee>
+                <svea_payment_fee>15</svea_payment_fee>
             </totals_sort>
         </sales>
         <payment>
