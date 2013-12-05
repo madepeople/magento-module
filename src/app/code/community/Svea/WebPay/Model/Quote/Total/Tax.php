@@ -14,7 +14,7 @@ class Svea_WebPay_Model_Quote_Total_Tax
 
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
-        if (!$address->getPaymentFeeTax()) {
+        if (!$address->getSveaPaymentFeeAmount()) {
             return $this;
         }
 
@@ -40,24 +40,27 @@ class Svea_WebPay_Model_Quote_Total_Tax
 
         $rate = $taxCalculationModel->getRate($request->setProductClassId($taxClassId));
         if ($rate) {
-            $this->_getAddress()->addTotalAmount('tax', $address->getPaymentFeeTax());
-            $this->_getAddress()->addBaseTotalAmount('tax', $address->getBasePaymentFeeTax());
+//            $this->_getAddress()->addTotalAmount('tax', $address->getSveaPaymentFeeTaxAmount());
+//            $this->_getAddress()->addBaseTotalAmount('tax', $address->getBaseSveaPaymentFeeTaxAmount());
+            $paymentFeeTax = $taxCalculationModel->calcTaxAmount($address->getSveaPaymentFeeAmount(), $rate, true, false);
+            $basePaymentFeeTax = $taxCalculationModel->calcTaxAmount($address->getBaseSveaPaymentFeeAmount(), $rate, true, false);
 
-            $this->_saveAppliedTaxes(
-                $address,
-                $taxCalculationModel->getAppliedRates($request),
-                $address->getPaymentFeeTax(),
-                $address->getBasePaymentFeeTax(),
-                $rate
-            );
+            $address->setSveaPaymentFeeTaxAmount($paymentFeeTax);
+            $address->setBaseSveaPaymentFeeTaxAmount($basePaymentFeeTax);
         }
+
+        $paymentFee = $address->getSveaPaymentFeeAmount() - $address->getSveaPaymentFeeTaxAmount();
+        $basePaymentFee = $address->getBaseSveaPaymentFeeAmount() - $address->getBaseSveaPaymentFeeTaxAmount();
+
+        $address->setTotalAmount('svea_payment_fee', $paymentFee);
+        $address->setBaseTotalAmount('svea_payment_fee', $basePaymentFee);
 
         return $this;
     }
 
     public function fetch(Mage_Sales_Model_Quote_Address $address)
     {
-        // Override the default tax fetcher
+        // We don't need this be separate
         return $this;
     }
 }
