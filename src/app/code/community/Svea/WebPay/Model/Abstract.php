@@ -161,7 +161,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         }
 
         // Invoice fee
-        $paymentFee = $order->getPayment()->getAdditionalInformation('svea_payment_fee');
+        $paymentFee = $order->getSveaPaymentFeeInclTax();
 
         if ($paymentFee > 0) {
             $paymentFeeTaxClass = $this->getConfigData('handling_fee_tax_class');
