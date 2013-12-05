@@ -1,24 +1,22 @@
 <?php
 
 class Svea_WebPay_Model_Quote_Total_Tax
-    extends Mage_Tax_Model_Sales_Total_Quote_Tax
+    extends Mage_Sales_Model_Quote_Address_Total_Abstract
 {
     public function __construct()
     {
         $this->setCode('svea_handling_fee_tax');
-        $this->_helper      = Mage::helper('tax');
-        $this->_calculator  = Mage::getSingleton('tax/calculation');
-        $this->_config      = Mage::getSingleton('tax/config');
-        $this->_weeeHelper = Mage::helper('weee');
     }
 
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
+        parent::collect($address);
+
+        $address->setSveaPaymentFeeTaxAmount(0);
+        $address->setBaseSveaPaymentFeeTaxAmount(0);
         if (!$address->getSveaPaymentFeeAmount()) {
             return $this;
         }
-
-        $this->_setAddress($address);
 
         $custTaxClassId = $address->getQuote()->getCustomerTaxClassId();
         $store = $address->getQuote()->getStore();
@@ -36,31 +34,31 @@ class Svea_WebPay_Model_Quote_Total_Tax
             ->getPayment()
             ->getMethodInstance();
 
-        $taxClassId = $methodInstance->getConfigData('handling_fee_tax_class');
+        $paymentFeeTax = 0;
+        $basePaymentFeeTax = 0;
 
+        $taxClassId = $methodInstance->getConfigData('handling_fee_tax_class');
         $rate = $taxCalculationModel->getRate($request->setProductClassId($taxClassId));
+
         if ($rate) {
-//            $this->_getAddress()->addTotalAmount('tax', $address->getSveaPaymentFeeTaxAmount());
-//            $this->_getAddress()->addBaseTotalAmount('tax', $address->getBaseSveaPaymentFeeTaxAmount());
             $paymentFeeTax = $taxCalculationModel->calcTaxAmount($address->getSveaPaymentFeeAmount(), $rate, true, false);
             $basePaymentFeeTax = $taxCalculationModel->calcTaxAmount($address->getBaseSveaPaymentFeeAmount(), $rate, true, false);
-
-            $address->setSveaPaymentFeeTaxAmount($paymentFeeTax);
-            $address->setBaseSveaPaymentFeeTaxAmount($basePaymentFeeTax);
         }
 
-        $paymentFee = $address->getSveaPaymentFeeAmount() - $address->getSveaPaymentFeeTaxAmount();
-        $basePaymentFee = $address->getBaseSveaPaymentFeeAmount() - $address->getBaseSveaPaymentFeeTaxAmount();
+        $paymentFee = $address->getSveaPaymentFeeAmount();
+        $basePaymentFee = $address->getBaseSveaPaymentFeeAmount();
+        if ($methodInstance->getConfigData('handling_fee_includes_tax')) {
+            $paymentFee -= $paymentFeeTax;
+            $basePaymentFee -= $basePaymentFeeTax;
+        }
 
+        $address->setSveaPaymentFeeTaxAmount($paymentFeeTax);
+        $address->setBaseSveaPaymentFeeTaxAmount($basePaymentFeeTax);
         $address->setTotalAmount('svea_payment_fee', $paymentFee);
         $address->setBaseTotalAmount('svea_payment_fee', $basePaymentFee);
+        $this->_getAddress()->addTotalAmount('tax', $address->getSveaPaymentFeeTaxAmount());
+        $this->_getAddress()->addBaseTotalAmount('tax', $address->getBaseSveaPaymentFeeTaxAmount());
 
-        return $this;
-    }
-
-    public function fetch(Mage_Sales_Model_Quote_Address $address)
-    {
-        // We don't need this be separate
         return $this;
     }
 }

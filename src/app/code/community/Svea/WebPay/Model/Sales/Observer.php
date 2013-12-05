@@ -10,24 +10,6 @@
  */
 class Svea_WebPay_Model_Sales_Observer
 {
-    public function addPaymentFeeToPayment(Varien_Event_Observer $observer)
-    {
-        $order = $observer->getEvent()->getOrder();
-
-        $payment = $order->getPayment();
-        if (!preg_match('/svea_invoice/', $payment->getMethod())) {
-            return;
-        }
-
-        $paymentFee = $order->getBillingAddress()->getPaymentFee();
-        if (empty($paymentFee)) {
-            return;
-        }
-
-        $payment->setAdditionalInformation('svea_payment_fee', $paymentFee)
-                ->save();
-    }
-
     public function autodeliverOrder(Varien_Event_Observer $observer)
     {
         $payment = $observer->getEvent()->getPayment();

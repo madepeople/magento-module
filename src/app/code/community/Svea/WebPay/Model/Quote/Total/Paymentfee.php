@@ -24,12 +24,12 @@ class Svea_WebPay_Model_Quote_Total_Paymentfee extends Mage_Sales_Model_Quote_Ad
             return $this;
         }
 
-        $items = $address->getAllItems();
-        if (!count($items)) {
+        if ($address->getQuote()->getPayment()->getMethod() !== 'svea_invoice') {
             return $this;
         }
 
-        if ($address->getQuote()->getPayment()->getMethod() !== 'svea_invoice') {
+        $items = $address->getAllItems();
+        if (!count($items)) {
             return $this;
         }
 
@@ -58,7 +58,8 @@ class Svea_WebPay_Model_Quote_Total_Paymentfee extends Mage_Sales_Model_Quote_Ad
             $total = array(
                 'code' => $this->getCode(),
                 'title' => Mage::helper('svea_webpay')->__('invoice_fee'),
-                'value' => $address->getSveaPaymentFeeAmount()
+                'value' => $address->getSveaPaymentFeeAmount() +
+                        $address->getSveaPaymentFeeTaxAmount()
             );
             $address->addTotal($total);
         }

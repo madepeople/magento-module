@@ -208,9 +208,9 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
         // Invoice fee
         $payment = $invoice->getOrder()->getPayment();
-        $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
-        $paymentFeeTaxAmount = $payment->getAdditionalInformation('svea_payment_fee_tax_amount');
-        $invoiced = $payment->getAdditionalInformation('svea_payment_fee_invoiced');
+        $paymentFee = $invoice->getOrder()->getSveaPaymentFeeAmount();
+        $paymentFeeTaxAmount = $invoice->getOrder()->getSveaPaymentFeeTaxAmount();
+        $invoiced = $invoice->getOrder()->getSveaPaymentFeeInvoiced();
 
         if ($paymentFee > 0 && $invoiced == 0) {
             $invoiceFee = Item::invoiceFee()
