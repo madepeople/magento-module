@@ -37,8 +37,8 @@ class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
             $source = $order;
         }
 
-        $paymentFee = $source->getSveaPaymentFeeInclTax();
-        $basePaymentFee = $source->getBaseSveaPaymentFeeInclTax();
+        $paymentFee = (float)$source->getSveaPaymentFeeInclTax();
+        $basePaymentFee = (float)$source->getBaseSveaPaymentFeeInclTax();
 
         if (empty($paymentFee)) {
             return;

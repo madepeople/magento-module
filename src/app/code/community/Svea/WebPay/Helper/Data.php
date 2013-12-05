@@ -285,7 +285,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                     ->setAmountIncVat($priceInclTax);
 
             $sveaObject->addOrderRow($orderRow);
-
         }
 
         // Shipping
@@ -295,7 +294,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $shippingFee = Item::shippingFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName($creditMemo->getShippingMethod())
-                    ->setDescription($creditMemo->getShippingDescription())
+                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription())
                     ->setAmountExVat($creditMemo->getShippingAmount())
                     ->setAmountIncVat($shippingIncVat);
 
