@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Svea_WebPay>
-            <version>4.0.11</version>
+            <version>4.0.12</version>
         </Svea_WebPay>
     </modules>
     <global>
@@ -60,70 +60,78 @@
             <quote>
                 <!-- For checkout + cart -->
                 <totals>
-                    <svea_handling_fee>
-                        <class>svea_webpay/quote_total</class>
-                        <before>discount</before>
-                        <after>tax</after>
-                    </svea_handling_fee>
+                    <svea_payment_fee>
+                        <class>svea_webpay/quote_total_paymentfee</class>
+                        <after>subtotal,freeshipping,msrp</after>
+                        <before>shipping,grand_total</before>
+                    </svea_payment_fee>
+                    <svea_payment_fee_tax>
+                        <class>svea_webpay/quote_total_tax</class>
+                        <after>svea_payment_fee,tax_shipping,discount,msrp,tax</after>
+                        <before>grand_total</before>
+                    </svea_payment_fee_tax>
                 </totals>
             </quote>
 
-            <!-- Order admin -->
-            <order>
+            <!-- Invoice admin -->
+            <order_invoice>
                 <totals>
-                    <svea_handling_fee>
-                        <class>svea_webpay/order_total_paymentfee</class>
-                        <after>subtotal,discount,shipping</after>
-                        <before>tax,grand_total</before>
-                    </svea_handling_fee>
+                    <svea_payment_fee>
+                        <class>svea_webpay/invoice_total_paymentfee</class>
+                        <after>subtotal,shipping,cost,tax</after>
+                        <before>grand_total</before>
+                    </svea_payment_fee>
                 </totals>
-            </order>
+            </order_invoice>
 
             <!-- Refund admin -->
             <order_creditmemo>
                 <totals>
-                    <svea_handling_fee>
+                    <svea_payment_fee>
                         <class>svea_webpay/creditmemo_total_paymentfee</class>
-                    </svea_handling_fee>
+                        <after>subtotal,wee,discount,shipping,cost_total,grand_total,tax</after>
+                    </svea_payment_fee>
                 </totals>
             </order_creditmemo>
-
-            <order_invoice>
-                <!-- Invoice admin -->
-                <totals>
-                    <svea_handling_fee>
-                        <class>svea_webpay/invoice_total_paymentfee</class>
-                    </svea_handling_fee>
-                </totals>
-            </order_invoice>
         </sales>
+
+        <pdf>
+            <totals>
+                <svea_handling_fee translate="title">
+                    <title>invoice_fee</title>
+                    <model>svea_webpay/sales_order_pdf_total_paymentfee</model>
+                    <source_field>payment_fee</source_field>
+                    <font_size>7</font_size>
+                    <display_zero>0</display_zero>
+                    <sort_order>450</sort_order>
+                </svea_handling_fee>
+            </totals>
+        </pdf>
 
         <fieldsets>
             <sales_convert_quote_address>
-                <svea_payment_fee>
-                    <to_order_address>*</to_order_address>
-                </svea_payment_fee>
+                <svea_payment_fee_amount>
+                    <to_order>*</to_order>
+                </svea_payment_fee_amount>
+                <svea_payment_fee_tax_amount>
+                    <to_order>*</to_order>
+                </svea_payment_fee_tax_amount>
+                <svea_payment_fee_incl_tax>
+                    <to_order>*</to_order>
+                </svea_payment_fee_incl_tax>
+                <base_svea_payment_fee_amount>
+                    <to_order>*</to_order>
+                </base_svea_payment_fee_amount>
+                <base_svea_payment_fee_tax_amount>
+                    <to_order>*</to_order>
+                </base_svea_payment_fee_tax_amount>
+                <base_svea_payment_fee_incl_tax>
+                    <to_order>*</to_order>
+                </base_svea_payment_fee_incl_tax>
             </sales_convert_quote_address>
-
-            <sales_convert_order>
-                <svea_payment_fee>
-                    <to_invoice>*</to_invoice>
-                    <to_shipment>*</to_shipment>
-                    <to_cm>*</to_cm>
-                </svea_payment_fee>
-            </sales_convert_order>
         </fieldsets>
 
         <events>
-            <sales_model_service_quote_submit_before>
-                <observers>
-                    <add_payment_fee_to_payment>
-                        <type>singleton</type>
-                        <class>svea_webpay/sales_observer</class>
-                        <method>addPaymentFeeToPayment</method>
-                    </add_payment_fee_to_payment>
-                </observers>
-            </sales_model_service_quote_submit_before>
             <sales_order_payment_place_start>
                 <observers>
                     <setup_hosted_order>
@@ -245,7 +253,7 @@
         <sales>
             <!-- Used by the quote to sort totals -->
             <totals_sort>
-                <svea_handling_fee>15</svea_handling_fee>
+                <svea_payment_fee>15</svea_payment_fee>
             </totals_sort>
         </sales>
         <payment>
@@ -273,6 +281,7 @@
                 <order_status>pending</order_status>
                 <title>Svea Invoice</title>
                 <test>1</test>
+                <handling_fee_includes_tax>1</handling_fee_includes_tax>
                 <payment_action>authorize</payment_action>
             </svea_invoice>
             <svea_paymentplan>

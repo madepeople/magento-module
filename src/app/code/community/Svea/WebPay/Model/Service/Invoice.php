@@ -60,14 +60,18 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
         $response = $sveaObject
                 ->deliverInvoiceOrder()
                 ->doRequest();
-        
+
         if ($response->accepted == 1) {
             $successMessage = Mage::helper('svea_webpay')->__('delivered');
-            $order->addStatusToHistory($this->getConfigData('paid_order_status'), $successMessage, false);
-            $payment->setIsTransactionClosed(false);
-            $paymentInfo = $this->getInfoInstance();
-            $paymentInfo->setAdditionalInformation('svea_invoice_id', $response->invoiceId);
-            $order->save();
+            $orderStatus = $this->getConfigData('paid_order_status')
+                ?: $order->getStatus();
+            if (!empty($orderStatus)) {
+                $order->addStatusToHistory($orderStatus, $successMessage, false);
+            }
+            $rawDetails = $this->_sveaResponseToArray($response);
+            $payment->setTransactionId($response->invoiceId)
+                ->setIsTransactionClosed(false)
+                ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
         } else {
             $errorMessage = $response->errormessage;
             $statusCode = $response->resultcode;
@@ -80,6 +84,8 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
 
             return Mage::throwException($errorTranslated);
         }
+
+        return $this;
     }
 
     /**
@@ -110,12 +116,17 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
         $paymentMethodConfig = $this->getSveaStoreConfClass($order->getStoreId());
         Mage::helper('svea_webpay')->getRefundRequest($payment, $paymentMethodConfig, $sveaOrderId);
         $sveaObject = $order->getData('svea_refund_request');
-        $response = $sveaObject->setCreditInvoice($this->getInfoInstance()
-                ->getAdditionalInformation('svea_invoice_id'))
-                ->deliverInvoiceOrder()->doRequest();
+
+        $invoiceId = (int)$payment->getRefundTransactionId();
+        $response = $sveaObject->setCreditInvoice($invoiceId)
+            ->deliverInvoiceOrder()
+            ->doRequest();
 
         if ($response->accepted == 1) {
-            return parent::refund($payment, $amount);
+            $rawDetails = $this->_sveaResponseToArray($response);
+            $payment->setTransactionId($response->invoiceId)
+                ->setLastTransId($response->invoiceId)
+                ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
         } else {
             $errorMessage = $response->errormessage;
             $statusCode = $response->resultcode;
@@ -124,6 +135,8 @@ class Svea_WebPay_Model_Service_Invoice extends Svea_WebPay_Model_Service_Abstra
 
             return Mage::throwException($errorTranslated);
         }
+
+        return $this;
     }
 
     /**

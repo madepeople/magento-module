@@ -181,7 +181,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $shippingFee = Item::shippingFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName($invoice->getShippingMethod())
-                    ->setDescription($invoice->getShippingDescription())
+                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription())
                     ->setAmountExVat($invoice->getShippingAmount())
                     ->setAmountIncVat($shippingIncVat);
 
@@ -207,20 +207,19 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Invoice fee
-        $payment = $invoice->getOrder()->getPayment();
-        $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
-        $paymentFeeTaxAmount = $payment->getAdditionalInformation('svea_payment_fee_tax_amount');
-        $invoiced = $payment->getAdditionalInformation('svea_payment_fee_invoiced');
+        $paymentFee = $invoice->getSveaPaymentFeeAmount();
+        $paymentFeeInclTax = $invoice->getSveaPaymentFeeInclTax();
+        $invoiced = $invoice->getOrder()->getSveaPaymentFeeInvoiced();
 
         if ($paymentFee > 0 && $invoiced == 0) {
             $invoiceFee = Item::invoiceFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-                    ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
-                    ->setAmountIncVat($paymentFee);
+                    ->setAmountExVat($paymentFee)
+                    ->setAmountIncVat($paymentFeeInclTax);
 
             $sveaObject->addFee($invoiceFee);
-            $payment->setAdditionalInformation('svea_payment_fee_invoiced', 1);
+            $invoice->getOrder()->setSveaPaymentFeeInvoiced($paymentFeeInclTax);
         }
 
         $sveaObject = $sveaObject->setCountryCode($countryCode)
@@ -286,7 +285,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                     ->setAmountIncVat($priceInclTax);
 
             $sveaObject->addOrderRow($orderRow);
-
         }
 
         // Shipping
@@ -296,7 +294,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $shippingFee = Item::shippingFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName($creditMemo->getShippingMethod())
-                    ->setDescription($creditMemo->getShippingDescription())
+                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription())
                     ->setAmountExVat($creditMemo->getShippingAmount())
                     ->setAmountIncVat($shippingIncVat);
 
@@ -312,7 +310,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $sveaObject->addDiscount($discountRow);
         }
 
-        //Gift cards
+        // Gift cards
         if (abs($creditMemo->getGiftCardsAmount()) > 0) {
             $giftCardRow = Item::fixedDiscount()
                     ->setAmountIncVat(abs($creditMemo->getGiftCardsAmount()))
@@ -322,21 +320,22 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Invoice fee
-        $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
-        $adjustmentFee = $creditMemo->getAdjustmentPositive();
-        $paymentFeeTaxAmount = $payment->getAdditionalInformation('svea_payment_fee_tax_amount');
-        $refunded = $payment->getAdditionalInformation('svea_payment_fee_refunded');
-
-        if ($paymentFee > 0 && $refunded == 0 && $paymentFee == $adjustmentFee) {
+        $paymentFee = $creditMemo->getSveaPaymentFeeAmount();
+        $paymentFeeInclTax = $creditMemo->getSveaPaymentFeeInclTax();
+        $refunded = $creditMemo->getOrder()->getSveaPaymentFeeRefunded();
+        if ($paymentFee > 0 && $refunded == 0) {
             $invoiceFee = Item::invoiceFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-                    ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
-                    ->setAmountIncVat($paymentFee);
+                    ->setAmountExVat($paymentFee)
+                    ->setAmountIncVat($paymentFeeInclTax);
 
             $sveaObject = $sveaObject->addFee($invoiceFee);
-            $payment->setAdditionalInformation('svea_payment_fee_refunded', 1);
-        } else if ($adjustmentFee > 0) {
+            $creditMemo->getOrder()->setSveaPaymentFeeRefunded($paymentFeeInclTax);
+        }
+
+        $adjustmentFee = $creditMemo->getAdjustmentPositive();
+        if ($adjustmentFee > 0) {
             $invoiceAdjustment = Item::invoiceFee()
                     ->setVatPercent(0)
                     ->setAmountIncVat($adjustmentFee);
