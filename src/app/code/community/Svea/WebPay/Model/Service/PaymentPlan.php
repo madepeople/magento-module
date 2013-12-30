@@ -58,7 +58,7 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
         }
         $order = $payment->getOrder();
         $countryCode = $order->getBillingAddress()->getCountryId();
-        $paymentMethodConfig = $this->getSveaStoreConfClass();
+        $paymentMethodConfig = $this->getSveaStoreConfClass($order->getStoreId());
         $conf = new SveaMageConfigProvider($paymentMethodConfig);
         $sveaObject = WebPay::deliverOrder($conf);
         $response = $sveaObject
