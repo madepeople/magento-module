@@ -145,9 +145,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;
             }
-            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_GROUPED) {
-                continue;
-            }
 
             if (!$item->getQty()) {
                 continue;
@@ -257,9 +254,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                 continue;
             }
             if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
-                continue;
-            }
-            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_GROUPED) {
                 continue;
             }
 
