@@ -37,7 +37,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         }
         return $result;
     }
-    
+
     /**
      * Add Customer details to Svea CreateOrder object
      *
@@ -156,7 +156,8 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
      */
     public function void(Varien_Object $payment)
     {
-        $auth = $this->getSveaStoreConfClass();
+        $order = $payment->getOrder();
+        $auth = $this->getSveaStoreConfClass($order->getStoreId());
         $conf = new SveaMageConfigProvider($auth);
 
         $sveaObject = WebPay::closeOrder($conf);
