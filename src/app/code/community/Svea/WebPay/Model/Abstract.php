@@ -68,9 +68,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         // Build the rows for request
         $totalDiscount = 0;
         foreach ($order->getAllItems() as $item) {
-            // Do not include the Bundle as product. Only its products.
-            if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE
-                    || $item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+            if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;
             }
 
@@ -78,6 +76,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             $price = $item->getPrice();
             $priceInclTax = $item->getPriceInclTax();
             $taxPercent = $item->getTaxPercent();
+            $name = $item->getName();
 
             $parentItem = $item->getParentItem();
             if ($parentItem) {
@@ -87,15 +86,18 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                         $priceInclTax = $parentItem->getPriceInclTax();
                         $taxPercent = $parentItem->getTaxPercent();
                         break;
+                    case Mage_Catalog_Model_Product_Type::TYPE_BUNDLE:
+                        $taxPercent = $priceInclTax = $price = 0;
+                        $name = '- ' . $name;
+                        break;
                 }
             }
 
             $qty = get_class($item) == 'Mage_Sales_Model_Quote_Item' ? $item->getQty() : $item->getQtyOrdered();
             $orderRow = Item::orderRow()
-                    ->setArticleNumber($item->getProductId())
+                    ->setArticleNumber($item->getSku())
                     ->setQuantity((int)$qty)
-                    ->setName($item->getName())
-                    ->setDescription($item->getShortDescription())
+                    ->setName($name)
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setVatPercent((int)$taxPercent);
 
@@ -104,11 +106,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             } else {
                 $orderRow->setAmountExVat((float)$price);
             }
-
-//            if ($item->getDiscountAmount()) {
-//                $percent = ($item->getDiscountAmount()/($priceInclTax*$qty))*100;
-//                $orderRow->setDiscountPercent((int)$percent);
-//            }
 
             $svea->addOrderRow($orderRow);
         }
@@ -144,8 +141,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         if (abs($order->getDiscountAmount()) > 0) {
             $discountRow = Item::fixedDiscount()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setAmountIncVat(abs($order->getDiscountAmount()))
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'));
+                    ->setAmountIncVat(abs($order->getDiscountAmount()));
 
             $svea->addDiscount($discountRow);
         }
