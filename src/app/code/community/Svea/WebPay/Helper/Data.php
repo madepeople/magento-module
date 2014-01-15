@@ -134,53 +134,89 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $sveaObject = WebPay::deliverOrder($conf);
         $order = $invoice->getOrder();
         $countryCode = $order->getBillingAddress()->getCountryId();
+        $storeId = $order->getStoreId();
+        $store = Mage::app()->getStore($storeId);
+        $taxCalculationModel = Mage::getSingleton('tax/calculation');
+        $taxConfig = Mage::getSingleton('tax/config');
+
         // Add invoiced items
         foreach ($invoice->getAllItems() as $item) {
             $orderItem = $item->getOrderItem();
-            //Do not include the Bundle as product. Only it's products.
-
-            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
-                continue;
-            }
             if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;
             }
 
-            if (!$item->getQty()) {
-                continue;
+            // Default to the item price
+            $price = $orderItem->getPrice();
+            $priceInclTax = $orderItem->getPriceInclTax();
+            $taxPercent = $orderItem->getTaxPercent();
+            $name = $item->getName();
+
+            $parentItem = $orderItem->getParentItem();
+            if ($parentItem) {
+                switch ($parentItem->getProductType()) {
+                    case Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE:
+                        $price = $parentItem->getPrice();
+                        $priceInclTax = $parentItem->getPriceInclTax();
+                        $taxPercent = $parentItem->getTaxPercent();
+                        break;
+                    case Mage_Catalog_Model_Product_Type::TYPE_BUNDLE:
+                        $taxPercent = $priceInclTax = $price = 0;
+                        $name = '- ' . $name;
+                        break;
+                }
             }
 
-            // Set price amounts in regards to above
-            if (($parentItem = $orderItem->getParentItem()) !== null) {
-                $price = $parentItem->getPrice();
-                $priceInclTax = $parentItem->getPriceInclTax();
-            } else {
-                $price = $item->getPrice();
-                $priceInclTax = $item->getPriceInclTax();
+            switch (get_class($item)) {
+                case 'Mage_Sales_Model_Quote_Item':
+                case 'Mage_Sales_Model_Order_Invoice_Item':
+                case 'Mage_Sales_Model_Order_Creditmemo_Item':
+                    $qty = $item->getQty();
+                    break;
+                default:
+                    $qty = $item->getQtyOrdered();
+                    break;
             }
 
             $orderRow = Item::orderRow()
-                    ->setArticleNumber($item->getProductId())
-                    ->setQuantity($item->getQty())
-                    ->setAmountExVat($price)
-                    ->setName($item->getName())
-                    ->setDescription($item->getShortDescription())
+                    ->setArticleNumber($item->getSku())
+                    ->setQuantity((int)$qty)
+                    ->setName($name)
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setAmountIncVat($priceInclTax);
+                    ->setVatPercent((int)$taxPercent);
+
+            if ($taxConfig->priceIncludesTax($storeId)) {
+                $orderRow->setAmountIncVat((float)$priceInclTax);
+            } else {
+                $orderRow->setAmountExVat((float)$price);
+            }
 
             $sveaObject->addOrderRow($orderRow);
         }
 
+        $request = $taxCalculationModel->getRateRequest(
+                $order->getShippingAddress(),
+                $order->getBillingAddress(),
+                null,
+                $store);
+
         // Add shipping fee
         if ($invoice->getShippingAmount() > 0) {
-            $shippingIncVat = $invoice->getShippingAmount() + $invoice->getShippingTaxAmount();
-
             $shippingFee = Item::shippingFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName($invoice->getShippingMethod())
-                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription())
-                    ->setAmountExVat($invoice->getShippingAmount())
-                    ->setAmountIncVat($shippingIncVat);
+                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription());
+
+            // We require shipping tax to be set
+            $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
+            $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
+            $shippingFee->setVatPercent((int)$rate);
+
+            if ($taxConfig->shippingPriceIncludesTax($storeId)) {
+                $shippingFee->setAmountIncVat($invoice->getShippingInclTax());
+            } else {
+                $shippingFee->setAmountExVat($invoice->getShippingAmount());
+            }
 
             $sveaObject->addFee($shippingFee);
         }
@@ -245,52 +281,80 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
         $order = $payment->getOrder();
         $creditMemo = $payment->getCreditmemo();
+        $storeId = $order->getStoreId();
         $countryCode = $order->getBillingAddress()->getCountryId();
+        $taxCalculationModel = Mage::getSingleton('tax/calculation');
+        $taxConfig = Mage::getSingleton('tax/config');
+        $store = Mage::app()->getStore($storeId);
 
         foreach ($creditMemo->getAllItems() as $item) {
             $orderItem = $item->getOrderItem();
-            //Do not include the Bundle as product. Only it's products.
-            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE) {
-                continue;
-            }
             if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;
             }
 
-            if (!$item->getQty()) {
-                continue;
-            }
+            // Default to the item price
+            $price = $orderItem->getPrice();
+            $priceInclTax = $orderItem->getPriceInclTax();
+            $taxPercent = $orderItem->getTaxPercent();
+            $name = $item->getName();
+            $qty = $item->getQty();
 
-            if (($parentItem = $orderItem->getParentItem()) !== null) {
-                $price = $parentItem->getPrice();
-                $priceInclTax = $parentItem->getPriceInclTax();
-            } else {
-                $price = $item->getPrice();
-                $priceInclTax = $item->getPriceInclTax();
+            $parentItem = $orderItem->getParentItem();
+            if ($parentItem) {
+                switch ($parentItem->getProductType()) {
+                    case Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE:
+                        $price = $parentItem->getPrice();
+                        $priceInclTax = $parentItem->getPriceInclTax();
+                        $taxPercent = $parentItem->getTaxPercent();
+                        $qty = $parentItem->getQtyRefunded();
+                        break;
+                    case Mage_Catalog_Model_Product_Type::TYPE_BUNDLE:
+                        $taxPercent = $priceInclTax = $price = 0;
+                        $name = '- ' . $name;
+                        break;
+                }
             }
 
             $orderRow = Item::orderRow()
-                    ->setArticleNumber($item->getProductId())
-                    ->setQuantity($item->getQty())
-                    ->setAmountExVat($price)
-                    ->setName($item->getName())
-                    ->setDescription($item->getShortDescription())
+                    ->setArticleNumber($item->getSku())
+                    ->setQuantity((int)$qty)
+                    ->setName($name)
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setAmountIncVat($priceInclTax);
+                    ->setVatPercent((int)$taxPercent);
+
+            if ($taxConfig->priceIncludesTax($storeId)) {
+                $orderRow->setAmountIncVat((float)$priceInclTax);
+            } else {
+                $orderRow->setAmountExVat((float)$price);
+            }
 
             $sveaObject->addOrderRow($orderRow);
         }
 
+        $request = $taxCalculationModel->getRateRequest(
+                $order->getShippingAddress(),
+                $order->getBillingAddress(),
+                null,
+                $store);
+
         // Shipping
         if ($creditMemo->getShippingAmount() > 0) {
-            $shippingIncVat = $creditMemo->getShippingAmount() + $creditMemo->getShippingTaxAmount();
-
             $shippingFee = Item::shippingFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName($creditMemo->getShippingMethod())
-                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription())
-                    ->setAmountExVat($creditMemo->getShippingAmount())
-                    ->setAmountIncVat($shippingIncVat);
+                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription());
+
+            // We require shipping tax to be set
+            $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
+            $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
+            $shippingFee->setVatPercent((int)$rate);
+
+            if ($taxConfig->shippingPriceIncludesTax($storeId)) {
+                $shippingFee->setAmountIncVat($creditMemo->getShippingInclTax());
+            } else {
+                $shippingFee->setAmountExVat($creditMemo->getShippingAmount());
+            }
 
             $sveaObject->addFee($shippingFee);
         }
