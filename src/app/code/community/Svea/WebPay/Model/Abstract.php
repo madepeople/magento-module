@@ -45,8 +45,9 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
      *  Just use their prices as is
      *
      * Bundle products:
-     *  Use the simple associated product prices, but we need to know that the
-     *  parent of the simple product is actually a bundle product
+     *  The main parent product has the price, but the associated products
+     *  need to be transferred on separate 0 amount lines so the invoice is
+     *  verbose enough
      *
      * Grouped products:
      *  These are treated the same way as simple products
