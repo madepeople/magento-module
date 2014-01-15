@@ -63,8 +63,9 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      *  Just use their prices as is
      *
      * Bundle products:
-     *  Use the simple associated product prices, but we need to know that the
-     *  parent of the simple product is actually a bundle product
+     *  The main parent product has the price, but the associated products
+     *  need to be transferred on separate 0 amount lines so the invoice is
+     *  verbose enough
      *
      * Grouped products:
      *  These are treated the same way as simple products
@@ -78,9 +79,9 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         $storeId = $object->getStoreId();
 
         foreach ($object->getAllItems() as $item) {
-            // Do not include the Bundle as product. Only its products.
-            if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_BUNDLE
-                    || $item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+            $orderItem = $item->getOrderItem();
+            if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
+                // The configurable item is only interesting as a parent
                 continue;
             }
 
@@ -90,17 +91,16 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                     break;
                 default:
                     $qty = $item->getQty();
-                    // We only need the qty from the child item
-                    $item = $item->getOrderItem();
                     break;
             }
 
             // Default to the current item price
-            $price = $item->getPrice();
-            $priceInclTax = (float)$item->getPriceInclTax();
-            $taxPercent = (float)$item->getTaxPercent();
+            $price = $orderItem->getPrice();
+            $priceInclTax = (float)$orderItem->getPriceInclTax();
+            $taxPercent = (float)$orderItem->getTaxPercent();
+            $name = $item->getName();
 
-            $parentItem = $item->getParentItem();
+            $parentItem = $orderItem->getParentItem();
             if ($parentItem) {
                 switch ($parentItem->getProductType()) {
                     case Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE:
@@ -108,14 +108,17 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                         $priceInclTax = (float)$parentItem->getPriceInclTax();
                         $taxPercent = $parentItem->getTaxPercent();
                         break;
+                    case Mage_Catalog_Model_Product_Type::TYPE_BUNDLE:
+                        $taxPercent = $priceInclTax = $price = 0;
+                        $name = '- ' . $name;
+                        break;
                 }
             }
 
             $row = Item::orderRow();
-            $row->setArticleNumber($item->getProductId())
+            $row->setArticleNumber($item->getSku())
                     ->setQuantity((int)$qty)
-                    ->setName($item->getName())
-                    ->setDescription($item->getShortDescription())
+                    ->setName($name)
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setVatPercent((int)$taxPercent);
 
