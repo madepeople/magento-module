@@ -72,7 +72,7 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
                     ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($address->getPostcode())
                     ->setLocality($address->getCity())
-                    ->setIpAddress($_SERVER['SERVER_ADDR'])
+                    ->setIpAddress($_SERVER['SERVER_ADDR']) // Not good enough for reverse proxies
                     ->setPhoneNumber($address->getTelephone());
 
             if ($countryCode == "DE" || $countryCode == "NL") {
