@@ -107,12 +107,12 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
 
         // Set vars
         var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
-        var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+        var loader = "<img src='<?php echo Mage::getBaseUrl("media", true); ?>svea/loader.gif' id='sveaLoader'>";
 
         // Show Loader
         $("sveaPaymentPlanShowAddresses").update().insert(loader);
 
-        new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>svea_webpay/service/getAddresses', {
+        new Ajax.Request('<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>', {
             parameters: {ssn: ssn, type: 0, cc: "<?php echo $_country; ?>"},
             onSuccess: function(transport) {
                 var json = transport.responseText.evalJSON();

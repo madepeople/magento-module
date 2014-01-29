@@ -4,9 +4,9 @@
  * in the order_view totals block in /admin. It's important to realize that
  * this code doesn't *calculate* anything, it simply makes sure that the
  * payment fee is displayed correctly.
- * 
+ *
  * The class is used for orders, invoices and creditmemos.
- * 
+ *
  * @see Svea_WebPay_Model_Adminhtml_Observer
  */
 class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
@@ -14,22 +14,36 @@ class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
 {
     public function initTotals()
     {
-        $payment = $this->getParentBlock()
-                ->getOrder()
-                ->getPayment();
+        $order = $this->getParentBlock()
+                ->getOrder();
+        $payment = $order->getPayment();
 
         if (!preg_match('/svea_invoice/', $payment->getMethod())) {
             return;
         }
 
-        $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
+        $parentBlock = $this->getParentBlock();
+        if ($parentBlock instanceof Mage_Adminhtml_Block_Sales_Order_Invoice_Totals) {
+            if (!$parentBlock->getInvoice()->getId() && $order->getSveaPaymentFeeInvoiced()) {
+                return;
+            }
+            $source = $parentBlock->getInvoice();
+        } else if ($parentBlock instanceof Mage_Adminhtml_Block_Sales_Order_Creditmemo_Totals) {
+            if (!$parentBlock->getCreditmemo()->getId() && $order->getSveaPaymentFeeRefunded() == $order->getSveaPaymentFeeInclTax()) {
+                return;
+            }
+            $source = $parentBlock->getCreditmemo();
+        } else {
+            $source = $order;
+        }
+
+        $paymentFee = (float)$source->getSveaPaymentFeeInclTax();
+        $basePaymentFee = (float)$source->getBaseSveaPaymentFeeInclTax();
+
         if (empty($paymentFee)) {
             return;
         }
 
-        $basePaymentFee = $payment->getAdditionalInformation('base_payment_fee')
-                ? : $paymentFee;
-        
         $label = Mage::helper('svea_webpay')->__('invoice_fee');
 
         $total = new Varien_Object(array(
@@ -40,7 +54,7 @@ class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
         ));
 
         $this->getParentBlock()
-                ->addTotal($total, 'last');
+                ->addTotal($total, 'shipping_incl');
 
         return $this;
     }

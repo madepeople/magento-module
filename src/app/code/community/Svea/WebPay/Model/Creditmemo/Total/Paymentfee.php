@@ -11,29 +11,66 @@
 class Svea_WebPay_Model_Creditmemo_Total_Paymentfee
     extends Mage_Sales_Model_Order_Creditmemo_Total_Abstract
 {
-    public function collect(Mage_Sales_Model_Order_Creditmemo $creditMemo)
+    public function collect(Mage_Sales_Model_Order_Creditmemo $creditmemo)
     {
-        if ($creditMemo->getOrder()->hasCreditmemos() != 0) {
-            return $creditMemo;
+        $creditmemo->setSveaPaymentFeeAmount(0);
+        $creditmemo->setBaseSveaPaymentFeeAmount(0);
+        $creditmemo->setSveaPaymentFeeTaxAmount(0);
+        $creditmemo->setBaseSveaPaymentFeeTaxAmount(0);
+        $creditmemo->setSveaPaymentFeeInclTax(0);
+        $creditmemo->setBaseSveaPaymentFeeInclTax(0);
+
+        $order = $creditmemo->getOrder();
+        if (!$order->getSveaPaymentFeeAmount()) {
+            return $this;
         }
 
-        $payment = $creditMemo->getOrder()->getPayment();
-        $paymentFee = $payment->getAdditionalInformation('svea_payment_fee');
-        $paymentFeeTaxAmount = $payment->getAdditionalInformation('svea_payment_fee_tax_amount');
-        $paymentFeeRefunded = $payment->getAdditionalInformation('svea_payment_fee_refunded');
+        $paymentFeeAmount = 0;
+        $basePaymentFeeAmount = 0;
+        $paymentFeeTaxAmount = 0;
+        $basePaymentFeeTaxAmount = 0;
+        $paymentFeeTaxInclTax = 0;
+        $basePaymentFeeTaxInclTax = 0;
 
-        if (empty($paymentFee) || $paymentFeeRefunded > 0) {
-            return;
+        $grandTotal = $creditmemo->getGrandTotal();
+        $baseGrandTotal = $creditmemo->getBaseGrandTotal();
+        $taxAmount = $creditmemo->getTaxAmount();
+        $baseTaxAmount = $creditmemo->getBaseTaxAmount();
+
+        if ($invoice = $creditmemo->getInvoice()) {
+            if ($invoice->getSveaPaymentFeeAmount()) {
+                // Refund specific invoice
+                $source = $invoice;
+            }
+        } else if (!$order->getSveaPaymentFeeRefunded()) {
+            // Refund from order values
+            $source = $order;
         }
 
-        // Add tax
-        if ($paymentFeeTaxAmount > 0) {
-            $creditMemo->setTaxAmount($creditMemo->getTaxAmount() + $paymentFeeTaxAmount);
-            $creditMemo->setBaseTaxAmount($creditMemo->getBaseTaxAmount() + $paymentFeeTaxAmount);
+        if (isset($source)) {
+            $paymentFeeAmount = $source->getSveaPaymentFeeAmount();
+            $basePaymentFeeAmount = $source->getBaseSveaPaymentFeeAmount();
+            $paymentFeeTaxAmount = $source->getSveaPaymentFeeTaxAmount();
+            $basePaymentFeeTaxAmount = $source->getBaseSveaPaymentFeeTaxAmount();
+            $paymentFeeTaxInclTax = $source->getSveaPaymentFeeInclTax();
+            $basePaymentFeeInclTax = $source->getBaseSveaPaymentFeeInclTax();
         }
 
-        $creditMemo->setGrandTotal($creditMemo->getGrandTotal() + $paymentFee);
-        $creditMemo->setBaseGrandTotal($creditMemo->getBaseGrandTotal() + $paymentFee);
+        $taxAmount += $paymentFeeTaxAmount;
+        $baseTaxAmount += $basePaymentFeeTaxAmount;
+        $grandTotal += $paymentFeeTaxInclTax;
+        $baseGrandTotal += $basePaymentFeeInclTax;
+
+        $creditmemo->setSveaPaymentFeeAmount($paymentFeeAmount);
+        $creditmemo->setBaseSveaPaymentFeeAmount($basePaymentFeeAmount);
+        $creditmemo->setSveaPaymentFeeTaxAmount($paymentFeeTaxAmount);
+        $creditmemo->setBaseSveaPaymentFeeTaxAmount($basePaymentFeeTaxAmount);
+        $creditmemo->setSveaPaymentFeeInclTax($paymentFeeTaxInclTax);
+        $creditmemo->setBaseSveaPaymentFeeInclTax($basePaymentFeeInclTax);
+        $creditmemo->setTaxAmount($taxAmount);
+        $creditmemo->setBaseTaxAmount($baseTaxAmount);
+        $creditmemo->setGrandTotal($grandTotal);
+        $creditmemo->setBaseGrandTotal($baseGrandTotal);
 
         return $this;
     }

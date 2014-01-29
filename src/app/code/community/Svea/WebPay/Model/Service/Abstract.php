@@ -20,6 +20,25 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
     protected $_canVoid = true;
 
     /**
+     * Convert the object returned from Svea to an array because it's easier
+     * to handle and store
+     *
+     * @param object $response
+     * @return array
+     */
+    protected function _sveaResponseToArray($response)
+    {
+        $result = array();
+        foreach ($response as $key => $val) {
+            if (!is_string($key) || is_object($val)) {
+                continue;
+            }
+            $result[$key] = $val;
+        }
+        return $result;
+    }
+
+    /**
      * Add Customer details to Svea CreateOrder object
      *
      * @param type $order
@@ -137,7 +156,8 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
      */
     public function void(Varien_Object $payment)
     {
-        $auth = $this->getSveaStoreConfClass();
+        $order = $payment->getOrder();
+        $auth = $this->getSveaStoreConfClass($order->getStoreId());
         $conf = new SveaMageConfigProvider($auth);
 
         $sveaObject = WebPay::closeOrder($conf);

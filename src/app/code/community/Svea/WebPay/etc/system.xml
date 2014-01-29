@@ -31,7 +31,7 @@
                         <new_order_status translate="label">
                             <label>New order status</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status_new</source_model>
+                            <source_model>adminhtml/system_config_source_order_status_processing</source_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -89,7 +89,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </clear_cart_on_fulfillment>
-                        <!-- Sort order ska in -->
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
                     </fields>
                 </svea_cardpayment>
 
@@ -121,7 +129,7 @@
                         <new_order_status translate="label">
                             <label>New order status</label>
                             <frontend_type>select</frontend_type>
-                            <source_model>adminhtml/system_config_source_order_status_new</source_model>
+                            <source_model>adminhtml/system_config_source_order_status_processing</source_model>
                             <sort_order>3</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -187,6 +195,15 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </clear_cart_on_fulfillment>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
                     </fields>
                 </svea_directpayment>
 
@@ -264,6 +281,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </handling_fee>
+                        <handling_fee_includes_tax translate="label">
+                            <label>Handling Fee Includes Tax</label>
+                            <comment>Set to 'yes' if the entered invoice fee includes tax.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>9</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </handling_fee_includes_tax>
                         <handling_fee_tax_class translate="label">
                             <label>Handling fee tax class</label>
                             <frontend_type>select</frontend_type>
@@ -329,6 +356,15 @@
                             <show_in_store>1</show_in_store>
                             <comment>Text to show when payment is selected in checkout. Optional</comment>
                         </invoice_info>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
                     </fields>
                 </svea_invoice>
 
@@ -463,6 +499,15 @@
                             <show_in_store>1</show_in_store>
                             <comment>Text to show when payment is selected in checkout. Optional</comment>
                         </paymentplan_info>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                        </sort_order>
                     </fields>
                 </svea_paymentplan>
             </groups>

@@ -98,8 +98,8 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
     <li>&nbsp;</li>
 
-    <!-- Hide get address button for FI, NL and DE -->
-    <?php if (in_array($_country, array('SE', 'DK', 'NO'))): ?>
+    <!-- Hide get address button for FI, NL, NO and DE -->
+    <?php if (in_array($_country, array('SE', 'DK'))): ?>
         <li id="showInvoiceAddressBox">
             <label for="sveaInvoiceShowAddressest"><?php echo Mage::helper('svea_webpay')->__('invoice_address') . ":"; ?></label>
             <div id="sveaInvoiceShowAddresses" style="display:inline-block;"></div>
@@ -172,13 +172,13 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
     function sveaGetAddress(e) {
         // Set vars
         var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
-        var loader = "<img src='<?php echo Mage::getBaseUrl("media"); ?>svea/loader.gif' id='sveaLoader'>";
+        var loader = "<img src='<?php echo Mage::getBaseUrl("media", true); ?>svea/loader.gif' id='sveaLoader'>";
         var type = $$('input:checked[type=radio][name=payment[svea_invoice_customerType]]')[0].value;
 
         // Show Loader
         $("sveaInvoiceShowAddresses").update().insert(loader);
 
-        new Ajax.Request('<?php echo Mage::getBaseUrl(); ?>svea_webpay/service/getAddresses', {
+        new Ajax.Request('<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>', {
             parameters: {ssn: ssn, type: type, cc: "<?php echo $_country; ?>"},
             onSuccess: function(transport) {
                 var json = transport.responseText.evalJSON();
