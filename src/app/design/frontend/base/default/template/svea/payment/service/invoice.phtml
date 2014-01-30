@@ -114,7 +114,6 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
 <script>
 
-//Change customer type
     var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
     $("payment_form_<?php echo $_code ?>_customerType_0").on("change", function(e) {
         customerType = $(this).value;
@@ -167,9 +166,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
         }
     });
 
-
-//Get Addresses
-    function sveaGetAddress(e) {
+    window.sveaGetAddress = function(e) {
         // Set vars
         var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
         var loader = "<img src='<?php echo Mage::getBaseUrl("media", true); ?>svea/loader.gif' id='sveaLoader'>";
@@ -227,5 +224,4 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
             }
         });
     }
-    ;
 </script>

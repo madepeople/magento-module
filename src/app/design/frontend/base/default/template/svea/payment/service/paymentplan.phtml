@@ -101,8 +101,7 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
 </ul>
 <script>
 
-// Get addresses
-    function sveaGetAddressPP(e) {
+    window.sveaGetAddressPP = function(e) {
 
         // Set vars
         var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
@@ -141,5 +140,4 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
             }
         });
     }
-    ;
 </script>
