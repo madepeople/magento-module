@@ -40,7 +40,7 @@
 
 "Error_24000","Svea error %s : Fakturabeloppet överstiger tillåtet orderbelopp."
 
-"Error_30000","Svea error %s : Krediteringen nekades."
+"Error_30000","Svea error %s : Nekad på grund av kreditupplysningen."
 "Error_30001","Svea error %s : The customer is blocked or has shown strange or unusual behavior."
 "Error_30002","Svea error %s : Baserat på kreditupplysningen nekades ordern."
 "Error_30003","Svea error %s : Det går ej att hitta kunden i kreditupplysningen."
