@@ -112,8 +112,8 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
                 $order->setStatus($newOrderStatus);
             }
 
-            $order->sendNewOrderEmail();
             $order->save();
+            $order->sendNewOrderEmail();
 
             $this->_redirect("checkout/onepage/success", array("secure" => true));
         } else {
