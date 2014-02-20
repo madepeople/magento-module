@@ -159,6 +159,15 @@
                     </set_current_invoice_to_capture>
                 </observers>
             </sales_order_payment_capture>
+            <core_block_abstract_to_html_before>
+                <observers>
+                    <add_payment_fee_total_to_block>
+                        <type>singleton</type>
+                        <class>svea_webpay/layout_observer</class>
+                        <method>addPaymentFeeTotalToBlock</method>
+                    </add_payment_fee_total_to_block>
+                </observers>
+            </core_block_abstract_to_html_before>
         </events>
     </global>
 
@@ -235,18 +244,6 @@
                 </Svea_WebPay>
             </modules>
         </translate>
-
-        <events>
-            <core_block_abstract_to_html_before>
-                <observers>
-                    <add_payment_fee_total_to_block>
-                        <type>singleton</type>
-                        <class>svea_webpay/adminhtml_observer</class>
-                        <method>addPaymentFeeTotalToBlock</method>
-                    </add_payment_fee_total_to_block>
-                </observers>
-            </core_block_abstract_to_html_before>
-        </events>
     </adminhtml>
 
     <default>

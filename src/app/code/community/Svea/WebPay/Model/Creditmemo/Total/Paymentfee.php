@@ -30,7 +30,6 @@ class Svea_WebPay_Model_Creditmemo_Total_Paymentfee
         $paymentFeeTaxAmount = 0;
         $basePaymentFeeTaxAmount = 0;
         $paymentFeeTaxInclTax = 0;
-        $basePaymentFeeTaxInclTax = 0;
 
         $grandTotal = $creditmemo->getGrandTotal();
         $baseGrandTotal = $creditmemo->getBaseGrandTotal();

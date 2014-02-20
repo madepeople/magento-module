@@ -7,10 +7,10 @@
  *
  * The class is used for orders, invoices and creditmemos.
  *
- * @see Svea_WebPay_Model_Adminhtml_Observer
+ * @see Svea_WebPay_Model_Layout_Observer
  */
-class Svea_WebPay_Block_Adminhtml_Total_Renderer_Paymentfee
-    extends Mage_Adminhtml_Block_Sales_Order_Totals
+class Svea_WebPay_Block_Layout_Total_Renderer_Paymentfee
+    extends Mage_Sales_Block_Order_Totals
 {
     public function initTotals()
     {

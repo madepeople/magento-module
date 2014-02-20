@@ -1,8 +1,8 @@
 <?php
 /**
- * Adminhtml related event listeners
+ * Layout related event listeners
  */
-class Svea_WebPay_Model_Adminhtml_Observer
+class Svea_WebPay_Model_Layout_Observer
 {
     /**
      * Make sure that the custom payment fee block renders correctly by the
@@ -21,7 +21,7 @@ class Svea_WebPay_Model_Adminhtml_Observer
         }
 
         $renderer = $block->getLayout()
-                ->createBlock('svea_webpay/adminhtml_total_renderer_paymentfee');
+                ->createBlock('svea_webpay/layout_total_renderer_paymentfee');
 
         $block->setChild('svea_payment_fee_renderer', $renderer);
     }
