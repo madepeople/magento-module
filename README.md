@@ -2,6 +2,9 @@
 ## Version 4.0
 This module is updated for the latest payment systems at SveaWebPay.
 The module is tested in Magento 1.7, but will work with older versions to
+
+Supports Magento 1.7 up to 1.8.1.
+
 Supported countries are
 **Sweden**, **Norway**, **Finland**, **Denmark**, **The Netherlands**, **Germany**.
 
