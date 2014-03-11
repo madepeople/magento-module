@@ -71,7 +71,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $orderTotal = $quote->getGrandTotal() - $quote->getShippingAmount();
         $params = Mage::getModel('svea_webpay/paymentplan')->getCollection();
 
-        $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams();
+        $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams($quote->getStoreId());
 
         // Get most recent and filter out campaigns that does not fit the
         // order amount
@@ -93,10 +93,14 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * @return string
      */
-    public function getLatestUpdateOfPaymentPlanParams()
+    public function getLatestUpdateOfPaymentPlanParams($storeId = null)
     {
         $collection = Mage::getModel('svea_webpay/paymentplan')->getCollection()
                 ->setOrder('timestamp', Varien_Data_Collection::SORT_ORDER_DESC);
+
+        if (null !== $storeId) {
+            $collection->addFieldToFilter('storeId', $storeId);
+        }
 
         if (!$collection->count()) {
             return 'Never';
