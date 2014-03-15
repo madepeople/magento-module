@@ -72,6 +72,11 @@
                 <svea_invoice_fee>self::_addInvoiceFeeRow</svea_invoice_fee>
             </totals>
         </svea>
+        <payment>
+            <groups>
+                <svea_webpay>Svea WebPay</svea_webpay>
+            </groups>
+        </payment>
     </global>
     <frontend>
         <secure_url>
@@ -116,6 +121,7 @@
                 <test>1</test>
                 <payment_action>authorize</payment_action>
                 <distribution_type>EMAIL</distribution_type>
+                <group>svea_webpay</group>
             </svea_invoice>
         </payment>
     </default>
