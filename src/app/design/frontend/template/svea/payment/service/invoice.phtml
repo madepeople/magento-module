@@ -1,25 +1,33 @@
-<ul class="form-list" id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
-    <li class="fields">
-        <input type="hidden" name="payment[<?php echo $this->getMethodCode() ?>][country]" id="payment_<?php echo $this->getMethodCode() ?>_country" value="<?php echo $this->getCountry() ?>">
+<div id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
+    <div id="svea-payment-information" class="svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-payment-nl svea-payment-de">
+        <ul class="form-list">
+            <li class="control">
+                <input type="radio" name="payment[<?php echo $this->getMethodCode() ?>][customer_type]" value="<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"<?php if ($this->getCustomerType() === Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL) echo ' checked="checked"' ?> id="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"><label for="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"> Individual</label>
+            </li>
+            <li class="control">
+                <input type="radio" name="payment[<?php echo $this->getMethodCode() ?>][customer_type]" value="<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"<?php if ($this->getCustomerType() === Svea_WebPay_Helper_Data::TYPE_COMPANY) echo ' checked="checked"' ?> id="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"><label for="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"> Company</label>
+            </li>
+        </ul>
+        <ul class="form-list svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi">
+            <li class="fields">
+                <input type="hidden" name="payment[<?php echo $this->getMethodCode() ?>][country]" id="payment_<?php echo $this->getMethodCode() ?>_country" value="<?php echo $this->getCountry() ?>">
 
-        <div class="field input-box">
-            <label for="payment_<?php echo $this->getMethodCode() ?>_ssn" class="required"><em>*</em><?php echo $this->__('SSN') ?></label>
-            <div class="input-box">
-                <input type="text" class="input-text required-entry" value="<?php echo $this->getSsn() ?>" name="payment[<?php echo $this->getMethodCode() ?>][ssn]" id="payment_<?php echo $this->getMethodCode() ?>_ssn">
-            </div>
-        </div>
-    </li>
-    <li class="control">
-        <input type="radio" name="payment[<?php echo $this->getMethodCode() ?>][customer_type]" value="<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"<?php if ($this->getCustomerType() === Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL) echo ' checked="checked"' ?> id="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"><label for="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"> Individual</label>
-    </li>
-    <li class="control">
-        <input type="radio" name="payment[<?php echo $this->getMethodCode() ?>][customer_type]" value="<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"<?php if ($this->getCustomerType() === Svea_WebPay_Helper_Data::TYPE_COMPANY) echo ' checked="checked"' ?> id="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"><label for="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"> Company</label>
-    </li>
-    <li class="control">
-        <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
-            <span>
-                <span><?php echo $this->__('Get Address') ?></span>
-            </span>
-        </button>
-    </li>
-</ul>
+                <div class="field input-box">
+                    <label for="payment_<?php echo $this->getMethodCode() ?>_ssn" class="required"><em>*</em><?php echo $this->__('SSN') ?></label>
+                    <div class="input-box">
+                        <input type="text" class="input-text required-entry" value="<?php echo $this->getSsn() ?>" name="payment[<?php echo $this->getMethodCode() ?>][ssn]" id="payment_<?php echo $this->getMethodCode() ?>_ssn">
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <ul class="form-list svea-payment-se svea-payment-dk">
+            <li class="control">
+                <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
+                    <span>
+                        <span><?php echo $this->__('Get Address') ?></span>
+                    </span>
+                </button>
+            </li>
+        </ul>
+    </div>
+</div>

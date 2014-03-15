@@ -7,6 +7,29 @@ abstract class Svea_WebPay_Block_Payment_Abstract
     extends Mage_Payment_Block_Form
 {
     /**
+     * Returns a constant string defining the type of checkout module used,
+     * which we can use in the javascript to determine how to handle markup
+     *
+     * @return string
+     */
+    protected function _getCheckoutType()
+    {
+        $request = $this->getRequest();
+        switch ($request->getModuleName()) {
+            case 'checkout':
+                // Do an extra check here for the Ecomdev module, the standard
+                // checkout, as well as the multishipping checkout
+                return 'onepage';
+            case 'streamcheckout':
+                return 'streamcheckout';
+            case 'onestepcheckout':
+                return 'onestepcheckout';
+            case 'firecheckout':
+                return 'firecheckout';
+        }
+    }
+
+    /**
      * It's always a good idea to have the customer type in templates
      *
      * @return string
@@ -16,7 +39,8 @@ abstract class Svea_WebPay_Block_Payment_Abstract
         $method = $this->getMethod();
         $infoInstance = $method->getInfoInstance();
         $methodInfo = $infoInstance->getAdditionalInformation($method->getCode());
-        return $methodInfo['customer_type'];
+        return isset($methodInfo['customer_type'])
+            ? $methodInfo['customer_type'] : '';
     }
     
     /**
@@ -29,7 +53,8 @@ abstract class Svea_WebPay_Block_Payment_Abstract
         $method = $this->getMethod();
         $infoInstance = $method->getInfoInstance();
         $methodInfo = $infoInstance->getAdditionalInformation($method->getCode());
-        return $methodInfo['ssn'];
+        return isset($methodInfo['ssn'])
+            ? $methodInfo['ssn'] : '';
     }
 
     /**
@@ -63,6 +88,7 @@ abstract class Svea_WebPay_Block_Payment_Abstract
             'baseUrl' => Mage::getUrl('', array(
                     '_secure' => true
                 )),
+            'checkoutType' => $this->_getCheckoutType(),
         ));
 
         $html = parent::_toHtml();

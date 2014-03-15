@@ -11,9 +11,8 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <frontend_class>complex</frontend_class>
-                    <frontend_model>svea_webpay/adminhtml_system_config_form_field_group</frontend_model>
+                    <frontend_model>adminhtml/system_config_form_fieldset</frontend_model>
                     <comment>Receive Payments using Online Invoicing, Payment Plans, Credit Cards and Direct Bank Payment.</comment>
-                    <help_url>http://www.sveawebpay.se/fa-hjalp/vanliga-fragor/</help_url>
                     <fields>
                         <svea_invoice translate="label" type="group">
                             <label>Invoice Settings</label>
@@ -147,7 +146,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/client_number</config_path>
+                                                    <config_path>payment/svea_invoice/fi/client_number</config_path>
                                                 </client_number>
                                                 <username translate="label">
                                                     <label>Username</label>
@@ -156,7 +155,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/username</config_path>
+                                                    <config_path>payment/svea_invoice/fi/username</config_path>
                                                 </username>
                                                 <password translate="label">
                                                     <label>Password</label>
@@ -165,7 +164,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/password</config_path>
+                                                    <config_path>payment/svea_invoice/fi/password</config_path>
                                                 </password>
                                             </fields>
                                         </fi>
@@ -184,7 +183,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/client_number</config_path>
+                                                    <config_path>payment/svea_invoice/dk/client_number</config_path>
                                                 </client_number>
                                                 <username translate="label">
                                                     <label>Username</label>
@@ -193,7 +192,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/username</config_path>
+                                                    <config_path>payment/svea_invoice/dk/username</config_path>
                                                 </username>
                                                 <password translate="label">
                                                     <label>Password</label>
@@ -202,7 +201,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/password</config_path>
+                                                    <config_path>payment/svea_invoice/dk/password</config_path>
                                                 </password>
                                             </fields>
                                         </dk>
@@ -221,7 +220,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/client_number</config_path>
+                                                    <config_path>payment/svea_invoice/nl/client_number</config_path>
                                                 </client_number>
                                                 <username translate="label">
                                                     <label>Username</label>
@@ -230,7 +229,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/username</config_path>
+                                                    <config_path>payment/svea_invoice/nl/username</config_path>
                                                 </username>
                                                 <password translate="label">
                                                     <label>Password</label>
@@ -239,7 +238,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/password</config_path>
+                                                    <config_path>payment/svea_invoice/nl/password</config_path>
                                                 </password>
                                             </fields>
                                         </nl>
@@ -258,7 +257,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/client_number</config_path>
+                                                    <config_path>payment/svea_invoice/de/client_number</config_path>
                                                 </client_number>
                                                 <username translate="label">
                                                     <label>Username</label>
@@ -267,7 +266,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/username</config_path>
+                                                    <config_path>payment/svea_invoice/de/username</config_path>
                                                 </username>
                                                 <password translate="label">
                                                     <label>Password</label>
@@ -276,7 +275,7 @@
                                                     <show_in_default>1</show_in_default>
                                                     <show_in_website>1</show_in_website>
                                                     <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/password</config_path>
+                                                    <config_path>payment/svea_invoice/de/password</config_path>
                                                 </password>
                                             </fields>
                                         </de>
@@ -299,6 +298,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
+                                            <config_path>payment/svea_invoice/invoice_fee_amount</config_path>
                                         </amount>
                                         <includes_tax translate="label">
                                             <label>Invoice Fee Includes Tax</label>
@@ -309,6 +309,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
+                                            <config_path>payment/svea_invoice/invoice_fee_includes_tax</config_path>
                                         </includes_tax>
                                         <tax_class translate="label">
                                             <label>Tax Class</label>
@@ -318,6 +319,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
+                                            <config_path>payment/svea_invoice/invoice_fee_tax_class</config_path>
                                         </tax_class>
                                     </fields>
                                 </invoice_fee>
@@ -338,6 +340,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>0</show_in_store>
+                                            <config_path>payment/svea_invoice/allowspecific</config_path>
                                         </allowspecific>
                                         <specificcountry translate="label">
                                             <label>Payment from Specific Countries</label>
@@ -347,6 +350,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>0</show_in_store>
+                                            <config_path>payment/svea_invoice/specificcountry</config_path>
                                         </specificcountry>
                                         <payment_action translate="label">
                                             <label>Payment Action</label>
@@ -357,6 +361,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>0</show_in_store>
+                                            <config_path>payment/svea_invoice/payment_action</config_path>
                                         </payment_action>
                                         <order_status translate="label">
                                             <label>New Order Status</label>
@@ -366,6 +371,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>0</show_in_store>
+                                            <config_path>payment/svea_invoice/order_status</config_path>
                                         </order_status>
                                         <min_order_total translate="label">
                                             <label>Minimum Order Total</label>
@@ -374,6 +380,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>0</show_in_store>
+                                            <config_path>payment/svea_invoice/min_order_total</config_path>
                                         </min_order_total>
                                         <max_order_total translate="label">
                                             <label>Maximum Order Total</label>
@@ -382,6 +389,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>0</show_in_store>
+                                            <config_path>payment/svea_invoice/max_order_total</config_path>
                                         </max_order_total>
                                         <sort_order translate="label">
                                             <label>Sort Order</label>
@@ -391,6 +399,7 @@
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>0</show_in_store>
                                             <frontend_class>validate-number</frontend_class>
+                                            <config_path>payment/svea_invoice/sort_order</config_path>
                                         </sort_order>
                                         <distribution_type translate="label">
                                             <label>Invoice Distribution Type</label>
@@ -401,6 +410,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
+                                            <config_path>payment/svea_invoice/distribution_type</config_path>
                                         </distribution_type>
                                         <checkout_info translate="label">
                                             <label>Checkout Text</label>
@@ -410,22 +420,10 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
+                                            <config_path>payment/svea_invoice/checkout_info</config_path>
                                         </checkout_info>
                                     </fields>
                                 </advanced>
-
-                                <!--
-
-
-                                                        <invoice_info translate="label">
-                                                            <label>Info Text</label>
-                                                            <frontend_type>textarea</frontend_type>
-                                                            <sort_order>15</sort_order>
-                                                            <show_in_default>1</show_in_default>
-                                                            <show_in_website>1</show_in_website>
-                                                            <show_in_store>1</show_in_store>
-                                                            <comment>Text to show when payment is selected in checkout. Optional</comment>
-                                                        </invoice_info>-->
                             </fields>
                         </svea_invoice>
                     </fields>

@@ -7,9 +7,11 @@
  *
  * @author jonathan@madepeople.se
  */
-var Svea = Class.create({
+;var Svea = Class.create({
     config: {
         baseUrl: null,
+        checkoutType: 'onepage',
+        updateFieldsUsingJavascript: false
     },
     _requestRunning: false,
 
@@ -22,6 +24,41 @@ var Svea = Class.create({
                 this.config[key] = config[key];
             }
         }
+
+        if (this.config['updateFieldsUsingJavascript']) {
+            this.displayCountrySpecificFields();
+            $('checkout:form').on('change', '[name*=country_id]',
+                this.displayCountrySpecificFields.bindAsEventListener(this));
+        }
+    },
+
+    /**
+     * Some countries such as the netherlands have separated the address with
+     * the street. So we need to dynamically insert a street + house number
+     * field of our own which we concatenate and fill the real fields with. We
+     * have to pass this information to the payment method instance.
+     *
+     * @returns void
+     */
+    displayCountrySpecificFields: function (event)
+    {
+        var select;
+        if (event) {
+            select = event.target;
+        } else {
+            select = $$('[name=billing[country_id]]').length
+                ? $$('[name=billing[country_id]]')[0] : null;
+        }
+
+        if (!select) {
+            return;
+        }
+
+        var countryId = $(select)[$(select).selectedIndex].value
+            .toLowerCase();
+
+        $$('[class*=svea-payment]').invoke('hide');
+        $$('.svea-payment-' + countryId).invoke('show');
     },
 
     /**

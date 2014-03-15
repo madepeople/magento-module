@@ -57,6 +57,10 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
 
         // Jesus christ, please, what, how, can we remove this stuff below?
         //
+        // We could possible use javascript to dynamically insert a house number
+        // field when the country selector has NL selected. We need to switch
+        // other personal number/address things depending on country anyway
+        //
         // Separates the street from the housenumber according to testcases
         $pattern = "/^(?:\s)*([0-9]*[A-ZÄÅÆÖØÜßäåæöøüa-z]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]+)(?:\s*)([0-9]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]*[^\s])?(?:\s)*$/";
         preg_match($pattern, $street, $addressArray);
