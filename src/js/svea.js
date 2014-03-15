@@ -31,10 +31,8 @@
             this.toggleIndividualAndCompany.bindAsEventListener(this));
 
         this.displayCountrySpecificFields();
-        if (this.config['updateFieldsUsingJavascript']) {
-            $(body).on('change', '[name*=country_id]',
-                this.displayCountrySpecificFields.bindAsEventListener(this));
-        }
+        $(body).on('change', '[name*=country_id]',
+            this.displayCountrySpecificFields.bindAsEventListener(this));
     },
 
     /**
@@ -115,7 +113,7 @@
         var data = {
             'ssn': $F('payment_' + method + '_ssn'),
             'customer_type': $$("input:checked[type=radio][name*='customer_type']")[0].value,
-            'country': $F('payment_' + method + '_country'),
+//            'country': $F('payment_' + method + '_country'), // Country should be fetched from the quote in the getaddress action
             'method': method.replace(/svea_/, '')
         };
 

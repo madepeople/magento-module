@@ -12,7 +12,7 @@
                     <show_in_store>1</show_in_store>
                     <frontend_class>complex</frontend_class>
                     <frontend_model>adminhtml/system_config_form_fieldset</frontend_model>
-                    <comment><![CDATA[<img src="https://webpay.sveaekonomi.se/webpay/images/logo.png"><br>Receive Payments using Online Invoicing, Payment Plans, Credit Cards and Direct Bank Payment.]]></comment>
+                    <comment><![CDATA[<img src="https://webpay.sveaekonomi.se/webpay/images/logo.png"><br>Receive Payments using Online Invoicing, Payment Plans, Credit Cards and Direct Bank Payment. <a href="http://www.sveawebpay.se/" target="_blank">Learn More</a>]]></comment>
                     <fields>
                         <svea_invoice translate="label" type="group">
                             <label><![CDATA[Invoice Settings]]></label>

@@ -19,53 +19,74 @@
             </li>
         </ul>
 
-        <!-- Scandinavia -->
-        <ul class="form-list svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-type-<?php echo $_typeIndividual ?>">
-            <li class="fields">
-                <input type="hidden" name="payment[<?php echo $this->getMethodCode() ?>][country]" id="payment_<?php echo $this->getMethodCode() ?>_country" value="<?php echo $this->getCountry() ?>">
-
-                <div class="field input-box">
-                    <label for="payment_<?php echo $this->getMethodCode() ?>_ssn" class="required"><em>*</em><?php echo $this->__('SSN') ?></label>
-                    <div class="input-box">
-                        <input type="text" class="input-text required-entry" value="<?php echo $this->getAdditionalData('ssn') ?>" name="payment[<?php echo $this->getMethodCode() ?>][ssn]" id="payment_<?php echo $this->getMethodCode() ?>_ssn">
+        <!-- For private individuals -->
+        <div class="svea-type-<?php echo $_typeIndividual ?>">
+            <!-- Scandinavia -->
+            <ul class="form-list svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi">
+                <li class="fields">
+                    <div class="field input-box">
+                        <label for="payment_<?php echo $this->getMethodCode() ?>_ssn" class="required"><em>*</em><?php echo $this->__('SSN') ?></label>
+                        <div class="input-box">
+                            <input type="text" class="input-text required-entry" value="<?php echo $this->getAdditionalData('ssn', $_typeIndividual) ?>" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeIndividual ?>][ssn]" id="payment_<?php echo $this->getMethodCode() ?>_ssn">
+                        </div>
                     </div>
-                </div>
-            </li>
-        </ul>
+                </li>
+            </ul>
 
-        <!-- Germany and the Netherlands -->
-        <ul class="form-list svea-payment-nl svea-payment-de svea-type-<?php echo $_typeIndividual ?>">
-            <li class="fields">
-                <div class="field">
-                    <?php $_dob = $this->getLayout()->createBlock('customer/widget_dob') ?>
-                    <?php echo $_dob->setDate($_quote->getCustomerDob())->setFieldIdFormat('billing:%s')->setFieldNameFormat('billing[%s]')->toHtml() ?>
-                </div>
-            </li>
-        </ul>
+            <!-- Germany and the Netherlands -->
+            <ul class="form-list svea-payment-nl svea-payment-de">
+                <li class="fields">
+                    <div class="field">
+                        <?php $_dob = $this->getLayout()->createBlock('customer/widget_dob') ?>
+                        <?php echo $_dob->setDate($_quote->getCustomerDob())->setFieldIdFormat('billing:%s')->setFieldNameFormat('billing[%s]')->toHtml() ?>
+                    </div>
+                </li>
+            </ul>
 
-        <!-- NL and DE requires the "VAT Number" to be entered for companies -->
-        <ul class="form-list svea-payment-nl svea-payment-de">
-            <li class="fields">
-                <?php $_taxvat = $this->getLayout()->createBlock('customer/widget_taxvat') ?>
-                <?php echo $_taxvat->setTaxvat($_quote->getCustomerTaxvat())->setFieldIdFormat('billing:%s')->setFieldNameFormat('billing[%s]')->toHtml() ?>
-<!--                <div class="field input-box">-->
-<!--                    <label for="payment_--><?php //echo $this->getMethodCode() ?><!--_vat" class="required"><em>*</em>--><?php //echo $this->__('VAT Number'); ?><!--</label>-->
-<!--                    <div class="input-box">-->
-<!--                        <input type="text" class="input-text required-entry" value="--><?php //echo $this->getAdditionalData('vat') ?><!--" name="payment[--><?php //echo $this->getMethodCode() ?><!--][vat]"  id="payment_--><?php //echo $this->getMethodCode() ?><!--_vat">-->
-<!--                    </div>-->
-<!--                </div>-->
-            </li>
-        </ul>
-
-        <!-- Only Sweden and Denmark use the get address function -->
-        <ul class="form-list svea-payment-se svea-payment-dk">
-            <li class="control">
-                <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
+            <!-- Only Sweden and Denmark use the get address function -->
+            <ul class="form-list svea-payment-se svea-payment-dk">
+                <li class="control">
+                    <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
                     <span>
                         <span><?php echo $this->__('Get Address') ?></span>
                     </span>
-                </button>
-            </li>
-        </ul>
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- For companies -->
+        <div class="svea-type-<?php echo $_typeCompany ?>">
+            <!-- Scandinavia -->
+            <ul class="form-list svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi">
+                <li class="fields">
+                    <div class="field input-box">
+                        <label for="payment_<?php echo $this->getMethodCode() ?>_ssn" class="required"><em>*</em><?php echo $this->__('SSN') ?></label>
+                        <div class="input-box">
+                            <input type="text" class="input-text required-entry" value="<?php echo $this->getAdditionalData('ssn', $_typeCompany) ?>" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeCompany ?>][ssn]" id="payment_<?php echo $this->getMethodCode() ?>_ssn">
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- NL and DE requires the "VAT Number" to be entered for companies -->
+            <ul class="form-list svea-payment-nl svea-payment-de">
+                <li class="fields">
+                    <?php $_taxvat = $this->getLayout()->createBlock('customer/widget_taxvat') ?>
+                    <?php echo $_taxvat->setTaxvat($_quote->getCustomerTaxvat())->setFieldIdFormat('billing:%s')->setFieldNameFormat('billing[%s]')->toHtml() ?>
+                </li>
+            </ul>
+
+            <!-- Only Sweden and Denmark use the get address function -->
+            <ul class="form-list svea-payment-se svea-payment-dk">
+                <li class="control">
+                    <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
+                    <span>
+                        <span><?php echo $this->__('Get Address') ?></span>
+                    </span>
+                    </button>
+                </li>
+            </ul>
+        </div>
     </div>
 </div>

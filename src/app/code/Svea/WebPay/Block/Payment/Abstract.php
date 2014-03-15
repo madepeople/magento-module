@@ -36,11 +36,15 @@ abstract class Svea_WebPay_Block_Payment_Abstract
      * @param $key  Additional data key
      * @return string  The value or an empty string
      */
-    public function getAdditionalData($key)
+    public function getAdditionalData($key, $type = null)
     {
         $method = $this->getMethod();
         $infoInstance = $method->getInfoInstance();
         $methodInfo = $infoInstance->getAdditionalInformation($method->getCode());
+        if (null !== $type) {
+            $methodInfo = isset($methodInfo[$type])
+                ? $methodInfo[$type] : array();
+        }
         return isset($methodInfo[$key])
             ? $methodInfo[$key] : '';
     }
