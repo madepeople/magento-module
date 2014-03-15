@@ -30,31 +30,19 @@ abstract class Svea_WebPay_Block_Payment_Abstract
     }
 
     /**
-     * It's always a good idea to have the customer type in templates
+     * This one lets us get arbitrary values stored on the payment method object
+     * such as SSN, customer type, VAT number etc
      *
-     * @return string
+     * @param $key  Additional data key
+     * @return string  The value or an empty string
      */
-    public function getCustomerType()
+    public function getAdditionalData($key)
     {
         $method = $this->getMethod();
         $infoInstance = $method->getInfoInstance();
         $methodInfo = $infoInstance->getAdditionalInformation($method->getCode());
-        return isset($methodInfo['customer_type'])
-            ? $methodInfo['customer_type'] : '';
-    }
-    
-    /**
-     * Previously entered (and saved) SSN getters
-     * 
-     * @return string
-     */
-    public function getSsn()
-    {
-        $method = $this->getMethod();
-        $infoInstance = $method->getInfoInstance();
-        $methodInfo = $infoInstance->getAdditionalInformation($method->getCode());
-        return isset($methodInfo['ssn'])
-            ? $methodInfo['ssn'] : '';
+        return isset($methodInfo[$key])
+            ? $methodInfo[$key] : '';
     }
 
     /**
@@ -116,6 +104,8 @@ var _sveaLoaded, svea;
 
         // Fire the loading
         head.appendChild(script);
+    } else {
+        svea.displayCountrySpecificFields();
     }
 })();
 </script>

@@ -1,25 +1,63 @@
+<?php $_typeIndividual = Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>
+<?php $_typeCompany = Svea_WebPay_Helper_Data::TYPE_COMPANY ?>
+<?php $_quote = $this->getMethod()->getInfoInstance()->getQuote() ?>
 <div id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
     <div id="svea-payment-information" class="svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-payment-nl svea-payment-de">
+        <!-- Shared by all countries and types -->
         <ul class="form-list">
+            <?php $_checkoutInfo = trim(Mage::getStoreConfig('payment/' . $this->getMethodCode() . '/invoice_info')); ?>
+            <?php if (!empty($_checkoutInfo)): ?>
+                <li>
+                    <?php echo nl2br($_checkoutInfo) ?>
+                </li>
+            <?php endif ?>
             <li class="control">
-                <input type="radio" name="payment[<?php echo $this->getMethodCode() ?>][customer_type]" value="<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"<?php if ($this->getCustomerType() === Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL) echo ' checked="checked"' ?> id="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"><label for="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL ?>"> Individual</label>
+                <input type="radio" name="payment[<?php echo $this->getMethodCode() ?>][customer_type]" value="<?php echo $_typeIndividual ?>"<?php if ($this->getAdditionalData('customer_type') === $_typeIndividual || $this->getAdditionalData('customer_type') == '') echo ' checked="checked"' ?> id="payment_customer_type_<?php echo $_typeIndividual ?>"><label for="payment_customer_type_<?php echo $_typeIndividual ?>"> Individual</label>
             </li>
             <li class="control">
-                <input type="radio" name="payment[<?php echo $this->getMethodCode() ?>][customer_type]" value="<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"<?php if ($this->getCustomerType() === Svea_WebPay_Helper_Data::TYPE_COMPANY) echo ' checked="checked"' ?> id="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"><label for="payment_customer_type_<?php echo Svea_WebPay_Helper_Data::TYPE_COMPANY ?>"> Company</label>
+                <input type="radio" name="payment[<?php echo $this->getMethodCode() ?>][customer_type]" value="<?php echo $_typeCompany ?>"<?php if ($this->getAdditionalData('customer_type') === $_typeCompany) echo ' checked="checked"' ?> id="payment_customer_type_<?php echo $_typeCompany ?>"><label for="payment_customer_type_<?php echo $_typeCompany ?>"> Company</label>
             </li>
         </ul>
-        <ul class="form-list svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi">
+
+        <!-- Scandinavia -->
+        <ul class="form-list svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-type-<?php echo $_typeIndividual ?>">
             <li class="fields">
                 <input type="hidden" name="payment[<?php echo $this->getMethodCode() ?>][country]" id="payment_<?php echo $this->getMethodCode() ?>_country" value="<?php echo $this->getCountry() ?>">
 
                 <div class="field input-box">
                     <label for="payment_<?php echo $this->getMethodCode() ?>_ssn" class="required"><em>*</em><?php echo $this->__('SSN') ?></label>
                     <div class="input-box">
-                        <input type="text" class="input-text required-entry" value="<?php echo $this->getSsn() ?>" name="payment[<?php echo $this->getMethodCode() ?>][ssn]" id="payment_<?php echo $this->getMethodCode() ?>_ssn">
+                        <input type="text" class="input-text required-entry" value="<?php echo $this->getAdditionalData('ssn') ?>" name="payment[<?php echo $this->getMethodCode() ?>][ssn]" id="payment_<?php echo $this->getMethodCode() ?>_ssn">
                     </div>
                 </div>
             </li>
         </ul>
+
+        <!-- Germany and the Netherlands -->
+        <ul class="form-list svea-payment-nl svea-payment-de svea-type-<?php echo $_typeIndividual ?>">
+            <li class="fields">
+                <div class="field">
+                    <?php $_dob = $this->getLayout()->createBlock('customer/widget_dob') ?>
+                    <?php echo $_dob->setDate($_quote->getCustomerDob())->setFieldIdFormat('billing:%s')->setFieldNameFormat('billing[%s]')->toHtml() ?>
+                </div>
+            </li>
+        </ul>
+
+        <!-- NL and DE requires the "VAT Number" to be entered for companies -->
+        <ul class="form-list svea-payment-nl svea-payment-de">
+            <li class="fields">
+                <?php $_taxvat = $this->getLayout()->createBlock('customer/widget_taxvat') ?>
+                <?php echo $_taxvat->setTaxvat($_quote->getCustomerTaxvat())->setFieldIdFormat('billing:%s')->setFieldNameFormat('billing[%s]')->toHtml() ?>
+<!--                <div class="field input-box">-->
+<!--                    <label for="payment_--><?php //echo $this->getMethodCode() ?><!--_vat" class="required"><em>*</em>--><?php //echo $this->__('VAT Number'); ?><!--</label>-->
+<!--                    <div class="input-box">-->
+<!--                        <input type="text" class="input-text required-entry" value="--><?php //echo $this->getAdditionalData('vat') ?><!--" name="payment[--><?php //echo $this->getMethodCode() ?><!--][vat]"  id="payment_--><?php //echo $this->getMethodCode() ?><!--_vat">-->
+<!--                    </div>-->
+<!--                </div>-->
+            </li>
+        </ul>
+
+        <!-- Only Sweden and Denmark use the get address function -->
         <ul class="form-list svea-payment-se svea-payment-dk">
             <li class="control">
                 <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">

@@ -25,10 +25,31 @@
             }
         }
 
+        var body = $$('body')[0];
+        this.toggleIndividualAndCompany();
+        $(body).on('click', '[name*=customer_type]',
+            this.toggleIndividualAndCompany.bindAsEventListener(this));
+
+        this.displayCountrySpecificFields();
         if (this.config['updateFieldsUsingJavascript']) {
-            this.displayCountrySpecificFields();
-            $('checkout:form').on('change', '[name*=country_id]',
+            $(body).on('change', '[name*=country_id]',
                 this.displayCountrySpecificFields.bindAsEventListener(this));
+        }
+    },
+
+    /**
+     * Toggle the blocks specific to private individuals/companies
+     *
+     * @param event
+     */
+    toggleIndividualAndCompany: function (event)
+    {
+        $$('[class*=svea-type]').invoke('hide');
+
+        var elements = $$('input:checked[name*=customer_type]');
+        if (elements.length > 0) {
+            var type = elements[0].value;
+            $$('.svea-type-' + type).invoke('show');
         }
     },
 

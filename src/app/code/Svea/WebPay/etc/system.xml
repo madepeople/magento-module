@@ -12,10 +12,10 @@
                     <show_in_store>1</show_in_store>
                     <frontend_class>complex</frontend_class>
                     <frontend_model>adminhtml/system_config_form_fieldset</frontend_model>
-                    <comment>Receive Payments using Online Invoicing, Payment Plans, Credit Cards and Direct Bank Payment.</comment>
+                    <comment><![CDATA[<img src="https://webpay.sveaekonomi.se/webpay/images/logo.png"><br>Receive Payments using Online Invoicing, Payment Plans, Credit Cards and Direct Bank Payment.]]></comment>
                     <fields>
                         <svea_invoice translate="label" type="group">
-                            <label>Invoice Settings</label>
+                            <label><![CDATA[Invoice Settings]]></label>
                             <sort_order>1</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
@@ -42,6 +42,7 @@
                                 </test>
                                 <title translate="label">
                                     <label>Title</label>
+                                    <comment>Displayed in the checkout process and on order confirmations.</comment>
                                     <frontend_type>text</frontend_type>
                                     <sort_order>16</sort_order>
                                     <show_in_default>1</show_in_default>
@@ -50,7 +51,7 @@
                                 </title>
                                 <account_settings translate="label" type="group">
                                     <label>Account Settings</label>
-                                    <comment>The client number, username and password are specific to the country the customer orders from. For instance, Swedish invoice orders will use different account information from Norwegian orders.</comment>
+                                    <comment>The client number, username and password are specific to the country the customer orders from. For instance, Swedish invoice orders will use different account information than Norwegian orders.</comment>
                                     <sort_order>20</sort_order>
                                     <show_in_default>1</show_in_default>
                                     <show_in_website>1</show_in_website>
