@@ -2,49 +2,31 @@
 <config>
     <modules>
         <Svea_WebPay>
-            <version>4.1.0</version>
+            <version>5.0.0</version>
         </Svea_WebPay>
     </modules>
-    <frontend>
-        <secure_url>
-            <svea_webpay>/svea_webpay</svea_webpay>
-        </secure_url>
-        <routers>
-            <svea_webpay>
-                <use>standard</use>
-                <args>
-                    <module>Svea_WebPay</module>
-                    <frontName>svea_webpay</frontName>
-                </args>
-            </svea_webpay>
-        </routers>
-        <translate>
-            <modules>
-                <Svea_WebPay>
-                    <files>
-                        <default>Svea_WebPay.csv</default>
-                    </files>
-                </Svea_WebPay>
-            </modules>
-        </translate>
-    </frontend>
-    <adminhtml>
-        <translate>
-            <modules>
-                <Svea_WebPay>
-                    <files>
-                        <default>Svea_WebPay.csv</default>
-                    </files>
-                </Svea_WebPay>
-            </modules>
-        </translate>
-    </adminhtml>
     <global>
         <models>
             <svea_webpay>
                 <class>Svea_WebPay_Model</class>
+                <resourceModel>svea_webpay_resource</resourceModel>
             </svea_webpay>
+            <svea_webpay_resource>
+                <class>Svea_WebPay_Model_Resource</class>
+                <entities>
+                    <paymentplan>
+                        <table>svea_webpay_paymentplan</table>
+                    </paymentplan>
+                </entities>
+            </svea_webpay_resource>
         </models>
+        <resources>
+            <svea_webpay_setup>
+                <setup>
+                    <module>Svea_WebPay</module>
+                </setup>
+            </svea_webpay_setup>
+        </resources>
         <blocks>
             <svea_webpay>
                 <class>Svea_WebPay_Block</class>
@@ -91,6 +73,40 @@
             </totals>
         </svea>
     </global>
+    <frontend>
+        <secure_url>
+            <svea_webpay>/svea_webpay</svea_webpay>
+        </secure_url>
+        <routers>
+            <svea_webpay>
+                <use>standard</use>
+                <args>
+                    <module>Svea_WebPay</module>
+                    <frontName>svea_webpay</frontName>
+                </args>
+            </svea_webpay>
+        </routers>
+        <translate>
+            <modules>
+                <Svea_WebPay>
+                    <files>
+                        <default>Svea_WebPay.csv</default>
+                    </files>
+                </Svea_WebPay>
+            </modules>
+        </translate>
+    </frontend>
+    <adminhtml>
+        <translate>
+            <modules>
+                <Svea_WebPay>
+                    <files>
+                        <default>Svea_WebPay.csv</default>
+                    </files>
+                </Svea_WebPay>
+            </modules>
+        </translate>
+    </adminhtml>
     <default>
         <payment>
             <svea_invoice>
