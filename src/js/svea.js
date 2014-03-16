@@ -37,7 +37,9 @@
         $(body).on('click', 'input[name=payment[method]]',
             this.initializeFields.bindAsEventListener(this));
 
-        this.initializeFields();
+        if ($$('.svea-address-box').length) {
+            this.initializeFields();
+        }
     },
 
     initializeFields: function()
@@ -225,7 +227,9 @@
         function addressSelectorChanged(event)
         {
             var select = event.target;
-            updateAddressContainer.call(this, $F(select));
+            var addressSelector = $F(select);
+            updateBillingAddressForm.call(this, addressSelector);
+            updateAddressContainer.call(this, addressSelector);
         }
 
         /**
@@ -288,6 +292,8 @@
                 address = obj.customerIdentity[0];
             }
 
+            $('payment_' + this.getCurrentMethod() + '_address_selector').value = addressSelector;
+
             // We should in the future insert the address box in different
             // places depending on which checkout module we use, and perhaps
             // also allow developers to customize where the box ends up in a
@@ -332,13 +338,13 @@
 
             for (var key in obj['_identity_parameter_map']) {
                 var name = obj['_identity_parameter_map'][key].toLowerCase();
-                $$('[name=billing[' + name + ']]').each(function (element) {
+                $$('[name*="billing[' + name + ']"]').each(function (element) {
                     element.value = address[key];
                     element.setValue(address[key]);
                 });
             }
 
-            updateAddressContainer.call(this, address);
+            updateAddressContainer.call(this, address.addressSelector);
         }
 
         customerType = $$("input:checked[type=radio][name*='customer_type']")[0].value;

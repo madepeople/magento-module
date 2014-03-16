@@ -275,10 +275,12 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                 null,
                 $store);
 
+        $order = $object instanceof Mage_Sales_Model_Order
+            ? $object : $object->getOrder();
+
         $shippingFee = Item::shippingFee()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                ->setName($object->getShippingMethod())
-                ->setDescription($object->getShippingDescription())
+                ->setName($order->getShippingDescription())
                 ->setAmountExVat((float)$object->getShippingAmount());
 
         $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);

@@ -44,12 +44,47 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
             return $this;
         }
 
-        $createdAt = date('Y-m-d', strtotime($order->getCreatedAt()));
-        $address = $order->getBillingAddress();
-        $countryCode = $order->getBillingAddress()->getCountryId();
-        $svea->setClientOrderNumber($order->getIncrementId())
-                ->setOrderDate($createdAt)
-                ->setCurrency($order->getOrderCurrencyCode());
+        // We need to verify that we have address data to work with, and we also
+        // have to verify the address key in the address data with the posted
+        // one from the ordering process
+        $sveaInformation = $this->getInfoInstance()
+            ->getAdditionalInformation($this->getCode());
+
+        if (!empty($sveaInformation) && !empty($sveaInformation['address_selector'])) {
+            // Get address has been used, and we need to override the billing
+            // address that the customer has entered, and possibly also the
+            // shipping address
+            $quote = $order->getQuote();
+            $additionalData = unserialize($quote->getPayment()->getAdditionalData());
+            if (empty($additionalData) || empty($additionalData['getaddresses_response'])) {
+                throw new Mage_Payment_Exception("Can't fetch address information for order. Please contact support.");
+            }
+
+            $addressData = $additionalData['getaddresses_response'];
+            $address = null;
+            foreach ($addressData->customerIdentity as $identity) {
+                if ($identity->addressSelector == $sveaInformation['address_selector']) {
+                    $address = $identity;
+                    break;
+                }
+            }
+
+            if (null === $address) {
+                throw new Mage_Payment_Exception('Selected civil registry address does not match the database.');
+            }
+
+            // Set the order addresses to the civil registry information
+            foreach ($order->getAddressesCollection() as $orderAddress) {
+                $orderAddress->setFirstname($address->firstName)
+                    ->setLastname($address->lastName . ' ' . $address->coAddress)
+                    ->setCity($address->locality)
+                    ->setPostcode($address->zipCode)
+                    ->setStreet($address->street);
+            }
+        }
+
+        $billingAddress = $order->getBillingAddress();
+        $countryCode = $billingAddress->getCountryId();
 
         $data = $this->getInfoInstance()
             ->getData($this->getCode());
@@ -60,40 +95,50 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
         switch ($customerType) {
             case Svea_WebPay_Helper_Data::TYPE_COMPANY:
                 $item = Item::companyCustomer();
-                $item->setEmail($address->getEmail())
-                    ->setCompanyName($address->getCompany());
+                $item->setCompanyName($billingAddress->getCompany());
 
-                if (in_array($countryCode, array('DE', 'NL'))) {
-                    $item->setVatNumber($typeData['ssn_vat']);
-                } else {
-                    $item->setNationalIdNumber($typeData['ssn_vat']);
-                    $item->setAddressSelector($typeData['address_selector']);
+                switch ($countryCode) {
+                    case 'SE':
+                    case 'NO':
+                    case 'DK':
+                    case 'FI':
+                        $item->setNationalIdNumber($typeData['ssn_vat']);
+                        $item->setAddressSelector($typeData['address_selector']);
+                        break;
+                    case 'NL':
+                    case 'DE':
+                        $item->setVatNumber($typeData['ssn_vat']);
+                        break;
                 }
                 break;
             case Svea_WebPay_Helper_Data::TYPE_INDIVIDUAL:
                 $item = Item::individualCustomer();
                 $item->setNationalIdNumber($typeData['ssn_vat'])
-                    ->setName($address->getFirstname(), $address->getLastname());
+                    ->setName($billingAddress->getFirstname(), $billingAddress->getLastname());
 
-                if (in_array($countryCode, array('DE', 'NL'))) {
-                    $item->setBirthDate($typeData['birth_year'],
-                        $typeData['birth_month'],
-                        $typeData['birth_day']);
-                }
-                if ($countryCode === 'NL') {
-                    $item->setInitials($typeData['initials']);
+                switch ($countryCode) {
+                    case 'NL':
+                        $item->setInitials($typeData['initials']);
+                    case 'DE':
+                        $item->setBirthDate($typeData['birth_year'],
+                            $typeData['birth_month'],
+                            $typeData['birth_day']);
+                        break;
                 }
                 break;
         }
 
-        $item->setEmail($address->getEmail())
-            ->setStreetAddress($address->getStreetFull(), $typeData['housenumber'])
-            ->setZipCode($address->getPostcode())
-            ->setLocality($address->getCity())
+        $item->setEmail($billingAddress->getEmail())
+            ->setStreetAddress($billingAddress->getStreetFull(), $typeData['housenumber'])
+            ->setZipCode($billingAddress->getPostcode())
+            ->setLocality($billingAddress->getCity())
             ->setIpAddress(Mage::helper('core/http')->getRemoteAddr(false))
-            ->setPhoneNumber($address->getTelephone());
+            ->setPhoneNumber($billingAddress->getTelephone());
 
-        $svea->addCustomerDetails($item);
+        $svea->setClientOrderNumber($order->getIncrementId())
+            ->setOrderDate(date('Y-m-d', strtotime($order->getCreatedAt())))
+            ->setCurrency($order->getOrderCurrencyCode())
+            ->addCustomerDetails($item);
 
         return $svea;
     }

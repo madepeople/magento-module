@@ -60,6 +60,21 @@ class Svea_WebPay_UtilityController extends Mage_Core_Controller_Front_Action
 
                     $billingAddress->save();
 
+                    // Unsure how sure we can be that this information isn't
+                    // overwritten by something else at a later stage, should
+                    // we maybe disallow orders without this information on
+                    // quote payment? To me it makes sense, OK!
+                    $payment = $quote->getPayment();
+                    $additionalData = $payment->getAdditionalData();
+                    if (!empty($additionalData)) {
+                        $additionalData = unserialize($additionalData);
+                    } else {
+                        $additionalData = array();
+                    }
+                    $additionalData['getaddresses_response'] = $response;
+                    $payment->setAdditionalData(serialize($additionalData));
+                    $payment->save();
+
                     // Prefixed keys to prevent integration library conflicts
                     $response->_billing_address = $billingAddress->toArray();
                     $response->_identity_parameter_map = $this->_identityParameterMap;

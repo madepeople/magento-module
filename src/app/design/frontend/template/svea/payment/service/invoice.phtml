@@ -12,6 +12,11 @@
 <?php $_quote = $this->getMethod()->getInfoInstance()->getQuote() ?>
 <div id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
     <div id="svea-invoice-payment-information" class="svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-payment-nl svea-payment-de">
+        <!-- This input needs to be populated and transmitted to the backend,
+             because we validate it against the items fetched from getAddress
+             to minimize fraud -->
+        <input type="hidden" id="payment_<?php echo $this->getMethodCode() ?>_address_selector" name="payment[<?php echo $this->getMethodCode() ?>][address_selector]" value="">
+
         <!-- Shared by all countries and types -->
         <ul class="form-list">
             <?php $_checkoutInfo = trim(Mage::getStoreConfig('payment/' . $this->getMethodCode() . '/invoice_info')); ?>
@@ -96,7 +101,7 @@
             <!-- Only Sweden and Denmark use the get address function -->
             <ul class="form-list svea-payment-se svea-payment-dk svea-get-address">
                 <li class="control">
-                    <button type="button" class="button" onclick="window.svea.getAddress('<?php echo $this->getMethodCode() ?>')">
+                    <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
                         <span>
                             <span><?php echo $this->__('get_address') ?></span>
                         </span>
@@ -134,7 +139,7 @@
             <!-- Only Sweden and Denmark use the getAddress function -->
             <ul class="form-list svea-payment-se svea-payment-dk svea-get-address">
                 <li class="control">
-                    <button type="button" class="button" onclick="window.svea.getAddress('<?php echo $this->getMethodCode() ?>')">
+                    <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
                         <span>
                             <span><?php echo $this->__('get_address') ?></span>
                         </span>
