@@ -113,14 +113,6 @@
             });
         }
 
-        var input;
-        if (event) {
-            input = event.target;
-        } else {
-            input = $$('input:checked[name=payment[method]]').length
-                ? $$('input:checked[name=payment[method]]')[0] : null;
-        }
-
         // If getAddress is hidden we should show the fields
         var getAddressVisible = false;
         $$('.svea-get-address').each(function (element) {
@@ -129,12 +121,36 @@
             }
         });
 
-        var method = $(input).value;
-        if (getAddressVisible && method.match(/^svea_(invoice|paymentplan)/)) {
+        var method = this.getCurrentMethod();
+        if (getAddressVisible && method && method.match(/^svea_(invoice|paymentplan)/)) {
             toggleFields.call(this, Element.hide);
         } else {
             toggleFields.call(this, Element.show);
         }
+    },
+
+    /**
+     * Returns the currently selected method, or undefined is not invoice or
+     * payment plan
+     *
+     * @returns string
+     */
+    getCurrentMethod: function (strip)
+    {
+        var input = $$('input:checked[name=payment[method]]').length
+            ? $$('input:checked[name=payment[method]]')[0] : null;
+
+        if (input) {
+            var value = input.value;
+            if (value.match(/^svea_/)) {
+                if (strip) {
+                    return value.replace(/^svea_/, '');
+                }
+                return value;
+            }
+        }
+
+        return undefined;
     },
 
     /**
@@ -155,7 +171,8 @@
             this.fieldConditionsChanged();
         }
 
-        $('svea-invoice-address-box').hide();
+        var method = this.getCurrentMethod(true);
+        $('svea-' + method + '-address-box').hide();
     },
 
     /**
@@ -226,6 +243,7 @@
                 return;
             }
 
+            var method = this.getCurrentMethod();
             var select = new Element('select', {
                 'name': 'payment[' + method + '][' + customerType + '][address_selector]'
             });
@@ -256,9 +274,10 @@
          */
         function updateAddressContainer(addressSelector)
         {
+            var method = this.getCurrentMethod(true);
             obj = this._addressObject;
             if (obj.customerIdentity.length < 1) {
-                $('svea-invoice-address-box').hide();
+                $('svea-' + method + '-address-box').hide();
                 return;
             }
 
@@ -273,14 +292,13 @@
             // places depending on which checkout module we use, and perhaps
             // also allow developers to customize where the box ends up in a
             // convenient way
-            var addressTemplate = new Template($('svea-invoice-address-template').innerHTML);
-
-            $('svea-invoice-address-box').show();
-            $('svea-invoice-address-box').down('.svea-loader').hide();
-            $('svea-invoice-address-box').down('.svea-address-element')
+            var addressTemplate = new Template($('svea-' + method + '-address-template').innerHTML);
+            $('svea-' + method + '-address-box').show();
+            $('svea-' + method + '-address-box').down('.svea-loader').hide();
+            $('svea-' + method + '-address-box').down('.svea-address-element')
                 .update(addressTemplate.evaluate(address));
 
-            $('svea-invoice-address-box').down('.svea-address-container')
+            $('svea-' + method + '-address-box').down('.svea-address-container')
                 .show();
         }
 
@@ -347,29 +365,30 @@
             parameters: data,
             onCreate: function (transport) {
                 this._addressObject = null;
-                $('svea-invoice-address-box').down('.svea-address-element')
+                method = method.replace(/^svea_/, '');
+                $('svea-' + method + '-address-box').down('.svea-address-element')
                     .update();
-                $('svea-invoice-address-box').down('.svea-address-container')
+                $('svea-' + method + '-address-box').down('.svea-address-container')
                     .hide();
-                $('svea-invoice-address-box').show();
-                $('svea-invoice-address-box').down('.svea-loader').show();
+                $('svea-' + method + '-address-box').show();
+                $('svea-' + method + '-address-box').down('.svea-loader').show();
             },
             onComplete: (function (transport) {
                 this._requestRunning = false;
+                method = method.replace(/^svea_/, '');
                 var obj = transport.responseJSON;
                 if (obj.errormessage && obj.errormessage.length) {
                     // TODO: Error handling
-                    $('svea-invoice-address-box').hide();
+                    $('svea-' + method + '-address-box').hide();
                     alert(obj.errormessage);
                     return;
                 }
                 this._addressObject = obj;
 
                 updateBillingAddressForm.call(this);
-                updateAddressContainer.call(this);
 
                 var addressSelect = buildAddressSelect.call(this, obj);
-                $('svea-invoice-address-box').down('.svea-select-container')
+                $('svea-' + method + '-address-box').down('.svea-select-container')
                     .update(addressSelect);
             }).bind(this)
         });

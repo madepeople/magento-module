@@ -63,10 +63,6 @@ class Svea_WebPay_UtilityController extends Mage_Core_Controller_Front_Action
                     // Prefixed keys to prevent integration library conflicts
                     $response->_billing_address = $billingAddress->toArray();
                     $response->_identity_parameter_map = $this->_identityParameterMap;
-                    $response->_address_html = $this->getLayout()
-                        ->createBlock('svea_webpay/payment_service_address')
-                        ->setAddress($billingAddress)
-                        ->toHtml();
                 }
             }
         } catch (Exception $e) {

@@ -75,8 +75,8 @@
                 </li>
             </ul>
 
-            <!-- Initials and house number for the Netherlands -->
-            <ul class="form-list svea-payment-nl">
+            <!-- Initials and house number for the Netherlands + Germany -->
+            <ul class="form-list svea-payment-nl svea-payment-de">
                 <li class="fields">
                     <div class="field">
                         <label for="payment_<?php echo $_typeIndividual ?>_<?php echo $this->getMethodCode() ?>_housenumber" class="required"><em>*</em><?php echo $this->__('text_housenumber') ?></label>
@@ -84,7 +84,7 @@
                             <input type="text" class="input-text required-entry" id="payment_<?php echo $_typeIndividual ?>_<?php echo $this->getMethodCode() ?>_housenumber" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeIndividual ?>][housenumber]" />
                         </div>
                     </div>
-                    <div class="field">
+                    <div class="field svea-payment-nl">
                         <label for="payment_<?php echo $_typeIndividual ?>_<?php echo $this->getMethodCode() ?>_initials" class="required"><em>*</em><?php echo $this->__('text_initials') ?></label>
                         <div class="input-box">
                             <input type="text" class="input-text required-entry" id="payment_<?php echo $_typeIndividual ?>_<?php echo $this->getMethodCode() ?>_initials" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeIndividual ?>][initials]" />
@@ -114,6 +114,18 @@
                         <label for="payment_<?php echo $_typeCompany ?>_<?php echo $this->getMethodCode() ?>_ssn" class="required"><em>*</em><?php echo $this->__('text_vat_no') ?></label>
                         <div class="input-box">
                             <input type="text" class="input-text required-entry" value="<?php echo $this->getAdditionalData('ssn_vat', $_typeCompany) ?>" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeCompany ?>][ssn_vat]" id="payment_<?php echo $_typeCompany ?>_<?php echo $this->getMethodCode() ?>_ssn">
+                        </div>
+                    </div>
+                </li>
+            </ul>
+
+            <!-- Initials and house number for the Netherlands + Germany -->
+            <ul class="form-list svea-payment-nl svea-payment-de">
+                <li class="fields">
+                    <div class="field">
+                        <label for="payment_<?php echo $_typeCompany ?>_<?php echo $this->getMethodCode() ?>_housenumber" class="required"><em>*</em><?php echo $this->__('text_housenumber') ?></label>
+                        <div class="input-box">
+                            <input type="text" class="input-text required-entry" id="payment_<?php echo $_typeCompany ?>_<?php echo $this->getMethodCode() ?>_housenumber" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeCompany ?>][housenumber]" />
                         </div>
                     </div>
                 </li>
