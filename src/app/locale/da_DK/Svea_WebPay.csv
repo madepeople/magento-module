@@ -21,6 +21,7 @@
 "month","måned"
 "initial_fee","Indledende gebyr vil blive tilføjet"
 "no_orderid","No order is placed at Svea. Svea order id is required"
+"your_invoice_will_be_sent_to","Fakturaen vil blive sendt til:"
 
 "Error_20000","Svea error %s : Ordre lukket"
 "Error_20001","Svea error %s : Ordre nægtet"

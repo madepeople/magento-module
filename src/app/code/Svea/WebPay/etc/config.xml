@@ -121,6 +121,11 @@
                 <test>1</test>
                 <payment_action>authorize</payment_action>
                 <distribution_type>EMAIL</distribution_type>
+                <allow_separate_shipping_address>0</allow_separate_shipping_address>
+                <address_template><![CDATA[#{firstName} #{lastName} #{coAddress}<br>
+#{street}<br>
+#{zipCode} #{locality}<br>
+T: #{phoneNumber}]]></address_template>
                 <group>svea_webpay</group>
             </svea_invoice>
         </payment>

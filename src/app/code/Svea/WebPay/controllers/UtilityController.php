@@ -8,6 +8,15 @@
  */
 class Svea_WebPay_UtilityController extends Mage_Core_Controller_Front_Action
 {
+    protected $_identityParameterMap = array(
+        'firstName' => 'Firstname',
+        'lastName' => 'Lastname',
+        'street' => 'street',
+        'zipCode' => 'Postcode',
+        'locality' => 'City',
+        'phoneNumber' => 'Telephone',
+    );
+
     /**
      * Fetch the address informtaion from Svea WebPay and set up the billing
      * address in the quote so it will be used if people go back and forth
@@ -39,17 +48,9 @@ class Svea_WebPay_UtilityController extends Mage_Core_Controller_Front_Action
                     // Update the billing address so the fetched information is used
                     // in the order object request
                     $identity = $response->customerIdentity[0];
-                    $identityParameterMap = array(
-                        'firstName' => 'Firstname',
-                        'lastName' => 'Lastname',
-                        'phoneNumber' => 'Telephone',
-                        'zipCode' => 'Postcode',
-                        'locality' => 'City',
-                        'street' => 'street',
-                    );
 
                     $billingAddress = $quote->getBillingAddress();
-                    foreach ($identityParameterMap as $source => $target) {
+                    foreach ($this->_identityParameterMap as $source => $target) {
                         if (!isset($identity->$source)) {
                             continue;
                         }
@@ -58,8 +59,11 @@ class Svea_WebPay_UtilityController extends Mage_Core_Controller_Front_Action
                     }
 
                     $billingAddress->save();
+
+                    // Prefixed keys to prevent integration library conflicts
                     $response->_billing_address = $billingAddress->toArray();
-                    $response->address_html = $this->getLayout()
+                    $response->_identity_parameter_map = $this->_identityParameterMap;
+                    $response->_address_html = $this->getLayout()
                         ->createBlock('svea_webpay/payment_service_address')
                         ->setAddress($billingAddress)
                         ->toHtml();
@@ -71,5 +75,5 @@ class Svea_WebPay_UtilityController extends Mage_Core_Controller_Front_Action
 
         $this->getResponse()->setHeader('Content-type', 'application/json');
         $this->getResponse()->setBody(Mage::helper('core')->jsonEncode($response));
-   }
+    }
 }

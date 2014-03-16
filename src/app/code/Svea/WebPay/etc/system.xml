@@ -414,7 +414,7 @@
                                             <config_path>payment/svea_invoice/distribution_type</config_path>
                                         </distribution_type>
                                         <checkout_info translate="label">
-                                            <label>Checkout Text</label>
+                                            <label>Checkout Textbox</label>
                                             <comment>Optional text that will display when Invoice Payment is selected in the checkout.</comment>
                                             <frontend_type>textarea</frontend_type>
                                             <sort_order>150</sort_order>
@@ -423,6 +423,27 @@
                                             <show_in_store>1</show_in_store>
                                             <config_path>payment/svea_invoice/checkout_info</config_path>
                                         </checkout_info>
+                                        <address_template>
+                                            <label>Address Template</label>
+                                            <comment>Determines how the address information returned from the GetAddress call should be presented.</comment>
+                                            <frontend_type>textarea</frontend_type>
+                                            <sort_order>160</sort_order>
+                                            <show_in_default>1</show_in_default>
+                                            <show_in_website>1</show_in_website>
+                                            <show_in_store>1</show_in_store>
+                                            <config_path>payment/svea_invoice/address_template</config_path>
+                                        </address_template>
+                                        <allow_separate_shipping_address>
+                                            <label>Allow Separate Shipping Address</label>
+                                            <comment><![CDATA[<strong style="color:red">Warning!</strong> Svea WebPay has to be consulted prior to enabling this option. When enabled, customers are allowed to choose a different shipping address than the one specified in the civil register. All such orders will be marked as "Suspected Fraud" and need manual inspection before authorized.]]></comment>
+                                            <frontend_type>select</frontend_type>
+                                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                                            <sort_order>170</sort_order>
+                                            <show_in_default>1</show_in_default>
+                                            <show_in_website>1</show_in_website>
+                                            <show_in_store>1</show_in_store>
+                                            <config_path>payment/svea_invoice/allow_separate_shipping_address</config_path>
+                                        </allow_separate_shipping_address>
                                     </fields>
                                 </advanced>
                             </fields>

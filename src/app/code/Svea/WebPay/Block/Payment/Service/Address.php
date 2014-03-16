@@ -28,12 +28,18 @@ class Svea_WebPay_Block_Payment_Service_Address
     {
         $address = $this->getAddress();
         $html =<<<EOF
-                <address>
-                    {$address->getFirstname()} {$address->getLastname()}<br>
-                    {$address->getStreetFull()}<br>
-                    {$address->getPostcode()} {$address->getCity()}
+                <strong style="display: block;border-bottom: 1px solid #A2B5C4;margin-bottom: 10px;">{$this->__('your_invoice_will_be_sent_to')}</strong>
+                <div class="svea-select-container"></div>
+                <address class=svea-address-element" style="font-style:14px; font-weight: bold;">
+                    #{fullName}<br>
+                    #{street}<br>
+                    #{zipCode} #{locality}<br>
+                    T: #{phoneNumber}
                 </address>
 EOF;
+//                    {$address->getFirstname()} {$address->getLastname()}<br>
+//                    {$address->getStreetFull()}<br>
+//                    {$address->getPostcode()} {$address->getCity()}
         return $html;
     }
 }

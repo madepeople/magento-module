@@ -87,6 +87,7 @@ abstract class Svea_WebPay_Block_Payment_Abstract
         $html .= <<<EOF
 <script type="text/javascript">
 var _sveaLoaded, svea;
+window.svea = svea;
 (function () {
     if (!window._sveaLoaded) {
         // Set this in the beginning because, well, concurrency and stuff
@@ -98,8 +99,7 @@ var _sveaLoaded, svea;
         script.src = $scriptUrl;
 
         var callback = function () {
-            svea = new Svea($parameters);
-            window.svea = svea;
+            window.svea = new Svea($parameters);
         }
 
         // Then bind the event to the callback function.

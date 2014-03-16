@@ -79,7 +79,12 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         $storeId = $object->getStoreId();
 
         foreach ($object->getAllItems() as $item) {
-            $orderItem = $item->getOrderItem();
+            if ($item instanceof Mage_Sales_Model_Order_Item) {
+                $orderItem = $item;
+            } else {
+                $orderItem = $item->getOrderItem();
+            }
+
             if ($orderItem->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 // The configurable item is only interesting as a parent
                 continue;

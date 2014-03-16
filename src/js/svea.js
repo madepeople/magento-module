@@ -15,6 +15,7 @@
         automaticallyToggleFields: true
     },
     _requestRunning: false,
+    _addressObject: null,
 
     initialize: function (config)
     {
@@ -29,17 +30,21 @@
         // Our initializers both need to set the first state as well as listen
         // for state changes
         var body = $$('body')[0];
-        this.toggleIndividualAndCompany();
         $(body).on('click', '[name*=customer_type]',
-            this.toggleIndividualAndCompany.bindAsEventListener(this));
-
-        this.displayCountrySpecificFields();
+            this.initializeFields.bindAsEventListener(this));
         $(body).on('change', '[name*=country_id]',
-            this.displayCountrySpecificFields.bindAsEventListener(this));
-
-        this.fieldConditionsChanged();
+            this.initializeFields.bindAsEventListener(this));
         $(body).on('click', 'input[name=payment[method]]',
-            this.fieldConditionsChanged.bindAsEventListener(this));
+            this.initializeFields.bindAsEventListener(this));
+
+        this.initializeFields();
+    },
+
+    initializeFields: function()
+    {
+        this.toggleIndividualAndCompany();
+        this.displayCountrySpecificFields();
+        this.fieldConditionsChanged();
     },
 
     /**
@@ -53,7 +58,7 @@
      */
     fieldConditionsChanged: function (event)
     {
-        if (!this.automaticallyToggleFields) {
+        if (!this.config['automaticallyToggleFields']) {
             return;
         }
 
@@ -68,6 +73,10 @@
         {
             var addressFields = ['firstname', 'lastname', 'street', 'city',
                 'postcode'];
+
+            if (!this.config['allowSeparateShippingAddress']) {
+                addressFields.push('use_for_shipping');
+            }
 
             $(addressFields).each(function (field) {
                 var elements = $$('[name*="billing[' + field + ']"]');
@@ -98,7 +107,9 @@
                 // debatable, "field" is a general class name, but magento
                 // core actually uses it for this specific purpose
                 var container = $(element).up('.field');
-                action(container);
+                if (container) {
+                    action(container);
+                }
             });
         }
 
@@ -120,9 +131,9 @@
 
         var method = $(input).value;
         if (getAddressVisible && method.match(/^svea_(invoice|paymentplan)/)) {
-            toggleFields(Element.hide);
+            toggleFields.call(this, Element.hide);
         } else {
-            toggleFields(Element.show);
+            toggleFields.call(this, Element.show);
         }
     },
 
@@ -143,6 +154,8 @@
         if (event) {
             this.fieldConditionsChanged();
         }
+
+        $('svea-invoice-address-box').hide();
     },
 
     /**
@@ -185,40 +198,137 @@
      */
     getAddress: function (method)
     {
+        var customerType;
+
+        /**
+         * Triggers when the address selector dropdown has been changed
+         *
+         * @param event
+         */
+        function addressSelectorChanged(event)
+        {
+            var select = event.target;
+            updateAddressContainer.call(this, $F(select));
+        }
+
+        /**
+         * Builds the select box used for choosing between multiple addresses,
+         * a common case for companies
+         *
+         * @param Object obj
+         * @return HTMLSelectElement
+         */
+        function buildAddressSelect(obj)
+        {
+            var identities = obj.customerIdentity;
+            if (identities.length === 1) {
+                // Only one address, no select box required
+                return;
+            }
+
+            var select = new Element('select', {
+                'name': 'payment[' + method + '][' + customerType + '][address_selector]'
+            });
+
+            $(identities).each(function (identity) {
+                var content = identity.fullName + ", " +
+                    identity.street + ", " +
+                    identity.zipCode + " " +
+                    identity.locality;
+
+                var option = new Element('option', {
+                    value: identity.addressSelector
+                });
+
+                $(option).update(content.escapeHTML());
+                $(select).insert(option);
+            });
+
+            $(select).setStyle('width: 100%; margin-bottom: 10px');
+            $(select).observe('change', addressSelectorChanged.bindAsEventListener(this));
+
+            return select;
+        }
+
+        /**
+         * Update the tool tip container with the fetched address and also create
+         * and insert a the address select box if needed
+         */
+        function updateAddressContainer(addressSelector)
+        {
+            obj = this._addressObject;
+            if (obj.customerIdentity.length < 1) {
+                $('svea-invoice-address-box').hide();
+                return;
+            }
+
+            var obj = this._addressObject,
+                address = getCustomerIdentityFromSelector.call(this, addressSelector);
+
+            if (!address) {
+                address = obj.customerIdentity[0];
+            }
+
+            // We should in the future insert the address box in different
+            // places depending on which checkout module we use, and perhaps
+            // also allow developers to customize where the box ends up in a
+            // convenient way
+            var addressTemplate = new Template($('svea-invoice-address-template').innerHTML);
+
+            $('svea-invoice-address-box').show();
+            $('svea-invoice-address-box').down('.svea-loader').hide();
+            $('svea-invoice-address-box').down('.svea-address-element')
+                .update(addressTemplate.evaluate(address));
+
+            $('svea-invoice-address-box').down('.svea-address-container')
+                .show();
+        }
+
+        function getCustomerIdentityFromSelector(selector)
+        {
+            var obj = this._addressObject, address;
+            for (var i = 0; i < obj.customerIdentity.length; i++) {
+                if (selector == obj.customerIdentity[i].addressSelector) {
+                    address = obj.customerIdentity[i];
+                    break;
+                }
+            }
+            return address;
+        }
+
         /**
          * Updates the billing address fields with information fetched from
          * the Svea getAddress call
          *
-         * @param Object obj
+         * @param int key  Address key
          * @returns void
          */
-        function updateBillingAddressForm(obj)
+        function updateBillingAddressForm(addressSelector)
         {
-            var billingAddress = obj['_billing_address'], element;
-            for (var key in billingAddress) {
-                $$('[name=billing[' + key + ']]').each(function (element) {
-                    element.value = billingAddress[key];
-                    element.setValue(billingAddress[key]);
+            var obj = this._addressObject,
+                address = getCustomerIdentityFromSelector.call(this, addressSelector);
+
+            if (!address) {
+                address = obj.customerIdentity[0];
+            }
+
+            for (var key in obj['_identity_parameter_map']) {
+                var name = obj['_identity_parameter_map'][key].toLowerCase();
+                $$('[name=billing[' + name + ']]').each(function (element) {
+                    element.value = address[key];
+                    element.setValue(address[key]);
                 });
             }
 
-            if ('address_html' in obj) {
-                // We should in the future insert the address box in different
-                // places depending on which checkout module we use, and perhaps
-                // also allow developers to customize where the box ends up in a
-                // convenient way
-                $$('.svea-address-box').invoke('delete');
-                $('svea-payment-information').insert({
-                    top: obj['address_html']
-                });
-            }
+            updateAddressContainer.call(this, address);
         }
 
-        var customerType = $$("input:checked[type=radio][name*='customer_type']")[0].value;
+        customerType = $$("input:checked[type=radio][name*='customer_type']")[0].value;
 
         var ssn_vat = $$('input[name*="[' + customerType + '][ssn_vat]"]')[0].value;
         if (ssn_vat.strip() === '') {
             alert(Translator.translate('Please enter your Social Security Number/VAT Number.').stripTags());
+            return;
         }
 
         if (this._requestRunning) {
@@ -235,15 +345,32 @@
         this._requestRunning = true;
         new Ajax.Request(url, {
             parameters: data,
+            onCreate: function (transport) {
+                this._addressObject = null;
+                $('svea-invoice-address-box').down('.svea-address-element')
+                    .update();
+                $('svea-invoice-address-box').down('.svea-address-container')
+                    .hide();
+                $('svea-invoice-address-box').show();
+                $('svea-invoice-address-box').down('.svea-loader').show();
+            },
             onComplete: (function (transport) {
                 this._requestRunning = false;
                 var obj = transport.responseJSON;
                 if (obj.errormessage && obj.errormessage.length) {
                     // TODO: Error handling
+                    $('svea-invoice-address-box').hide();
                     alert(obj.errormessage);
                     return;
                 }
-                updateBillingAddressForm(obj);
+                this._addressObject = obj;
+
+                updateBillingAddressForm.call(this);
+                updateAddressContainer.call(this);
+
+                var addressSelect = buildAddressSelect.call(this, obj);
+                $('svea-invoice-address-box').down('.svea-select-container')
+                    .update(addressSelect);
             }).bind(this)
         });
     }

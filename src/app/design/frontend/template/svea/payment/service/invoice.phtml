@@ -11,7 +11,7 @@
 <?php $_typeCompany = Svea_WebPay_Helper_Data::TYPE_COMPANY ?>
 <?php $_quote = $this->getMethod()->getInfoInstance()->getQuote() ?>
 <div id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
-    <div id="svea-payment-information" class="svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-payment-nl svea-payment-de">
+    <div id="svea-invoice-payment-information" class="svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-payment-nl svea-payment-de">
         <!-- Shared by all countries and types -->
         <ul class="form-list">
             <?php $_checkoutInfo = trim(Mage::getStoreConfig('payment/' . $this->getMethodCode() . '/invoice_info')); ?>
@@ -50,17 +50,17 @@
                             <label for="billing:month"><?php echo $this->__('text_date_of_birth') ?></label>
                             <div class="input-box customer-dob">
                                 <div class="dob-year">
-                                    <input type="text" id="billing:year" name="billing[year]" value="" title="Year" class="input-text validate-custom" autocomplete="off">
-                                    <label for="billing:year" class="required"><em>*</em><?php echo $this->__('YYYY') ?></label>
+                                    <input type="text" id="payment:year" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeIndividual ?>][birth_year]" value="" title="Year" class="input-text validate-custom" autocomplete="off">
+                                    <label for="payment:year" class="required"><em>*</em><?php echo $this->__('YYYY') ?></label>
                                 </div><div class="dob-month">
-                                    <input type="text" id="billing:month" name="billing[month]" value="" title="Month" class="input-text validate-custom">
-                                    <label for="billing:month" class="required"><em>*</em><?php echo $this->__('MM') ?></label>
+                                    <input type="text" id="payment:month" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeIndividual ?>][birth_month]" value="" title="Month" class="input-text validate-custom">
+                                    <label for="payment:month" class="required"><em>*</em><?php echo $this->__('MM') ?></label>
                                 </div><div class="dob-day">
-                                    <input type="text" id="billing:day" name="billing[day]" value="" title="Day" class="input-text validate-custom">
-                                    <label for="billing:day" class="required"><em>*</em><?php echo $this->__('DD') ?></label>
+                                    <input type="text" id="payment:day" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeIndividual ?>][birth_day]" value="" title="Day" class="input-text validate-custom">
+                                    <label for="payment:day" class="required"><em>*</em><?php echo $this->__('DD') ?></label>
                                 </div>
                                 <div class="dob-full" style="display:none;">
-                                    <input type="hidden" id="billing:dob" name="billing[dob]">
+                                    <input type="hidden" id="payment:dob" name="payment[<?php echo $this->getMethodCode() ?>][<?php echo $_typeIndividual ?>][dob]">
                                 </div>
 
                                 <div class="validation-advice" style="display: none;"></div>
@@ -96,10 +96,10 @@
             <!-- Only Sweden and Denmark use the get address function -->
             <ul class="form-list svea-payment-se svea-payment-dk svea-get-address">
                 <li class="control">
-                    <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
-                    <span>
-                        <span><?php echo $this->__('get_address') ?></span>
-                    </span>
+                    <button type="button" class="button" onclick="window.svea.getAddress('<?php echo $this->getMethodCode() ?>')">
+                        <span>
+                            <span><?php echo $this->__('get_address') ?></span>
+                        </span>
                     </button>
                 </li>
             </ul>
@@ -119,23 +119,33 @@
                 </li>
             </ul>
 
-            <!-- Only Sweden and Denmark use the get address function -->
+            <!-- Only Sweden and Denmark use the getAddress function -->
             <ul class="form-list svea-payment-se svea-payment-dk svea-get-address">
                 <li class="control">
-                    <button type="button" class="button" onclick="svea.getAddress('<?php echo $this->getMethodCode() ?>')">
-                    <span>
-                        <span><?php echo $this->__('get_address') ?></span>
-                    </span>
+                    <button type="button" class="button" onclick="window.svea.getAddress('<?php echo $this->getMethodCode() ?>')">
+                        <span>
+                            <span><?php echo $this->__('get_address') ?></span>
+                        </span>
                     </button>
                 </li>
             </ul>
         </div>
 
         <!-- We put the getAddressed address inside this little boxy box -->
-        <div class="svea-address-box tool-tip" style="position:static;display:none">
-            <img class="svea-loader" src="<?php echo $this->getSkinUrl('svea/loader.gif') ?>">
-            <div class="svea-address-container">
-                <!-- This one should also contain the multiple addresses dropdown -->
+        <div class="svea-payment-se svea-payment-dk">
+            <div id="svea-invoice-address-box" class="svea-address-box tool-tip" style="position:static;margin-bottom:10px;display:none;">
+                <img class="svea-loader" src="<?php echo $this->getSkinUrl('svea/loader-blue.gif') ?>">
+                <div class="svea-address-container" style="display:none">
+                    <strong style="display: block;border-bottom: 1px solid #A2B5C4;margin-bottom: 10px;"><?php echo $this->__('your_invoice_will_be_sent_to') ?></strong>
+                    <div class="svea-select-container"></div>
+                    <address class="svea-address-element" style="font-size:14px; font-weight: bold;"></address>
+                </div>
+            </div>
+
+            <!-- Using a div tag for a template actually works everywhere, it
+                 would be more nice to use a script tag, but prototype is weird -->
+            <div id="svea-invoice-address-template" style="display:none">
+                <?php echo $this->getMethod()->getConfigData('address_template') ?>
             </div>
         </div>
     </div>
