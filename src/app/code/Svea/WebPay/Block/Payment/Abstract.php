@@ -88,9 +88,9 @@ abstract class Svea_WebPay_Block_Payment_Abstract
 <script type="text/javascript">
 var _sveaLoaded, svea;
 (function () {
-    if (!_sveaLoaded) {
+    if (!window._sveaLoaded) {
         // Set this in the beginning because, well, concurrency and stuff
-        _sveaLoaded = true;
+        window._sveaLoaded = true;
 
         var head = document.getElementsByTagName('head')[0];
         var script = document.createElement('script');
@@ -99,6 +99,7 @@ var _sveaLoaded, svea;
 
         var callback = function () {
             svea = new Svea($parameters);
+            window.svea = svea;
         }
 
         // Then bind the event to the callback function.
@@ -109,7 +110,7 @@ var _sveaLoaded, svea;
         // Fire the loading
         head.appendChild(script);
     } else {
-        svea.displayCountrySpecificFields();
+        window.svea.displayCountrySpecificFields();
     }
 })();
 </script>

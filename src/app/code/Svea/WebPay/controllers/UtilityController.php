@@ -17,24 +17,24 @@ class Svea_WebPay_UtilityController extends Mage_Core_Controller_Front_Action
      */
     public function getAddressAction()
     {
-        $ssn = $this->getRequest()->getParam('ssn');
+        $quote = Mage::getSingleton('checkout/session')->getQuote();
+        $country = $quote->getBillingAddress()->getCountryId();
+        $ssnVat = $this->getRequest()->getParam('ssn_vat');
         $method = $this->getRequest()->getParam('method');
         $customerType = $this->getRequest()->getParam('customer_type');
-        $country = $this->getRequest()->getParam('country');
-        if (empty($ssn) || empty($method) || empty($customerType) || empty($country)) {
+        if (empty($ssnVat) || empty($method) || empty($customerType) || empty($country)) {
             // Just don't do anything
             return;
         }
 
         try {
             $response = Mage::helper('svea_webpay')->getAddresses(
-                    $method,
-                    $ssn,
-                    $customerType,
-                    $country);
+                $method,
+                $ssnVat,
+                $customerType,
+                $country);
 
             if (isset($response->customerIdentity)) {
-                $quote = Mage::getSingleton('checkout/session')->getQuote();
                 if ($quote && $quote->getId()) {
                     // Update the billing address so the fetched information is used
                     // in the order object request

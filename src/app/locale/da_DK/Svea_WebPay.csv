@@ -6,7 +6,7 @@
 "authorize_success %s","Ordre er oprettet, Svea Order id: %s"
 "unit","st"
 "customer_type","Type"
-"private","Privat"
+"individual","Privat"
 "company","Erhverv"
 "text_ssn","Cpr.nr."
 "text_birthyear","Fødselsår"

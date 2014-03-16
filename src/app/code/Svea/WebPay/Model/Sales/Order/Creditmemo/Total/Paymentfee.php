@@ -1,14 +1,9 @@
 <?php
+
 /**
- *
- * @category Payment
- * @package Svea_WebPay_Module_Magento
- * @author SveaWebPay <https://github.com/sveawebpay/magento-module>
- * @license https://github.com/sveawebpay/magento-module/blob/master/LICENSE.txt Apache License
- * @copyright (c) 2013, SveaWebPay (Svea Ekonomi AB)
- *
+ * @author jonathan@madepeople.se
  */
-class Svea_WebPay_Model_Creditmemo_Total_Paymentfee
+class Svea_WebPay_Model_Sales_Order_Creditmemo_Total_Paymentfee
     extends Mage_Sales_Model_Order_Creditmemo_Total_Abstract
 {
     public function collect(Mage_Sales_Model_Order_Creditmemo $creditmemo)

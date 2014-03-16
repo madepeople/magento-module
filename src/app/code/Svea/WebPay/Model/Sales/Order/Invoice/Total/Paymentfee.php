@@ -1,6 +1,13 @@
 <?php
 
-class Svea_WebPay_Model_Invoice_Total_Paymentfee extends Mage_Sales_Model_Order_Invoice_Total_Abstract
+/**
+ * Collect the totals for the to be created invoice, and don't include the
+ * invoice fee if it has already been accounted for in a previous invoice
+ *
+ * @author jonathan@madepeople.se
+ */
+class Svea_WebPay_Model_Sales_Order_Invoice_Total_Paymentfee
+    extends Mage_Sales_Model_Order_Invoice_Total_Abstract
 {
     public function collect(Mage_Sales_Model_Order_Invoice $invoice)
     {

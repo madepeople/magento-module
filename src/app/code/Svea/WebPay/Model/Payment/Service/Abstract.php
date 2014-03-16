@@ -46,10 +46,10 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
 
         $createdAt = date('Y-m-d', strtotime($order->getCreatedAt()));
         $data = $this->getInfoInstance()->getData($this->getCode());
-        $countryCode = $data['country'];
-        $customerType = $data['customer_type'];
         $address = $order->getBillingAddress();
         $street = $address->getStreetFull();
+        $countryCode = $order->getBillingAddress()->getCountryId();
+        $customerType = $data['customer_type'];
         $svea->setClientOrderNumber($order->getIncrementId())
                 ->setOrderDate($createdAt)
                 ->setCurrency($order->getOrderCurrencyCode());
@@ -69,6 +69,7 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
             $addressArray[2] = "";
         }
 
+        $typeData = $data[$customerType];
         if ($customerType === Svea_WebPay_Helper_Data::TYPE_COMPANY) {
             $item = Item::companyCustomer();
             $item->setEmail($address->getEmail())
@@ -76,35 +77,32 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
                     ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($address->getPostcode())
                     ->setLocality($address->getCity())
-                    ->setIpAddress($_SERVER['SERVER_ADDR']) // Not good enough for reverse proxies
+                    ->setIpAddress(Mage::helper('core/http')->getRemoteAddr(false)) // Not good enough for reverse proxies
                     ->setPhoneNumber($address->getTelephone());
 
-            if ($countryCode == "DE" || $countryCode == "NL") {
-                Mage::throwException('implement DE and NL');
-                $item->setVatNumber($data['vatNo']);
+            if (in_array($countryCode, array('DE', 'NL'))) {
+                $item->setVatNumber($typeData['vat']);
             } else {
-                $item->setNationalIdNumber($data['ssn']);
-                $item->setAddressSelector($data['addressSelector']);
+                $item->setNationalIdNumber($typeData['ssn']);
+                $item->setAddressSelector($typeData['addressSelector']);
             }
             $svea->addCustomerDetails($item);
         } else {
             $item = Item::individualCustomer();
-            $item->setNationalIdNumber($data['ssn'])
+            $item->setNationalIdNumber($typeData['ssn'])
                     ->setEmail($address->getEmail())
                     ->setName($address->getFirstname(), $address->getLastname())
                     ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($address->getPostcode())
                     ->setLocality($address->getCity())
-                    ->setIpAddress(Mage::helper('core/http')->getRemoteAddr(true))
+                    ->setIpAddress(Mage::helper('core/http')->getRemoteAddr(false))
                     ->setPhoneNumber($address->getTelephone());
 
-            if ($countryCode == "DE" || $countryCode == "NL") {
-                Mage::throwException('implement DE and NL');
-                $item->setBirthDate($data['birthYear'], $data['birthMonth'], $data['birthDay']);
+            if (in_array($countryCode, array('DE', 'NL'))) {
+                $item->setBirthDate($typeData['birthYear'], $typeData['birthMonth'], $typeData['birthDay']);
             }
-            if ($countryCode == "NL") {
-                Mage::throwException('implement DE and NL');
-                $item->setInitials($data['initials']);
+            if ($countryCode === 'NL') {
+                $item->setInitials($typeData['initials']);
             }
             $svea->addCustomerDetails($item);
         }

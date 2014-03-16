@@ -322,9 +322,11 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      */
     protected function _initializeSveaOrder($svea, $object)
     {
-        $data = $this->getInfoInstance()->getData($this->getCode());
-        $svea->setCountryCode($data['country']);
-
+        $countryCode = $this->getInfoInstance()
+            ->getOrder()
+            ->getBillingAddress()
+            ->getCountryId();
+        $svea->setCountryCode($countryCode);
         return $this;
     }
 

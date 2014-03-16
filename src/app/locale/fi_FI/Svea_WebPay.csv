@@ -6,7 +6,7 @@
 "authorize_success %s","Tilaus luotu, Svean tilausnro: %s"
 "unit","yksikkö"
 "customer_type","Tyyppi"
-"private","Yksityinen"
+"individual","Yksityinen"
 "company","Yritys"
 "text_ssn","Henkilötunnus"
 "text_birthyear","Syntymävuosi"

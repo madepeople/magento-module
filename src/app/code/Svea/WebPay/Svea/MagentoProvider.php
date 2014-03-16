@@ -28,17 +28,17 @@ class Svea_WebPay_Svea_MagentoProvider implements ConfigurationProvider
 
     public function getUsername($type, $country)
     {
-        return $this->_method->getConfigData('username');
+        return $this->_method->getConfigData(strtolower($country) . '/username');
     }
 
     public function getPassword($type, $country)
     {
-        return $this->_method->getConfigData('password');
+        return $this->_method->getConfigData(strtolower($country) . '/password');
     }
 
     public function getClientNumber($type, $country)
     {
-        return $this->_method->getConfigData('client_number');
+        return $this->_method->getConfigData(strtolower($country) . '/client_number');
     }
 
     public function getMerchantId($type, $country)

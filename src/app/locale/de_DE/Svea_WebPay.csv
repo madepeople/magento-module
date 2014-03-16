@@ -6,12 +6,13 @@
 "authorize_success %s","Order is created, Svea Order id: %s"
 "unit","st"
 "customer_type","Art"
-"private","Privat"
+"individual","Privat"
 "company","Geschäft"
 "text_ssn","Sozialversicherungsnummer"
 "text_birthyear","Geburtsjahr"
 "text_birthmonth","Geburtsmonat"
 "text_birthday","Geburtstag"
+"text_date_of_birth","Geburtsdatum"
 "text_vat_no","MwSt"
 "text_initials","Initialen"
 "invoice_address","Rechnungsadresse"
@@ -21,7 +22,7 @@
 "month","monat"
 "initial_fee","Ausgangsgebühr hinzukommen"
 
-"no_orderid","No order is placed at Svea. Svea order id is required"
+"no_orderid","No order is placed at Svea. Svea order ID is required"
 
 "Error_20000","Svea error %s : Auftrag geschlossen"
 "Error_20001","Svea error %s : Auftrag abgelehnt"
