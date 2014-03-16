@@ -59,6 +59,10 @@ class Svea_WebPay_UtilityController extends Mage_Core_Controller_Front_Action
 
                     $billingAddress->save();
                     $response->_billing_address = $billingAddress->toArray();
+                    $response->address_html = $this->getLayout()
+                        ->createBlock('svea_webpay/payment_service_address')
+                        ->setAddress($billingAddress)
+                        ->toHtml();
                 }
             }
         } catch (Exception $e) {

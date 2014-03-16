@@ -11,7 +11,8 @@
     config: {
         baseUrl: null,
         checkoutType: 'onepage',
-        allowSeparateShippingAddress: false
+        allowSeparateShippingAddress: false,
+        automaticallyToggleFields: true
     },
     _requestRunning: false,
 
@@ -52,20 +53,53 @@
      */
     fieldConditionsChanged: function (event)
     {
-        /**
-         * Hide the form fields that we fetch using getAddress, but only if
-         * getAddress is supposed to be used (actually meaning visible in the
-         * template)
-         */
-        function hideFields()
-        {
-            var fields = ['firstname', 'lastname', 'street', 'city', 'zip'];
-            alert('hiding fields');
+        if (!this.automaticallyToggleFields) {
+            return;
         }
 
-        function showFields()
+        /**
+         * Hide these form fields that we fetch using getAddress, but only if
+         * getAddress is supposed to be used (actually meaning visible in the
+         * template). Also, show them if the conditions change back
+         *
+         * @param action callable
+         */
+        function toggleFields(action)
         {
-            alert('showing fields');
+            var addressFields = ['firstname', 'lastname', 'street', 'city',
+                'postcode'];
+
+            $(addressFields).each(function (field) {
+                var elements = $$('[name*="billing[' + field + ']"]');
+                if (!elements.length) {
+                    return;
+                }
+
+                var element;
+                $(elements).each(function (el) {
+                    if (!element) {
+                        // Assign the first one, because street addresses can
+                        // be more than one
+                        element = el;
+                    }
+
+                    action(el);
+                });
+
+                var id = $(element).readAttribute('id');
+                var label = $$('label[for=' + id + ']').length
+                    ? $$('label[for=' + id + ']')[0] : null;
+
+                if (label) {
+                    action(label);
+                }
+
+                // See if there is a container that we recognize. This one is
+                // debatable, "field" is a general class name, but magento
+                // core actually uses it for this specific purpose
+                var container = $(element).up('.field');
+                action(container);
+            });
         }
 
         var input;
@@ -86,9 +120,9 @@
 
         var method = $(input).value;
         if (getAddressVisible && method.match(/^svea_(invoice|paymentplan)/)) {
-            hideFields();
+            toggleFields(Element.hide);
         } else {
-            showFields();
+            toggleFields(Element.show);
         }
     },
 
@@ -167,12 +201,23 @@
                     element.setValue(billingAddress[key]);
                 });
             }
+
+            if ('address_html' in obj) {
+                // We should in the future insert the address box in different
+                // places depending on which checkout module we use, and perhaps
+                // also allow developers to customize where the box ends up in a
+                // convenient way
+                $$('.svea-address-box').invoke('delete');
+                $('svea-payment-information').insert({
+                    top: obj['address_html']
+                });
+            }
         }
 
         var customerType = $$("input:checked[type=radio][name*='customer_type']")[0].value;
 
-        var ssn_vat = $$('input[name*="[' + customerType + '][ssn_vat]"]');
-        if (!ssn_vat) {
+        var ssn_vat = $$('input[name*="[' + customerType + '][ssn_vat]"]')[0].value;
+        if (ssn_vat.strip() === '') {
             alert(Translator.translate('Please enter your Social Security Number/VAT Number.').stripTags());
         }
 
