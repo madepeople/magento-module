@@ -174,7 +174,9 @@
         }
 
         var method = this.getCurrentMethod(true);
-        $('svea-' + method + '-address-box').hide();
+        if (method) {
+            $('svea-' + method + '-address-box').hide();
+        }
     },
 
     /**

@@ -282,7 +282,7 @@
                                         </de>
                                     </fields>
                                 </account_settings>
-                                <invoice_fee translate="label" type="group">
+                                <payment_fee translate="label" type="group">
                                     <label>Invoice Fee Settings</label>
                                     <sort_order>30</sort_order>
                                     <show_in_default>1</show_in_default>
@@ -299,7 +299,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/invoice_fee_amount</config_path>
+                                            <config_path>payment/svea_invoice/payment_fee_amount</config_path>
                                         </amount>
                                         <includes_tax translate="label">
                                             <label>Invoice Fee Includes Tax</label>
@@ -310,7 +310,7 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/invoice_fee_includes_tax</config_path>
+                                            <config_path>payment/svea_invoice/payment_fee_includes_tax</config_path>
                                         </includes_tax>
                                         <tax_class translate="label">
                                             <label>Tax Class</label>
@@ -320,10 +320,10 @@
                                             <show_in_default>1</show_in_default>
                                             <show_in_website>1</show_in_website>
                                             <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/invoice_fee_tax_class</config_path>
+                                            <config_path>payment/svea_invoice/payment_fee_tax_class</config_path>
                                         </tax_class>
                                     </fields>
-                                </invoice_fee>
+                                </payment_fee>
                                 <advanced translate="label" type="group">
                                     <label>Advanced Settings</label>
                                     <sort_order>40</sort_order>

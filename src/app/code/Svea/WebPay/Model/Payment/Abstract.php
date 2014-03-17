@@ -128,9 +128,9 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                     ->setVatPercent((int)$taxPercent);
 
             if (Mage::getStoreConfig('tax/calculation/price_includes_tax', $storeId)) {
-                $row->setAmountIncVat($priceInclTax);
+                $row->setAmountIncVat((float)$priceInclTax);
             } else {
-                $row->setAmountExVat($price);
+                $row->setAmountExVat((float)$price);
             }
 
             $svea->addOrderRow($row);
@@ -213,14 +213,14 @@ abstract class Svea_WebPay_Model_Payment_Abstract
 
         // The payment fee should be fetched from the totals, not
         // additional_information
-        $paymentFee = $object->getPayment()->getAdditionalInformation('svea_payment_fee');
-        $paymentFeeTaxAmount = $object->getPayment()->getAdditionalInformation('svea_payment_fee_tax_amount');
+        $paymentFee = $object->getSveaPaymentFeeAmount();
+        $paymentFeeInclTax = $object->getSveaPaymentFeeInclTax();
 
         $invoiceFeeRow = Item::invoiceFee()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-                ->setAmountExVat($paymentFee - $paymentFeeTaxAmount)
-                ->setAmountIncVat($paymentFee);
+                ->setAmountExVat((float)$paymentFee)
+                ->setAmountIncVat((float)$paymentFeeInclTax);
 
         $svea->addFee($invoiceFeeRow);
     }
@@ -303,12 +303,12 @@ abstract class Svea_WebPay_Model_Payment_Abstract
     {
         $rootNode = Mage::getConfig()->getNode('global/svea/totals');
         foreach ($rootNode->children() as $node) {
-            $node = (string)$node;
-            list($model, $method) = explode('::', $node);
+            $textNode = (string)$node;
+            list($model, $method) = explode('::', $textNode);
             if ($model === 'self') {
-                $this->$method($svea, $object, "$node");
+                $this->$method($svea, $object, $node->getName());
             } else {
-                Mage::getModel($model)->$method($svea, $object, "$node");
+                Mage::getModel($model)->$method($svea, $object, $node->getName());
             }
         }
 
