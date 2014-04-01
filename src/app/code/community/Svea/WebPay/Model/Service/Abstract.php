@@ -39,6 +39,59 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
     }
 
     /**
+     * Verify that the address posted is the one chosen from the getaddresses
+     * response. Also set the billing/shipping addresses to the ones returned
+     * from svea.
+     *
+     * @param $payment
+     * @return $this
+     * @throws Mage_Payment_Exception
+     */
+    protected function _setAddressToSveaAddress($payment)
+    {
+        // We need to verify that we have address data to work with, and we also
+        // have to verify the address key in the address data with the posted
+        // one from the ordering process
+        $sveaInformation = $payment->getAdditionalInformation();
+
+        $order = $payment->getOrder();
+        if (!empty($sveaInformation) && !empty($sveaInformation['svea_addressSelector'])) {
+            // Get address has been used, and we need to override the billing
+            // address that the customer has entered, and possibly also the
+            // shipping address
+            $quote = $order->getQuote();
+            $additionalData = unserialize($quote->getPayment()->getAdditionalData());
+            if (empty($additionalData) || empty($additionalData['getaddresses_response'])) {
+                throw new Mage_Payment_Exception("Can't fetch address information for order. Please contact support.");
+            }
+
+            $addressData = $additionalData['getaddresses_response'];
+            $address = null;
+            foreach ($addressData->customerIdentity as $identity) {
+                if ($identity->addressSelector == $sveaInformation['svea_addressSelector']) {
+                    $address = $identity;
+                    break;
+                }
+            }
+
+            if (null === $address) {
+                throw new Mage_Payment_Exception('Selected civil registry address does not match the database.');
+            }
+
+            // Set the order addresses to the civil registry information
+            foreach ($order->getAddressesCollection() as $orderAddress) {
+                $orderAddress->setFirstname($address->firstName)
+                    ->setLastname($address->lastName . ' ' . $address->coAddress)
+                    ->setCity($address->locality)
+                    ->setPostcode($address->zipCode)
+                    ->setStreet($address->street);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Add Customer details to Svea CreateOrder object
      *
      * @param type $order
@@ -110,8 +163,9 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         // Object created in validate()
         $sveaObject = $order->getData('svea_payment_request');
         $sveaObject = $this->_choosePayment($sveaObject);
-        $response = $sveaObject->doRequest();
+        $this->_setAddressToSveaAddress($payment);
 
+        $response = $sveaObject->doRequest();
         if ($response->accepted == 1) {
             $successMessage = Mage::helper('svea_webpay')->__('authorize_success %s', $response->sveaOrderId);
             $order->addStatusToHistory($this->getConfigData('paid_order_status'), $successMessage, false);

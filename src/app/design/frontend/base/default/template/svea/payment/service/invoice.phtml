@@ -186,6 +186,11 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
                     return;
                 }
 
+                var addressElement = $('<?php echo $_code ?>_addressSelector');
+                if (addressElement) {
+                    $(addressElement).remove();
+                }
+
                 // Show dropdown if company, show only text if private customer
                 if (json.customerIdentity.length > 1) {
                     var selectBox = "<select id='<?php echo $_code ?>_addressSelector' name='payment[<?php echo $_code ?>_addressSelector]'>";
@@ -199,6 +204,13 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
                     $("sveaInvoiceShowAddresses").insert(selectBox);
                 } else {
+                    $("sveaInvoiceShowAddresses").insert(new Element('input', {
+                        type: 'hidden',
+                        'id': '<?php echo $_code ?>_addressSelector',
+                        'name': 'payment[<?php echo $_code ?>_addressSelector]',
+                        'value': json.customerIdentity[0].addressSelector
+                    }));
+
                     if (json.customerIdentity[0].fullName == null) {
                         var name = json.customerIdentity[0].firstName + " " +
                                 json.customerIdentity[0].lastName + "<br>";
