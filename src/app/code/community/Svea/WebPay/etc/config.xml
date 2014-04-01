@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Svea_WebPay>
-            <version>4.0.15</version>
+            <version>4.0.16</version>
         </Svea_WebPay>
     </modules>
     <global>
