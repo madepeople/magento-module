@@ -86,6 +86,9 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     ->setPostcode($address->zipCode)
                     ->setStreet($address->street);
             }
+        } else if (in_array($order->getCountryId(), array('SE', 'DK'))) {
+            $message = Mage::helper('svea_webpay')->__('Please click the "Get Address" button to fetch your address information and proceed.');
+            throw new Mage_Payment_Exception($message);
         }
 
         return $this;
