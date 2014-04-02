@@ -140,6 +140,7 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
                 </button>
             </div>
         </li>
+        <input type="hidden" id="<?php echo $_code ?>_addressSelector" name="payment[<?php echo $_code ?>_addressSelector]" value="">
     <?php endif; ?>
 </ul>
 <script>
@@ -171,6 +172,8 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
                     json.customerIdentity[0].locality;
 
                 $("sveaPaymentPlanShowAddresses").insert(adress);
+
+                $("<?php echo $_code ?>_addressSelector").value = json.customerIdentity[0].addressSelector;
 
                 //For onestep checkouts, check if fields visible and auto-fill
                 if ($("billing:firstname").visible()) {
