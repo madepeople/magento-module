@@ -1,1 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<layout>
+    <!-- We need this file in order to add part payment options to the product view/list -->
+</layout>

@@ -2,6 +2,8 @@ src/app/code/Svea/*                                     app/code/community/Svea/
 src/lib/*                                               lib/Svea/
 src/js/*                                                js/
 src/app/design/frontend/template/*                      app/design/frontend/base/default/template/
+src/app/design/adminhtml/layout/*                       app/design/adminhtml/default/default/layout/
+src/app/design/adminhtml/template/*                     app/design/adminhtml/default/default/template/
 src/app/etc/modules/*                                   app/etc/modules/
 src/app/locale/da_DK/*                                  app/locale/da_DK/
 src/app/locale/de_DE/*                                  app/locale/de_DE/

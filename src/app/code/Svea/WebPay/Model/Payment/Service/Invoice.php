@@ -118,8 +118,40 @@ class Svea_WebPay_Model_Payment_Service_Invoice
      */
     public function refund(Varien_Object $payment, $amount)
     {
-        throw new Exception('implement me');
-        return parent::refund($payment, $amount);
+        $sveaOrderId = $payment->getParentTransactionId();
+        $creditmemo = $payment->getCreditmemo();
+
+        $sveaConfig = $this->_getSveaConfig();
+        $svea = WebPay::deliverOrder($sveaConfig);
+
+        $this->_initializeSveaOrder($svea, $creditmemo);
+        $this->_addItems($svea, $creditmemo);
+        $this->_addTotals($svea, $creditmemo);
+        $this->_validateAmount($svea, $amount);
+
+        $svea->setInvoiceDistributionType($this->getConfigData('distribution_type'));
+        $svea->setOrderId($sveaOrderId);
+die;
+        $response = $svea->deliverInvoiceOrder()
+            ->doRequest();
+
+        if ($response->accepted == 1) {
+            $rawDetails = $this->_sveaResponseToArray($response);
+            $payment->setTransactionId($response->invoiceId)
+                ->setIsTransactionClosed(false)
+                ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
+        } else {
+            $errorTranslated = Mage::helper('svea_webpay')->getErrorMessage(
+                $response->resultcode,
+                $response->errormessage);
+
+            Mage::throwException($errorTranslated);
+        }
+
+        return $this;
+
+//        throw new Exception('implement me');
+//        return parent::refund($payment, $amount);
     }
 
     /**
