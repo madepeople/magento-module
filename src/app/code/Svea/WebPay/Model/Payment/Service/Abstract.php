@@ -37,10 +37,14 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
      * @param object $order
      * @return \Svea_WebPay_Model_Payment_Service_Abstract|\CreateOrderBuilder
      */
-    protected function _initializeSveaOrder($svea, $order)
+    protected function _initializeSveaOrder($svea, $order = null)
     {
         parent::_initializeSveaOrder($svea, $order);
         if (!($svea instanceof Svea\CreateOrderBuilder)) {
+            return $this;
+        }
+
+        if ($order === null) {
             return $this;
         }
 

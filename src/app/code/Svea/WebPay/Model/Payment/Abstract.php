@@ -286,7 +286,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
         $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
         if (empty($rate)) {
-            Mage::throwException('The shipping fee needs a tax rate for Svea Invoice to work.');
+            throw new Mage_Payment_Exception('The shipping fee needs a tax rate for Svea Invoice to work.');
         }
         $shippingFee->setVatPercent((int)$rate);
         $svea->addFee($shippingFee);

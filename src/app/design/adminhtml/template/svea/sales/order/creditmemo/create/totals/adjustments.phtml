@@ -1,1 +1,7 @@
-hallå lr
+<?php $_source  = $this->getSource() ?>
+<?php if ($_source): ?>
+<tr>
+    <td class="label"><?php echo $this->getPaymentFeeLabel(); ?></td>
+    <td><input type="text" name="creditmemo[svea_payment_fee_amount]" value="<?php echo $this->getSveaPaymentFeeAmount()?>" class="input-text not-negative-amount" style="width:60px;text-align:right" id="payment_fee_amount" /></td>
+</tr>
+<?php endif ?>

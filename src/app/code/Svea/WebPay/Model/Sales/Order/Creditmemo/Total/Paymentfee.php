@@ -8,12 +8,12 @@ class Svea_WebPay_Model_Sales_Order_Creditmemo_Total_Paymentfee
 {
     public function collect(Mage_Sales_Model_Order_Creditmemo $creditmemo)
     {
-        $creditmemo->setSveaPaymentFeeAmount(0);
-        $creditmemo->setBaseSveaPaymentFeeAmount(0);
-        $creditmemo->setSveaPaymentFeeTaxAmount(0);
-        $creditmemo->setBaseSveaPaymentFeeTaxAmount(0);
-        $creditmemo->setSveaPaymentFeeInclTax(0);
-        $creditmemo->setBaseSveaPaymentFeeInclTax(0);
+//        $creditmemo->setSveaPaymentFeeAmount(0);
+//        $creditmemo->setBaseSveaPaymentFeeAmount(0);
+//        $creditmemo->setSveaPaymentFeeTaxAmount(0);
+//        $creditmemo->setBaseSveaPaymentFeeTaxAmount(0);
+//        $creditmemo->setSveaPaymentFeeInclTax(0);
+//        $creditmemo->setBaseSveaPaymentFeeInclTax(0);
 
         $order = $creditmemo->getOrder();
         if (!$order->getSveaPaymentFeeAmount()) {
@@ -46,20 +46,38 @@ class Svea_WebPay_Model_Sales_Order_Creditmemo_Total_Paymentfee
             $basePaymentFeeAmount = $source->getBaseSveaPaymentFeeAmount();
             $paymentFeeTaxAmount = $source->getSveaPaymentFeeTaxAmount();
             $basePaymentFeeTaxAmount = $source->getBaseSveaPaymentFeeTaxAmount();
-            $paymentFeeTaxInclTax = $source->getSveaPaymentFeeInclTax();
+            $paymentFeeInclTax = $source->getSveaPaymentFeeInclTax();
             $basePaymentFeeInclTax = $source->getBaseSveaPaymentFeeInclTax();
-        }
 
-        $taxAmount += $paymentFeeTaxAmount;
-        $baseTaxAmount += $basePaymentFeeTaxAmount;
-        $grandTotal += $paymentFeeTaxInclTax;
-        $baseGrandTotal += $basePaymentFeeInclTax;
+            if ($creditmemo->hasBaseSveaPaymentFeeAmount()) {
+                $isInclTax = Mage::getSingleton('tax/config')->displaySalesPricesInclTax($order->getStoreId());
+                $sourceBasePaymentFeeAmount = Mage::app()->getStore()->roundPrice($creditmemo->getBaseSveaPaymentFeeAmount());
+                if ($isInclTax && $sourceBasePaymentFeeAmount != 0) {
+                    $taxAmount -= $paymentFeeTaxAmount;
+                    $baseTaxAmount -= $basePaymentFeeTaxAmount;
+                    $grandTotal -= $paymentFeeInclTax;
+                    $baseGrandTotal -= $basePaymentFeeInclTax;
+
+                    $part = $sourceBasePaymentFeeAmount/$basePaymentFeeInclTax;
+                    $paymentFeeInclTax = Mage::app()->getStore()->roundPrice($paymentFeeInclTax*$part);
+                    $basePaymentFeeInclTax = $sourceBasePaymentFeeAmount;
+                    $paymentFeeAmount = Mage::app()->getStore()->roundPrice($basePaymentFeeAmount*$part);
+                    $paymentFeeTaxAmount = $paymentFeeInclTax - $paymentFeeAmount;
+                    $basePaymentFeeTaxAmount = $basePaymentFeeInclTax - $basePaymentFeeAmount;
+                }
+            }
+
+            $taxAmount += $paymentFeeTaxAmount;
+            $baseTaxAmount += $basePaymentFeeTaxAmount;
+            $grandTotal += $paymentFeeInclTax;
+            $baseGrandTotal += $basePaymentFeeInclTax;
+        }
 
         $creditmemo->setSveaPaymentFeeAmount($paymentFeeAmount);
         $creditmemo->setBaseSveaPaymentFeeAmount($basePaymentFeeAmount);
         $creditmemo->setSveaPaymentFeeTaxAmount($paymentFeeTaxAmount);
         $creditmemo->setBaseSveaPaymentFeeTaxAmount($basePaymentFeeTaxAmount);
-        $creditmemo->setSveaPaymentFeeInclTax($paymentFeeTaxInclTax);
+        $creditmemo->setSveaPaymentFeeInclTax($paymentFeeInclTax);
         $creditmemo->setBaseSveaPaymentFeeInclTax($basePaymentFeeInclTax);
         $creditmemo->setTaxAmount($taxAmount);
         $creditmemo->setBaseTaxAmount($baseTaxAmount);

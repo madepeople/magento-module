@@ -2,7 +2,7 @@
 <layout>
     <adminhtml_sales_order_creditmemo_new>
         <reference name="creditmemo_totals">
-            <block name="invoice_fee_adjustment" type="svea_webpay/adminhtml_sales_order_creditmemo_create_adjustments" template="svea/sales/order/creditmemo/adjustments.phtml"/>
+            <block name="invoice_fee_adjustment" type="svea_webpay/adminhtml_sales_order_creditmemo_create_adjustments" template="svea/sales/order/creditmemo/create/totals/adjustments.phtml"/>
         </reference>
     </adminhtml_sales_order_creditmemo_new>
 </layout>

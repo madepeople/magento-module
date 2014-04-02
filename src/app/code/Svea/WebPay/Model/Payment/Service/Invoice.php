@@ -131,7 +131,7 @@ class Svea_WebPay_Model_Payment_Service_Invoice
 
         $svea->setInvoiceDistributionType($this->getConfigData('distribution_type'));
         $svea->setOrderId($sveaOrderId);
-die;
+
         $response = $svea->deliverInvoiceOrder()
             ->doRequest();
 
@@ -149,9 +149,16 @@ die;
         }
 
         return $this;
+    }
 
-//        throw new Exception('implement me');
-//        return parent::refund($payment, $amount);
+    /**
+     * For Svea, it's the same as void
+     *
+     * @param Varien_Object $payment
+     */
+    public function cancel(Varien_Object $payment)
+    {
+        $this->void($payment);
     }
 
     /**
@@ -163,7 +170,22 @@ die;
      */
     public function void(Varien_Object $payment)
     {
-        throw new Exception('implement me');
-        return parent::void($payment);
+        $sveaOrderId = (int)$payment->getParentTransactionId();
+        $sveaConfig = $this->_getSveaConfig();
+        $svea = WebPay::closeOrder($sveaConfig);
+        $this->_initializeSveaOrder($svea, null);
+        $response = $svea->setOrderId($sveaOrderId)
+            ->closeInvoiceOrder()
+            ->doRequest();
+
+        if ($response->accepted != 1 && $response->resultcode !== 20000) {
+            $errorTranslated = Mage::helper('svea_webpay')->getErrorMessage(
+                $response->resultcode,
+                $response->errormessage);
+
+            Mage::throwException($errorTranslated);
+        }
+
+        return $this;
     }
 }
