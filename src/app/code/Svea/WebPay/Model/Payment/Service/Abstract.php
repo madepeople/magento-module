@@ -57,7 +57,7 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
             $quote = $order->getQuote();
             $additionalData = unserialize($quote->getPayment()->getAdditionalData());
             if (empty($additionalData) || empty($additionalData['getaddresses_response'])) {
-                throw new Mage_Payment_Exception("Can't fetch address information for order. Please contact support.");
+                Mage::throwException("Can't fetch address information for order. Please contact support.");
             }
 
             $addressData = $additionalData['getaddresses_response'];
@@ -70,7 +70,7 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
             }
 
             if (null === $address) {
-                throw new Mage_Payment_Exception('Selected civil registry address does not match the database.');
+                Mage::throwException('Selected civil registry address does not match the database.');
             }
 
             // Set the order addresses to the civil registry information
@@ -81,6 +81,9 @@ abstract class Svea_WebPay_Model_Payment_Service_Abstract
                     ->setPostcode($address->zipCode)
                     ->setStreet($address->street);
             }
+        } else if (in_array($order->getBillingAddress()->getCountryId(), array('SE', 'DK'))) {
+            $message = Mage::helper('svea_webpay')->__('Please click the "Get Address" button to fetch your address information and proceed.');
+            Mage::throwException($message);
         }
 
         $billingAddress = $order->getBillingAddress();
