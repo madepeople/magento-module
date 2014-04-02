@@ -1,5 +1,5 @@
 <_>
-   <form_key>lX0sGc8n6HlqtO7M</form_key>
+   <form_key>9wmSnnplSs44yOvJ</form_key>
    <name>Svea_WebPay</name>
    <channel>community</channel>
    <version_ids>
@@ -50,7 +50,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
             <max/>
          </max>
          <files>
-            <files>                                                                                                                       </files>
+            <files>                                                                                                                        </files>
          </files>
       </package>
       <extension>
