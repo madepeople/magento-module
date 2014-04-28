@@ -174,7 +174,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 <script>
 
     var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
-    $("payment_form_<?php echo $_code ?>_customerType_0").on("change", function (e) {
+    $("payment_form_<?php echo $_code ?>_customerType_0").observe("change", function (e) {
         customerType = $(this).value;
         if (currentCountry == 'NL' || currentCountry == 'DE') {
             if ($(this).value == 1) {
@@ -199,7 +199,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
         }
     });
-    $("payment_form_<?php echo $_code ?>_customerType_1").on("change", function (e) {
+    $("payment_form_<?php echo $_code ?>_customerType_1").observe("change", function (e) {
         customerType = $(this).value;
         if (currentCountry == 'NL' || currentCountry == 'DE') {
             if ($(this).value == 1) {
@@ -229,7 +229,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
         // Set vars
         var ssn = $("payment_form_<?php echo $_code ?>_ssn").value;
         var loader = "<img src='<?php echo Mage::getBaseUrl("media", true); ?>svea/loader.gif' id='sveaLoader'>";
-        var type = $$('input:checked[type=radio][name=payment[svea_invoice_customerType]]')[0].value;
+        var type = $$('input:checked[type=radio][name*=payment[svea_invoice_customerType]]')[0].value;
 
         // Show Loader
         $("sveaInvoiceShowAddresses").update().insert(loader);
