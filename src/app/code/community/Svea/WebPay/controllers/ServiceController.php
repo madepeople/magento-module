@@ -47,7 +47,7 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
 
                     $billingAddress = $quote->getBillingAddress();
                     foreach ($identityParameterMap as $source => $target) {
-                        if (!isset($identity->$source)) {
+                        if (empty($identity->$source)) {
                             continue;
                         }
                         $method = 'set' . $target;
