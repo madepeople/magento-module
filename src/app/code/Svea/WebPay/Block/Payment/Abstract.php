@@ -86,12 +86,12 @@ abstract class Svea_WebPay_Block_Payment_Abstract
         $html = parent::_toHtml();
         $html .= <<<EOF
 <script type="text/javascript">
-var _sveaLoaded, svea;
+var svea;
 window.svea = svea;
 (function () {
-    if (!window._sveaLoaded) {
+    if (!window.svea) {
         // Set this in the beginning because, well, concurrency and stuff
-        window._sveaLoaded = true;
+        window.svea = true;
 
         var head = document.getElementsByTagName('head')[0];
         var script = document.createElement('script');

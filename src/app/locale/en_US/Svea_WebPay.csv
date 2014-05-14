@@ -17,10 +17,11 @@
 "text_initials","Initials"
 "invoice_address","Invoice address"
 "get_address","Get address"
-"invoice_fee","Svea Invoice fee"
+"invoice_fee","Svea Invoice Fee"
 "delivered","Order is delivered"
 "month","month"
 "initial_fee","Initial fee will be added"
+"your_invoice_will_be_sent_to","The invoice will be sent to:"
 
 "no_orderid","No order is placed at Svea. Svea order id is required"
 

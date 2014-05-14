@@ -123,11 +123,13 @@
             }
         });
 
-        var method = this.getCurrentMethod();
-        if (getAddressVisible && method && method.match(/^svea_(invoice|paymentplan)/)) {
-            toggleFields.call(this, Element.hide);
-        } else {
-            toggleFields.call(this, Element.show);
+        if (this.config.checkoutType !== 'onepage') {
+            var method = this.getCurrentMethod();
+            if (getAddressVisible && method && method.match(/^svea_(invoice|paymentplan)/)) {
+                toggleFields.call(this, Element.hide);
+            } else {
+                toggleFields.call(this, Element.show);
+            }
         }
     },
 

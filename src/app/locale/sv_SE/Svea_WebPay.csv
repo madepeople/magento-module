@@ -19,10 +19,10 @@
 "invoice_address","Fakturaadress"
 "get_address","Hämta adress"
 "invoice_fee","Svea fakturaavgift"
+"your_invoice_will_be_sent_to","Fakturan kommer att skickas till:"
 "delivered","Order är levererad"
 "month","månad"
 "initial_fee","Uppläggningsavgift tillkommer"
-"your_invoice_will_be_sent_to","Fakturan kommer att skickas till:"
 "no_orderid","Ingen order hittas hos Svea. Det krävs ett Svea orderid."
 
 "Error_20000","Svea error %s : Ordern är stängd"
