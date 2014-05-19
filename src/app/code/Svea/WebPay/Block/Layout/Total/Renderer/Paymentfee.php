@@ -30,7 +30,7 @@ class Svea_WebPay_Block_Layout_Total_Renderer_Paymentfee
             }
             $source = $parentBlock->getInvoice();
         } else if ($parentBlock instanceof Mage_Adminhtml_Block_Sales_Order_Creditmemo_Totals) {
-            if (!$parentBlock->getCreditmemo()->getId() || $order->getSveaPaymentFeeRefunded() == $order->getSveaPaymentFeeInclTax()) {
+            if (!$parentBlock->getCreditmemo()->getId() && $order->getSveaPaymentFeeRefunded() == $order->getSveaPaymentFeeInclTax()) {
                 return;
             }
             $source = $parentBlock->getCreditmemo();

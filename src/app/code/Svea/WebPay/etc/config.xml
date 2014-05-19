@@ -200,17 +200,6 @@
                 </Svea_WebPay>
             </modules>
         </translate>
-        <events>
-            <adminhtml_sales_order_creditmemo_register_before>
-                <observers>
-                    <set_svea_payment_fee>
-                        <type>singleton</type>
-                        <class>svea_webpay/adminhtml_observer</class>
-                        <method>setCreditmemoSveaPaymentFee</method>
-                    </set_svea_payment_fee>
-                </observers>
-            </adminhtml_sales_order_creditmemo_register_before>
-        </events>
     </adminhtml>
     <default>
         <sales>
