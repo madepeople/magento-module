@@ -52,6 +52,14 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
         if ($this->getRequest()->getParam("response") && $this->getRequest()->getParam("mac")) {
             $conf = Mage::getStoreConfig('payment/svea_cardpayment');
             $this->responseAction($_REQUEST, $conf);
+
+            $quote = Mage::getModel('checkout/session')
+                ->getQuote();
+
+            if ($quote && $quote->getId()) {
+                $quote->setIsActive(false)
+                    ->save();
+            }
         }
     }
 
@@ -60,6 +68,14 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
         if ($this->getRequest()->getParam("response") && $this->getRequest()->getParam("mac")) {
             $conf = Mage::getStoreConfig('payment/svea_directpayment');
             $this->responseAction($_REQUEST, $conf);
+
+            $quote = Mage::getModel('checkout/session')
+                ->getQuote();
+
+            if ($quote && $quote->getId()) {
+                $quote->setIsActive(false)
+                    ->save();
+            }
         }
     }
 
