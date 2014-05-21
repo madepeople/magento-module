@@ -141,6 +141,10 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         $pattern = "/^(?:\s)*([0-9]*[A-ZÄÅÆÖØÜßäåæöøüa-z]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]+)(?:\s*)([0-9]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]*[^\s])?(?:\s)*$/";
         preg_match($pattern, $address, $addressArray);
         if( !array_key_exists( 2, $addressArray ) ) { $addressArray[2] = ""; } //fix for addresses w/o housenumber
+        if (empty($addressArray)) {
+            // Fallback if all fails (which it does)
+            $addressArray = array(null, $address);
+        }
 
         if ($company == "1") {
             $item = Item::companyCustomer();

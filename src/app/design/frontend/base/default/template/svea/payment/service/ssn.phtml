@@ -1,0 +1,168 @@
+<?php
+$_country = Mage::getSingleton('checkout/session')
+    ->getQuote()
+    ->getBillingAddress()
+    ->getCountry();
+
+$_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
+?>
+
+<ul class="form-list" id="svea_ssn_container">
+    <li style="margin-bottom:5px;">
+        <div class="input-box">
+            <label style="padding-right: 5px;">
+                <input type="radio"
+                   id="payment_form_customerType_0"
+                   name="payment[svea_info][customerType]" value="0"
+                   checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
+            </label>
+            <label>
+                <input type="radio"
+                   id="payment_form_customerType_1"
+                   name="payment[svea_info][customerType]"
+                   value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
+            </label>
+        </div>
+    </li>
+
+    <!-- If Nordic countries show, show SSN input field -->
+    <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
+        <li>
+            <label for="payment_form_ssn" class="required"
+                   id="label_ssn_customerType_0"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') . ":"; ?>
+            </label>
+            <label style="display:none;"
+                   for="payment_form_ssn" class="required"
+                   id="label_ssn_customerType_1"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no') . ":"; ?>
+            </label>
+
+            <div class="input-box">
+                <input type="text" title="payment_form_ssn"
+                       class="input-text required-entry"
+                       id="payment_form_ssn"
+                       name="payment[svea_info][ssn]"/>
+            </div>
+        </li>
+    <?php endif; ?>
+
+    <!-- If DE or NL, show dropdowns for birth date -->
+    <?php if (in_array($_country, array('NL', 'DE'))): ?>
+        <li class="forNLDE">
+            <label for="payment_form_birthYear"
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthyear') . ":"; ?>
+            </label>
+
+            <div class="input-box">
+                <select id="payment_form_birthYear"
+                        name="payment[svea_info][birthYear]"
+                        class="required validate-select">
+                    <option
+                        value=""><?php echo $this->__('-- Select --') ?></option>
+                    <?php $_currentYear = date('Y'); ?>
+                    <?php for ($_year = $_currentYear - 100; $_year <= $_currentYear - 17; $_year++): ?>
+                        <option
+                            value="<?php echo $_year ?>"><?php printf("%04d", $_year) ?></option>
+                    <?php endfor ?>
+                </select>
+            </div>
+        </li>
+        <li class="forNLDE">
+            <label for="payment_form_birthMonth"
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthmonth') . ":"; ?>
+            </label>
+
+            <div class="input-box">
+                <select id="payment_form_birthMonth"
+                        name="payment[svea_info][birthMonth]"
+                        class="required validate-select">
+                    <option
+                        value=""><?php echo $this->__('-- Select --') ?></option>
+                    <?php for ($_month = 1; $_month <= 12; $_month++): ?>
+                        <option
+                            value="<?php echo $_month ?>"><?php printf("%02d", $_month) ?></option>
+                    <?php endfor ?>
+                </select>
+            </div>
+        </li>
+        <li class="forNLDE">
+            <label for="payment_form_birthDay"
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthday') . ":"; ?>
+            </label>
+
+            <div class="input-box">
+                <select id="payment_form_birthDay"
+                        name="payment[svea_info][birthDay]"
+                        class="required validate-select">
+                    <option
+                        value=""><?php echo $this->__('-- Select --') ?></option>
+                    <?php for ($_day = 1; $_day <= 31; $_day++): ?>
+                        <option
+                            value="<?php echo $_day ?>"><?php printf("%02d", $_day) ?></option>
+                    <?php endfor ?>
+                </select>
+            </div>
+        </li>
+    <?php endif; ?>
+
+    <!-- If NL, DE or FI show VAT no input -->
+    <?php if (in_array($_country, array('NL', 'DE', 'FI'))): ?>
+        <li id="forNLDEcompany" style="display:none;">
+            <label for="payment_form_vatNo"
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no') . ":"; ?>
+            </label>
+
+            <div class="input-box">
+                <input type="text"
+                       title="payment_form_vatNo"
+                       class="input-text required-entry"
+                       id="payment_form_vatNo"
+                       name="payment[svea_info][vatNo]"/>
+            </div>
+        </li>
+    <?php endif; ?>
+
+    <!-- If NL show input field for initials -->
+    <?php if ($_country == "NL"): ?>
+        <li class="forNLDE forNL">
+            <label for="payment_form_initials"
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_initials') . ":"; ?>
+            </label>
+
+            <div class="input-box">
+                <input type="text"
+                       title="payment_form_initials"
+                       class="input-text required-entry"
+                       id="payment_form_initials"
+                       name="payment[svea_info][initials]"/>
+            </div>
+        </li>
+    <?php endif; ?>
+
+    <!-- Hide get address button for FI, NL, NO and DE -->
+    <?php if (in_array($_country, array('SE', 'DK'))): ?>
+        <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
+            <li id="showAddressBox">
+                <label
+                    for="sveaShowAddresses"><?php echo Mage::helper('svea_webpay')->__('invoice_address') . ":"; ?></label>
+
+                <div id="sveaShowAddresses"
+                     style="display:inline-block;"></div>
+            </li>
+        <?php endif ?>
+        <li>
+            <select id="svea_address_selectbox" style="display:none;margin-top:8px"></select>
+            <div id="payment-method-buttons-container" class="buttons-set" style="margin-top: 0 !important; border: 0 !important">
+                <button class="button" id="getAddress"
+                        onclick="sveaGetAddress();" type="button">
+                    <span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span>
+                </button>
+            </div>
+        </li>
+    <?php endif; ?>
+</ul>
+<input type="hidden" name="payment[svea_info][addressSelector]" id="svea_address_selector">
+
+<script>
+    var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
+    var usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
+</script>
