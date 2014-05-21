@@ -152,6 +152,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
         <li>
             <select id="svea_address_selectbox" style="display:none;margin-top:8px"></select>
             <div id="payment-method-buttons-container" class="buttons-set" style="margin-top: 0 !important; border: 0 !important">
+                <img src="<?php echo $this->getSkinUrl('svea/images/loader.gif') ?>" id="sveaLoader">
                 <button class="button" id="getAddress"
                         onclick="sveaGetAddress();" type="button">
                     <span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span>

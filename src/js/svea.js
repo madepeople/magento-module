@@ -111,18 +111,13 @@ window.sveaGetAddress = function (e) {
     var ssn = $("payment_form_ssn").value;
     var type = $$('input:checked[type=radio][name*=payment[svea_info][customerType]]')[0].value;
 
-    // Show Loader
-    if (!usingQuickCheckout) {
-        var loader = "<img src='<?php echo Mage::getBaseUrl("media", true); ?>svea/loader.gif' id='sveaLoader'>";
-        $("sveaShowAddresses").update().insert(loader);
-    }
+    $('sveaLoader').show();
 
     new Ajax.Request('<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>', {
         parameters: {ssn: ssn, type: type, cc: "<?php echo $_country; ?>"},
         onSuccess: function (transport) {
             var json = transport.responseText.evalJSON();
-            $('sveaLoader') && $('sveaLoader').remove();
-
+            $('sveaLoader').hide();
             if (json.accepted == false) {
                 if (usingQuickCheckout) {
                     alert(json.errormessage);
