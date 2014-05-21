@@ -53,48 +53,17 @@ class Svea_WebPay_Model_Checkout_Observer
 
     protected function _addAdditionalInfoToPayment($data, $payment)
     {
+        if (empty($data['svea_info'])) {
+            return;
+        }
+
+        foreach ($data['svea_info'] as $key => $value) {
+            $payment->setAdditionalInformation($key, $value);
+        }
+
         $method = $data['method'];
-        if (isset($data[$method . '_ssn'])) {
-            $payment
-                    ->setAdditionalInformation('svea_ssn', $data[$method . '_ssn']);
-        }
-        if (isset($data[$method . '_birthDay'])) {
-            $payment
-                    ->setAdditionalInformation('svea_birthDay', $data[$method . '_birthDay']);
-        }
-        if (isset($data[$method . '_birthMonth'])) {
-            $payment
-                    ->setAdditionalInformation('svea_birthMonth', $data[$method . '_birthMonth']);
-        }
-        if (isset($data[$method . '_birthYear'])) {
-            $payment
-                    ->setAdditionalInformation('svea_birthYear', $data[$method . '_birthYear']);
-        }
-        if($method == "svea_paymentplan"){
-             $payment->setAdditionalInformation('svea_customerType', "0");
-        }  else {
-             if (isset($data[$method . '_customerType'])) {
-            $payment->setAdditionalInformation('svea_customerType', $data[$method . '_customerType']);
-            }
-        }
-
-
-        if (isset($data[$method . '_vatNo'])) {
-            $payment
-                    ->setAdditionalInformation('svea_vatNo', $data[$method . '_vatNo']);
-        }
-        if (isset($data[$method . '_initials'])) {
-            $payment
-                    ->setAdditionalInformation('svea_initials', $data[$method . '_initials']);
-        }
-        if (isset($data[$method . '_addressSelector'])) {
-            $payment
-                    ->setAdditionalInformation('svea_addressSelector', $data[$method . '_addressSelector']);
-        }
-
-        if (isset($data[$method . '_campaign'])) {
-            $payment
-                    ->setAdditionalInformation('svea_campaign', $data[$method . '_campaign']);
+        if ($method == 'svea_paymentplan'){
+            $payment->setAdditionalInformation('svea_customerType', '0');
         }
         return $payment;
     }

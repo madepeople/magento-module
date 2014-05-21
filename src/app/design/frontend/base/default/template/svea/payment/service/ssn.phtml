@@ -13,13 +13,13 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
             <label style="padding-right: 5px;">
                 <input type="radio"
                    id="payment_form_customerType_0"
-                   name="payment[svea_info][customerType]" value="0"
+                   name="payment[svea_info][svea_customerType]" value="0"
                    checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
             </label>
             <label>
                 <input type="radio"
                    id="payment_form_customerType_1"
-                   name="payment[svea_info][customerType]"
+                   name="payment[svea_info][svea_customerType]"
                    value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
             </label>
         </div>
@@ -40,7 +40,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
                 <input type="text" title="payment_form_ssn"
                        class="input-text required-entry"
                        id="payment_form_ssn"
-                       name="payment[svea_info][ssn]"/>
+                       name="payment[svea_info][svea_ssn]"/>
             </div>
         </li>
     <?php endif; ?>
@@ -54,7 +54,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
             <div class="input-box">
                 <select id="payment_form_birthYear"
-                        name="payment[svea_info][birthYear]"
+                        name="payment[svea_info][svea_birthYear]"
                         class="required validate-select">
                     <option
                         value=""><?php echo $this->__('-- Select --') ?></option>
@@ -73,7 +73,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
             <div class="input-box">
                 <select id="payment_form_birthMonth"
-                        name="payment[svea_info][birthMonth]"
+                        name="payment[svea_info][svea_birthMonth]"
                         class="required validate-select">
                     <option
                         value=""><?php echo $this->__('-- Select --') ?></option>
@@ -91,7 +91,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
             <div class="input-box">
                 <select id="payment_form_birthDay"
-                        name="payment[svea_info][birthDay]"
+                        name="payment[svea_info][svea_birthDay]"
                         class="required validate-select">
                     <option
                         value=""><?php echo $this->__('-- Select --') ?></option>
@@ -116,7 +116,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
                        title="payment_form_vatNo"
                        class="input-text required-entry"
                        id="payment_form_vatNo"
-                       name="payment[svea_info][vatNo]"/>
+                       name="payment[svea_info][svea_vatNo]"/>
             </div>
         </li>
     <?php endif; ?>
@@ -133,7 +133,7 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
                        title="payment_form_initials"
                        class="input-text required-entry"
                        id="payment_form_initials"
-                       name="payment[svea_info][initials]"/>
+                       name="payment[svea_info][svea_initials]"/>
             </div>
         </li>
     <?php endif; ?>
@@ -152,18 +152,19 @@ $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
         <li>
             <select id="svea_address_selectbox" style="display:none;margin-top:8px"></select>
             <div id="payment-method-buttons-container" class="buttons-set" style="margin-top: 0 !important; border: 0 !important">
-                <img src="<?php echo $this->getSkinUrl('svea/images/loader.gif') ?>" id="sveaLoader">
                 <button class="button" id="getAddress"
                         onclick="sveaGetAddress();" type="button">
                     <span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span>
                 </button>
+                <img id="sveaLoader" style="display:none; float: right; margin:4px 6px 0 0;" src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>">
             </div>
         </li>
     <?php endif; ?>
 </ul>
-<input type="hidden" name="payment[svea_info][addressSelector]" id="svea_address_selector">
+<input type="hidden" name="payment[svea_info][svea_addressSelector]" id="svea_address_selector">
 
 <script>
     var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
     var usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
+    var getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
 </script>

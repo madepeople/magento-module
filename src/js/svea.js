@@ -113,8 +113,8 @@ window.sveaGetAddress = function (e) {
 
     $('sveaLoader').show();
 
-    new Ajax.Request('<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>', {
-        parameters: {ssn: ssn, type: type, cc: "<?php echo $_country; ?>"},
+    new Ajax.Request(getAddressUrl, {
+        parameters: {ssn: ssn, type: type, cc: currentCountry},
         onSuccess: function (transport) {
             var json = transport.responseText.evalJSON();
             $('sveaLoader').hide();

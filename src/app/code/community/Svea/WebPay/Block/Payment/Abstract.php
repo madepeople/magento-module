@@ -17,65 +17,6 @@ abstract class Svea_WebPay_Block_Payment_Abstract extends Mage_Payment_Block_For
     }
 
     /**
-     * Returns a constant string defining the type of checkout module used,
-     * which we can use in the javascript to determine how to handle markup
-     *
-     * @return string
-     */
-    protected function _getCheckoutType()
-    {
-        $request = $this->getRequest();
-        switch ($request->getModuleName()) {
-            case 'checkout':
-                // Do an extra check here for the Ecomdev module, the standard
-                // checkout, as well as the multishipping checkout
-                return 'onepage';
-            case 'streamcheckout':
-                return 'streamcheckout';
-            case 'onestepcheckout':
-                return 'onestepcheckout';
-            case 'firecheckout':
-                return 'firecheckout';
-        }
-    }
-
-    /**
-     * This one lets us get arbitrary values stored on the payment method object
-     * such as SSN, customer type, VAT number etc
-     *
-     * @param $key  Additional data key
-     * @return string  The value or an empty string
-     */
-    public function getAdditionalData($key, $type = null)
-    {
-        $method = $this->getMethod();
-        $infoInstance = $method->getInfoInstance();
-        $methodInfo = $infoInstance->getAdditionalInformation($method->getCode());
-        if (null !== $type) {
-            $methodInfo = isset($methodInfo[$type])
-                ? $methodInfo[$type] : array();
-        }
-        return isset($methodInfo[$key])
-            ? $methodInfo[$key] : '';
-    }
-
-    /**
-     * We need the country in templates to make decisions about addresses and
-     * stuff
-     *
-     * @return string
-     */
-    public function getCountry()
-    {
-        $method = $this->getMethod();
-        $paymentInfo = $method->getInfoInstance();
-
-        return ($paymentInfo instanceof Mage_Sales_Model_Order_Payment)
-            ? $paymentInfo->getOrder()->getBillingAddress()->getCountryId()
-            : $paymentInfo->getQuote()->getBillingAddress()->getCountryId();
-    }
-
-    /**
      * Loads the svea.js file and instantiates the svea payment object
      *
      * @return string
@@ -85,13 +26,6 @@ abstract class Svea_WebPay_Block_Payment_Abstract extends Mage_Payment_Block_For
         $scriptUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS,
                 true) . 'svea.js';
         $scriptUrl = Mage::helper('core')->jsonEncode($scriptUrl);
-
-        $parameters = Mage::helper('core')->jsonEncode(array(
-            'baseUrl' => Mage::getUrl('', array(
-                    '_secure' => true
-                )),
-            'checkoutType' => $this->_getCheckoutType(),
-        ));
 
         $html = parent::_toHtml();
         $html .= <<<EOF
