@@ -52,6 +52,14 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
         if ($this->getRequest()->getParam("response") && $this->getRequest()->getParam("mac")) {
             $conf = Mage::getStoreConfig('payment/svea_cardpayment');
             $this->responseAction($_REQUEST, $conf);
+
+            $quote = Mage::getModel('checkout/session')
+                ->getQuote();
+
+            if ($quote && $quote->getId()) {
+                $quote->setIsActive(false)
+                    ->save();
+            }
         }
     }
 
@@ -60,6 +68,14 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
         if ($this->getRequest()->getParam("response") && $this->getRequest()->getParam("mac")) {
             $conf = Mage::getStoreConfig('payment/svea_directpayment');
             $this->responseAction($_REQUEST, $conf);
+
+            $quote = Mage::getModel('checkout/session')
+                ->getQuote();
+
+            if ($quote && $quote->getId()) {
+                $quote->setIsActive(false)
+                    ->save();
+            }
         }
     }
 
@@ -74,7 +90,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
         if (!$order->getId()) {
             Mage::getSingleton('core/session')  ->addError("Order #" . $response->response->clientOrderNumber . " couldn't be loaded")
                                                 ->addError( Mage::helper('svea_webpay')->responseCodes($response->response->resultcode, $response->response->errormessage));
-            return $this->_redirect("checkout/onepage/failure", array("secure" => true));
+            return $this->_redirect("checkout/onepage/failure", array("_secure" => true));
         }
 
         if ($order->getTotalDue() == 0) {
@@ -82,7 +98,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
             Mage::getSingleton('core/session')  ->addError("Order #" . $response->response->clientOrderNumber . " has already been paid")
                                                 ->addError( Mage::helper('svea_webpay')->responseCodes($response->response->resultcode, $response->response->errormessage));
 
-            return $this->_redirect("checkout/onepage/failure", array("secure" => true));
+            return $this->_redirect("checkout/onepage/failure", array("_secure" => true));
         }
 
         if ($response->response->accepted == 1) {
@@ -115,7 +131,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
             $order->save();
             $order->sendNewOrderEmail();
 
-            $this->_redirect("checkout/onepage/success", array("secure" => true));
+            $this->_redirect("checkout/onepage/success", array("_secure" => true));
         } else {
             $errorMessage = $response->response->errormessage;
             $statusCode = $response->response->resultcode;
@@ -128,7 +144,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
 
             Mage::getSingleton('core/session')->addError(Mage::helper('svea_webpay')->responseCodes($statusCode, $errorMessage));
 
-            $this->_redirect("checkout/onepage/failure", array("secure" => true));
+            $this->_redirect("checkout/onepage/failure", array("_secure" => true));
         }
     }
 }
