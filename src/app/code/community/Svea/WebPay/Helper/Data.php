@@ -207,9 +207,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         // Add shipping fee
         if ($invoice->getShippingAmount() > 0) {
             $shippingFee = Item::shippingFee()
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setName($invoice->getShippingMethod())
-                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription());
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setName($order->getShippingDescription());
 
             // We require shipping tax to be set
             $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
@@ -345,9 +344,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         // Shipping
         if ($creditMemo->getShippingAmount() > 0) {
             $shippingFee = Item::shippingFee()
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setName($creditMemo->getShippingMethod())
-                    ->setDescription($order->getShippingMethod() . ': ' . $order->getShippingDescription());
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setName($order->getShippingDescription());
 
             // We require shipping tax to be set
             $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
@@ -366,8 +364,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         // Discount
         if (abs($creditMemo->getDiscountAmount()) > 0) {
             $discountRow = Item::fixedDiscount()
-                    ->setAmountIncVat(abs($creditMemo->getDiscountAmount()))
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'));
+                ->setAmountIncVat(abs($creditMemo->getDiscountAmount()))
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'));
 
             $sveaObject->addDiscount($discountRow);
         }
