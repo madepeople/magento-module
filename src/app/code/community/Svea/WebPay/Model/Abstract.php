@@ -120,9 +120,8 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         // Shipping
         if ($order->getShippingAmount() > 0) {
             $shippingFee = Item::shippingFee()
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setName($order->getShippingMethod())
-                    ->setDescription($order->getShippingDescription());
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setName($order->getShippingDescription());
 
             // We require shipping tax to be set
             $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
