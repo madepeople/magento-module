@@ -3,32 +3,75 @@ $_country = Mage::getSingleton('checkout/session')->getQuote()->getBillingAddres
 $_currency = Mage::app()->getStore()->getCurrentCurrencyCode();
 $_code = $this->getMethodCode();
 $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
-
+$_infoBlock = trim(Mage::getStoreConfig("payment/$_code/paymentplan_info"));
 $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
 ?>
-
-<ul class="form-list" id="payment_form_<?php echo $_code ?>"
-    style="display:none;">
-    <li>
-        <?php echo(nl2br(Mage::getStoreConfig("payment/$_code/paymentplan_info"))); ?>
-    </li>
+<ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
+    <?php if (!empty($_infoBlock)): ?>
+        <li>
+            <?php echo nl2br($_infoBlock); ?>
+        </li>
+    <?php endif; ?>
 
     <?php echo $this->getSsnHtml() ?>
 
     <!-- Show stored payment plan params -->
     <li id="showPaymentPlanParams">
         <div id="sveaPaymentPlanShowParams" style="display:inline-block;">
-            <?php $_i = 0;
-            foreach ($_resultParams as $_campaign): $_i++; ?>
-                <?php $_selected = ($_i === 1) ? "checked='checked'" : "" ?>
-                <label>
-                    <input type="radio"
-                           name="payment[<?php echo $_code ?>_campaign]" <?php echo $_selected ?>
-                           value="<?php echo $_campaign->campaincode; ?>"> <?php echo $_campaign->description; ?>
-                    - <?php echo $_campaign->monthlyamount . " " . $_currency . "/" . Mage::helper('svea_webpay')->__('month') ?>
-                </label>
-                <br>
-            <?php endforeach ?>
+            <select onchange="_updatePaymentPlanPrice();"
+                    id="paymentplan_campaign_chooser" name="payment[campaign]">
+                <?php
+                $_i = 0;
+                $_campaigns = array();
+                foreach ($_resultParams as $_campaign): $_i++;
+                    $_isCampaign = $_campaign->paymentfreemonths && ($_campaign->interestfreemonths == $_campaign->paymentfreemonths);
+                    ?>
+                    <?php $_selected = ($_i === 1) ? "selected" : "" ?>
+                    <?php if ($_isCampaign): ?>
+                        <option <?php echo $_selected ?>
+                            value="<?php echo $_campaign->campaincode; ?>"> <?php echo $_campaign->description; ?></option>
+                    <?php else: ?>
+                        <option <?php echo $_selected ?>
+                            value="<?php echo $_campaign->campaincode; ?>"> <?php echo $_campaign->contractlength; ?>
+                            mån
+                        </option>
+                    <?php endif; ?>
+                    <?php
+                    $_campaigns[] = array(
+                        'code' => $_campaign->campaincode,
+                        'amount' => $_campaign->monthlyamount,
+                        'is_campaign' => $_isCampaign
+                    );
+                endforeach;
+                ?>
+            </select>
+            <br>
+
+            <p id="paymentplan_cost_text" style="display:none">
+                Din månadskostnad: <span class="cost"><span id="paymentplan_cost"></span> <?php echo $_currency . "/" . Mage::helper('svea_webpay')->__('month') ?></span>
+            </p>
         </div>
     </li>
 </ul>
+
+<script>
+    var available_campaigns = <?php echo Mage::helper('core')->jsonEncode($_campaigns) ?>;
+    function _updatePaymentPlanPrice() {
+        var selectedOption = $$('#paymentplan_campaign_chooser option').find(function (el) {
+            return !!el.selected;
+        });
+
+        for (var i = 0; i < available_campaigns.length; i++) {
+            if (available_campaigns[i].code == selectedOption.value) {
+                if (available_campaigns[i].is_campaign) {
+                    $('paymentplan_cost_text').hide();
+                } else {
+                    $('paymentplan_cost_text').show();
+                    $('paymentplan_cost').update(available_campaigns[i].amount);
+                }
+            }
+        }
+    }
+
+    _updatePaymentPlanPrice();
+</script>
