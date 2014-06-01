@@ -1,5 +1,5 @@
 <_>
-   <form_key>KZbYj8YamM2NnGIA</form_key>
+   <form_key>INJM2yLD3frKAfz1</form_key>
    <name>Svea_WebPay</name>
    <channel>community</channel>
    <version_ids>
@@ -16,7 +16,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
    </description>
    <license>Apache License, Version 2.0</license>
    <license_uri/>
-   <version>4.0.19</version>
+   <version>4.0.20</version>
    <stability>stable</stability>
    <notes>N/A</notes>
    <authors>
@@ -50,7 +50,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
             <max/>
          </max>
          <files>
-            <files>                                                                                                                           </files>
+            <files>                                                                                                                            </files>
          </files>
       </package>
       <extension>
@@ -83,6 +83,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
          <target>magelocale</target>
          <target>magelocale</target>
          <target>magelocale</target>
+         <target>mageskin</target>
       </target>
       <path>
          <path/>
@@ -101,6 +102,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
          <path>nn_NO/Svea_WebPay.csv</path>
          <path>no_NO/Svea_WebPay.csv</path>
          <path>sv_SE/Svea_WebPay.csv</path>
+         <path>svea</path>
       </path>
       <type>
          <type>file</type>
@@ -119,6 +121,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
          <type>file</type>
          <type>file</type>
          <type>file</type>
+         <type>dir</type>
       </type>
       <include>
          <include/>
@@ -137,8 +140,10 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
          <include/>
          <include/>
          <include/>
+         <include/>
       </include>
       <ignore>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>
