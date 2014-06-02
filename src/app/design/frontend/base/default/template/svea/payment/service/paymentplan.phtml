@@ -19,7 +19,7 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
     <li id="showPaymentPlanParams">
         <div id="sveaPaymentPlanShowParams" style="display:inline-block;">
             <select onchange="_updatePaymentPlanPrice();"
-                    id="paymentplan_campaign_chooser" name="payment[campaign]">
+                    id="paymentplan_campaign_chooser" name="payment[svea_info][campaign]">
                 <?php
                 $_i = 0;
                 $_campaigns = array();
