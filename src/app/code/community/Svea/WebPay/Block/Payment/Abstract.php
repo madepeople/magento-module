@@ -16,6 +16,14 @@ abstract class Svea_WebPay_Block_Payment_Abstract extends Mage_Payment_Block_For
         return parent::_construct();
     }
 
+    protected function _prepareLayout()
+    {
+        $head = $this->getLayout()
+            ->getBlock('head');
+
+        $head->addCss('svea/css/checkout.css');
+    }
+
     /**
      * Loads the svea.js file and instantiates the svea payment object
      *
