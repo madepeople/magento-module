@@ -102,7 +102,10 @@ function sveaGetAddress(code)
             }
 
             // Show dropdown if company, show only text if private customer
-            _$('.sveaShowAddresses', code).update('');
+            var addressesBox = _$('.sveaShowAddresses', code);
+            if (addressesBox) {
+                addressesBox.update('');
+            }
             _$('.svea_address_selectbox', code).update('');
             customerIdentities = json.customerIdentity;
             if (customerIdentities.length > 1) {

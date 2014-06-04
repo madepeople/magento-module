@@ -72,7 +72,7 @@ if (empty($_method)) {
         <!-- Hide address select box for FI, NL, NO and DE -->
         <?php if (in_array($_country, array('SE', 'DK'))): ?>
             <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
-                    style="display:none;margin-top:8px"></select>
+                    style="display:none;margin-top:8px;width:100%"></select>
             <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
                 <div id="showAddressBox_<?php echo $_code ?>" class="field">
                     <label class="sveaShowAdressesLabel" for="sveaShowAddresses_<?php echo $_code ?>" style="display:none"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
