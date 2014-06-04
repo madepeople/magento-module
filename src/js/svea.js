@@ -77,7 +77,7 @@ function sveaGetAddress(code)
     }
 
     var ssn = _$('[name*=[svea_ssn]]', code).value,
-        typeElement = _$('input:checked[type=radio][name*=payment[svea_info][customerType]]', code),
+        typeElement = _$('input:checked[name*=customerType]', code),
         type = typeElement ? typeElement.value : 0;
 
     startLoading();
