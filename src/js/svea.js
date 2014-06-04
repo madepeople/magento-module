@@ -43,7 +43,7 @@ function sveaAddressChanged(addressSelector, container)
             address.zipCode + ' ' +
             address.locality;
 
-        $(container).down('.sveaShowAddresses').insert(adress);
+        $(container).down('.sveaShowAddresses').update(adress);
     }
 
     // For onestep checkouts, check if fields visible and auto-fill
@@ -150,7 +150,7 @@ function setCustomerTypeRadioThing()
 
 function sveaAddressSelectChanged()
 {
-    currentSveaAddress = Form.Element.Serializers.inputSelector(this);
+    currentSveaAddress = $F(this);
     var container = $(this).up('.svea-ssn-container');
     sveaAddressChanged(currentSveaAddress, container);
     $(container).down('.svea_address_selector').value = currentSveaAddress;

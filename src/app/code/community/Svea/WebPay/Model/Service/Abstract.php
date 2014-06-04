@@ -225,7 +225,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             $errorTranslated = Mage::helper('svea_webpay')->responseCodes($statusCode, $errorMessage);
             $order->addStatusToHistory($order->getStatus(), $errorTranslated, false);
 
-            return Mage::throwException($errorTranslated);
+            Mage::throwException($errorTranslated);
         }
     }
 

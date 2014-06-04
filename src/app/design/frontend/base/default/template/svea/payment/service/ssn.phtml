@@ -65,7 +65,7 @@ if (empty($_method)) {
         <!-- Hide get address button for FI, NL, NO and DE -->
         <?php if (in_array($_country, array('SE', 'DK'))): ?>
             <div class="field">
-                <select class="svea_address_selectbox"
+                <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
                         style="display:none;margin-top:8px"></select>
             </div>
             <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
