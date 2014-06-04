@@ -98,6 +98,7 @@ function sveaGetAddress(code)
 
             // Show dropdown if company, show only text if private customer
             _$('.sveaShowAddresses', code).update('');
+            _$('.svea_address_selectbox', code).update('');
             customerIdentities = json.customerIdentity;
             if (customerIdentities.length > 1) {
                 customerIdentities.each(function (item) {
@@ -112,9 +113,7 @@ function sveaGetAddress(code)
 
                     _$('.svea_address_selectbox', code).insert(option);
                 });
-
-                _$('.svea_address_selectbox', code).show()
-                    .update(selectBox);
+                _$('.svea_address_selectbox', code).show();
             } else {
                 _$('.svea_address_selectbox', code).hide();
             }
@@ -127,36 +126,43 @@ function sveaGetAddress(code)
     });
 }
 
-$(document).observe('dom:loaded', function () {
-    function setCustomerTypeRadioThing()
-    {
-        var customerType = $(this).value;
-        if (currentCountry == 'NL' || currentCountry == 'DE') {
-            if (customerType == 1) {
-                $$(".forNLDE").invoke('hide');
-                $$(".forNLDEcompany").invoke('show');
-            } else {
-                $$(".forNLDEcompany").invoke('hide');
-                $$(".forNLDE").invoke('show');
-            }
+function setCustomerTypeRadioThing()
+{
+    var customerType = $(this).value;
+    if (currentCountry == 'NL' || currentCountry == 'DE') {
+        if (customerType == 1) {
+            $$(".forNLDE").invoke('hide');
+            $$(".forNLDEcompany").invoke('show');
         } else {
-            if (customerType == 1) {
-                $$(".label_ssn_customerType_0").invoke('hide');
-                $$(".label_ssn_customerType_1").invoke('show');
-            } else {
-                $$(".label_ssn_customerType_1").invoke('hide');
-                $$(".label_ssn_customerType_0").invoke('show');
-            }
+            $$(".forNLDEcompany").invoke('hide');
+            $$(".forNLDE").invoke('show');
+        }
+    } else {
+        if (customerType == 1) {
+            $$(".label_ssn_customerType_0").invoke('hide');
+            $$(".label_ssn_customerType_1").invoke('show');
+        } else {
+            $$(".label_ssn_customerType_1").invoke('hide');
+            $$(".label_ssn_customerType_0").invoke('show');
         }
     }
+}
 
-    $$(".payment_form_customerType_0").invoke('observe', 'change', setCustomerTypeRadioThing);
-    $$(".payment_form_customerType_1").invoke('observe', 'change', setCustomerTypeRadioThing);
+function sveaAddressSelectChanged()
+{
+    currentSveaAddress = Form.Element.Serializers.inputSelector(this);
+    var container = $(this).up('.svea-ssn-container');
+    sveaAddressChanged(currentSveaAddress, container);
+    $(container).down('.svea_address_selector').value = currentSveaAddress;
+}
 
-    $$('.svea_address_selectbox').invoke('observe', 'change', function (e) {
-        currentSveaAddress = Form.Element.Serializers.inputSelector(this);
-        var container = $(this).up('.svea-ssn-container');
-        sveaAddressChanged(currentSveaAddress, container);
-        $(container).down('.svea_address_selector').value = currentSveaAddress;
-    });
+function setupAddressSelectorObservers()
+{
+    $$('.svea_address_selectbox').invoke('observe', 'change', sveaAddressSelectChanged);
+    $$('.payment_form_customerType_0').invoke('observe', 'change', setCustomerTypeRadioThing);
+    $$('.payment_form_customerType_1').invoke('observe', 'change', setCustomerTypeRadioThing);
+}
+
+$(document).observe('dom:loaded', function () {
+    setupAddressSelectorObservers();
 });

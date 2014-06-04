@@ -33,17 +33,49 @@ if (empty($_method)) {
 
     <!-- If Nordic countries show, show SSN input field -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
-        <label for="payment_form_ssn_<?php echo $_code ?>" class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') ?>
-            :</label>
-        <label style="display:none;"
-               for="payment_form_ssn_<?php echo $_code ?>" class="required">
-            <em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no') . ":"; ?>
-        </label>
+        <div>
+            <label for="payment_form_ssn_<?php echo $_code ?>" class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') ?>
+                :</label>
+            <label style="display:none;"
+                   for="payment_form_ssn_<?php echo $_code ?>" class="required">
+                <em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no') . ":"; ?>
+            </label>
 
-        <div class="input-box">
-            <input type="text" id="payment_form_ssn_<?php echo $_code ?>"
-                   class="input-text required-entry"
-                   name="payment[svea_info][svea_ssn]"/>
+            <div class="input-box">
+                <input type="text" id="payment_form_ssn_<?php echo $_code ?>"
+                       class="input-text required-entry"
+                       name="payment[svea_info][svea_ssn]"/>
+            </div>
+
+            <!-- Hide get address button for NO and FI -->
+            <?php if (in_array($_country, array('SE', 'DK'))): ?>
+                <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
+                    <div id="showAddressBox_<?php echo $_code ?>">
+                        <label
+                            for="sveaShowAddresses_<?php echo $_code ?>"><?php echo Mage::helper('svea_webpay')->__('invoice_address') . ":"; ?></label>
+
+                        <div class="sveaShowAddresses"
+                             id="sveaShowAddresses_<?php echo $_code ?>"
+                             style="display:inline-block;"></div>
+                    </div>
+                <?php endif ?>
+                <div>
+                    <select class="svea_address_selectbox" onchange=""
+                            style="display:none;margin-top:8px"></select>
+
+                    <div id="payment-method-buttons-container-<?php echo $_code ?>" class="buttons-set"
+                         style="margin-top: 0 !important; border: 0 !important">
+                        <button class="button"
+                                onclick="sveaGetAddress.call(this, '<?php echo $_code; ?>');"
+                                type="button">
+                            <span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span>
+                        </button>
+                        <img id="sveaLoader_<?php echo $_code ?>"
+                             style="display:none; float: right; margin:4px 6px 0 0;"
+                             src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>">
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 
@@ -140,35 +172,6 @@ if (empty($_method)) {
         </div>
     <?php endif; ?>
 
-    <!-- Hide get address button for FI, NL, NO and DE -->
-    <?php if (in_array($_country, array('SE', 'DK'))): ?>
-        <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
-            <div id="showAddressBox_<?php echo $_code ?>">
-                <label
-                    for="sveaShowAddresses_<?php echo $_code ?>"><?php echo Mage::helper('svea_webpay')->__('invoice_address') . ":"; ?></label>
-
-                <div class="sveaShowAddresses"
-                     id="sveaShowAddresses_<?php echo $_code ?>"
-                     style="display:inline-block;"></div>
-            </div>
-        <?php endif ?>
-        <div>
-            <select class="svea_address_selectbox"
-                    style="display:none;margin-top:8px"></select>
-
-            <div id="payment-method-buttons-container-<?php echo $_code ?>" class="buttons-set"
-                 style="margin-top: 0 !important; border: 0 !important">
-                <button class="button"
-                        onclick="sveaGetAddress.call(this, '<?php echo $_code; ?>');"
-                        type="button">
-                    <span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span>
-                </button>
-                <img id="sveaLoader_<?php echo $_code ?>"
-                     style="display:none; float: right; margin:4px 6px 0 0;"
-                     src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>">
-            </div>
-        </div>
-    <?php endif; ?>
     <input type="hidden" name="payment[svea_info][svea_addressSelector]"
            class="svea_address_selector">
 </div>
