@@ -73,12 +73,18 @@ function sveaGetAddress(code)
 {
     function startLoading()
     {
-        $('sveaLoader') && $('sveaLoader').show();
+        var getAddressButton = _$('.get-address-btn', code);
+        if (getAddressButton) {
+            $(getAddressButton).addClass('loading');
+        }
     }
 
     function stopLoading()
     {
-        $('sveaLoader') && $('sveaLoader').hide();
+        var getAddressButton = _$('.get-address-btn', code);
+        if (getAddressButton) {
+            $(getAddressButton).removeClass('loading');
+        }
     }
 
     var ssn = _$('[name*=[svea_ssn]]', code).value,

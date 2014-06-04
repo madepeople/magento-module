@@ -60,7 +60,7 @@ if (empty($_method)) {
                     <button class="button"
                             onclick="sveaGetAddress.call(this, '<?php echo $_code; ?>');"
                             type="button">
-                        <span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span>
+                        <span><span class="inner"><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span><span class="loader"><img src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>"></span></span>
                     </button>
                     <img id="sveaLoader_<?php echo $_code ?>"
                          style="display:none; float: right; margin:4px 6px 0 0;"
