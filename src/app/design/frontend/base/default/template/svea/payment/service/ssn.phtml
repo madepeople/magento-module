@@ -143,17 +143,7 @@ if (empty($_method)) {
 
     <!-- Hide get address button for FI, NL, NO and DE -->
     <?php if (in_array($_country, array('SE', 'DK'))): ?>
-        <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
-            <div id="showAddressBox_<?php echo $_code ?>">
-                <label
-                    for="sveaShowAddresses_<?php echo $_code ?>"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
-
-                <div class="sveaShowAddresses"
-                     id="sveaShowAddresses_<?php echo $_code ?>"
-                     style="display:inline-block;"></div>
-            </div>
-        <?php endif ?>
-        <div class="field">
+        <div>
             <select class="svea_address_selectbox"
                     style="display:none;margin-top:8px"></select>
 
@@ -168,6 +158,16 @@ if (empty($_method)) {
                      src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>">
             </div>
         </div>
+        <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
+            <div id="showAddressBox_<?php echo $_code ?>" class="field">
+                <label
+                    for="sveaShowAddresses_<?php echo $_code ?>"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
+
+                <div class="sveaShowAddresses"
+                     id="sveaShowAddresses_<?php echo $_code ?>"
+                     style="display:inline-block;"></div>
+            </div>
+        <?php endif ?>
     <?php endif; ?>
     <input type="hidden" name="payment[svea_info][svea_addressSelector]"
            class="svea_address_selector">

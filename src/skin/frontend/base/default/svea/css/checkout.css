@@ -1,26 +1,24 @@
-/* line 1, ../sass/checkout.scss */
-.checkout-form {
-  border-top: 1px solid #eee;
-  border-bottom: 1px solid #eee;
-  padding-top: 30px;
-  margin-bottom: 20px;
-}
-/* line 10, ../sass/checkout.scss */
-.checkout-form .form-list .customer-name .name-firstname {
+/* line 7, ../sass/checkout.scss */
+.form-list .customer-name .name-firstname {
   float: left;
   width: 49% !important;
   clear: none !important;
   margin-right: 1%;
 }
-/* line 16, ../sass/checkout.scss */
-.checkout-form .form-list .customer-name .name-lastname {
+/* line 13, ../sass/checkout.scss */
+.form-list .customer-name .name-lastname {
   float: left;
   width: 49% !important;
   clear: none !important;
   margin-left: 1%;
 }
-/* line 25, ../sass/checkout.scss */
-.checkout-form .form-list #paymentplan_cost_text {
+/* line 22, ../sass/checkout.scss */
+.form-list .svea-ssn-container .field {
+  float: none;
+  margin-bottom: 8px;
+}
+/* line 28, ../sass/checkout.scss */
+.form-list #paymentplan_cost_text {
   background-color: #297ab7;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -33,36 +31,43 @@
   margin-top: 10px;
   font-weight: bold;
 }
-/* line 37, ../sass/checkout.scss */
-.checkout-form .form-list #paymentplan_cost_text .cost {
+/* line 40, ../sass/checkout.scss */
+.form-list #paymentplan_cost_text .cost {
   font-weight: bold;
 }
 
-/* line 51, ../sass/checkout.scss */
+/* line 54, ../sass/checkout.scss */
 .customer-type {
   margin-bottom: 20px !important;
 }
-/* line 53, ../sass/checkout.scss */
+/* line 56, ../sass/checkout.scss */
 .customer-type label:first-child {
   margin-right: 40px;
 }
 
-/* line 62, ../sass/checkout.scss */
+/* line 63, ../sass/checkout.scss */
+#streamcheckout .checkout-form {
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+  padding-top: 30px;
+  margin-bottom: 20px;
+}
+/* line 71, ../sass/checkout.scss */
 #streamcheckout .form-list.svea_ssn_container .input-box {
   float: left;
   width: 59% !important;
   margin-right: 1%;
 }
-/* line 67, ../sass/checkout.scss */
+/* line 76, ../sass/checkout.scss */
 #streamcheckout .form-list.svea_ssn_container button {
   float: right;
   width: 39%;
 }
-/* line 70, ../sass/checkout.scss */
+/* line 79, ../sass/checkout.scss */
 #streamcheckout .form-list.svea_ssn_container button > span {
   height: 25px !important;
 }
-/* line 73, ../sass/checkout.scss */
+/* line 82, ../sass/checkout.scss */
 #streamcheckout .form-list.svea_ssn_container button span {
   line-height: 25px !important;
 }
