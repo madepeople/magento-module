@@ -50,7 +50,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
             <max/>
          </max>
          <files>
-            <files>                                                                                                                              </files>
+            <files>                                                                                                                                </files>
          </files>
       </package>
       <extension>
@@ -84,6 +84,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
          <target>magelocale</target>
          <target>magelocale</target>
          <target>mageskin</target>
+         <target>mageweb</target>
       </target>
       <path>
          <path/>
@@ -103,6 +104,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
          <path>no_NO/Svea_WebPay.csv</path>
          <path>sv_SE/Svea_WebPay.csv</path>
          <path>frontend/base/default/svea</path>
+         <path>js/svea.js</path>
       </path>
       <type>
          <type>file</type>
@@ -122,6 +124,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
          <type>file</type>
          <type>file</type>
          <type>dir</type>
+         <type>file</type>
       </type>
       <include>
          <include/>
@@ -141,8 +144,10 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
          <include/>
          <include/>
          <include/>
+         <include/>
       </include>
       <ignore>
+         <ignore/>
          <ignore/>
          <ignore/>
          <ignore/>
