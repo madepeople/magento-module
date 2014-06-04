@@ -16,8 +16,8 @@ if (empty($_method)) {
 ?>
 
 <div class="svea-ssn-container <?php echo $_class ?>">
-    <div class="input-box">
-        <label style="padding-right: 5px;">
+    <div class="field">
+        <label style="margin-right: 30px;">
             <input type="radio"
                    class="payment_form_customerType_0"
                    name="payment[svea_info][svea_customerType]" value="0"
@@ -33,25 +33,26 @@ if (empty($_method)) {
 
     <!-- If Nordic countries show, show SSN input field -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
-        <label for="payment_form_ssn_<?php echo $_code ?>" class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') ?>
-            :</label>
-        <label style="display:none;"
-               for="payment_form_ssn_<?php echo $_code ?>" class="required">
-            <em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no') . ":"; ?>
-        </label>
+        <div class="field">
+            <label for="payment_form_ssn_<?php echo $_code ?>" class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') ?></label>
+            <label style="display:none;"
+                   for="payment_form_ssn_<?php echo $_code ?>" class="required">
+                <em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no'); ?>
+            </label>
 
-        <div class="input-box">
-            <input type="text" id="payment_form_ssn_<?php echo $_code ?>"
-                   class="input-text required-entry"
-                   name="payment[svea_info][svea_ssn]"/>
+            <div class="input-box">
+                <input type="text" id="payment_form_ssn_<?php echo $_code ?>"
+                       class="input-text required-entry"
+                       name="payment[svea_info][svea_ssn]"/>
+            </div>
         </div>
     <?php endif; ?>
 
     <!-- If DE or NL, show dropdowns for birth date -->
     <?php if (in_array($_country, array('NL', 'DE'))): ?>
-        <div class="forNLDE">
+        <div class="field forNLDE">
             <label for="payment_form_birthYear_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthyear') . ":"; ?>
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthyear'); ?>
             </label>
 
             <div class="input-box">
@@ -68,9 +69,9 @@ if (empty($_method)) {
                 </select>
             </div>
         </div>
-        <div class="forNLDE">
+        <div class="field forNLDE">
             <label for="payment_form_birthMonth_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthmonth') . ":"; ?>
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthmonth'); ?>
             </label>
 
             <div class="input-box">
@@ -86,9 +87,9 @@ if (empty($_method)) {
                 </select>
             </div>
         </div>
-        <div class="forNLDE">
+        <div class="field forNLDE">
             <label for="payment_form_birthDay_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthday') . ":"; ?>
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthday'); ?>
             </label>
 
             <div class="input-box">
@@ -108,9 +109,9 @@ if (empty($_method)) {
 
     <!-- If NL, DE or FI show VAT no input -->
     <?php if (in_array($_country, array('NL', 'DE', 'FI'))): ?>
-        <div class="forNLDEcompany" style="display:none;">
+        <div class="field forNLDEcompany" style="display:none;">
             <label for="payment_form_vatNo_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no') . ":"; ?>
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no'); ?>
             </label>
 
             <div class="input-box">
@@ -125,9 +126,9 @@ if (empty($_method)) {
 
     <!-- If NL show input field for initials -->
     <?php if ($_country == "NL"): ?>
-        <div class="forNLDE forNL">
+        <div class="field forNLDE forNL">
             <label for="payment_form_initials_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_initials') . ":"; ?>
+                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_initials'); ?>
             </label>
 
             <div class="input-box">
@@ -145,19 +146,18 @@ if (empty($_method)) {
         <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
             <div id="showAddressBox_<?php echo $_code ?>">
                 <label
-                    for="sveaShowAddresses_<?php echo $_code ?>"><?php echo Mage::helper('svea_webpay')->__('invoice_address') . ":"; ?></label>
+                    for="sveaShowAddresses_<?php echo $_code ?>"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
 
                 <div class="sveaShowAddresses"
                      id="sveaShowAddresses_<?php echo $_code ?>"
                      style="display:inline-block;"></div>
             </div>
         <?php endif ?>
-        <div>
+        <div class="field">
             <select class="svea_address_selectbox"
                     style="display:none;margin-top:8px"></select>
 
-            <div id="payment-method-buttons-container-<?php echo $_code ?>" class="buttons-set"
-                 style="margin-top: 0 !important; border: 0 !important">
+            <div id="payment-method-buttons-container-<?php echo $_code ?>">
                 <button class="button"
                         onclick="sveaGetAddress.call(this, '<?php echo $_code; ?>');"
                         type="button">
