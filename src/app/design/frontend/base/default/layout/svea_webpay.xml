@@ -15,7 +15,10 @@
 
     <streamcheckout_index_index>
         <reference name="billing_before">
-            <block type="svea_webpay/payment_service_ssn" name="svea_ssn"/>
+            <block type="page/html_wrapper" name="svea_ssn_wrap">
+                <action method="setHtmlTagName"><name>li</name></action>
+                <block type="svea_webpay/payment_service_ssn" name="svea_ssn"/>
+            </block>
         </reference>
     </streamcheckout_index_index>
 </layout>
