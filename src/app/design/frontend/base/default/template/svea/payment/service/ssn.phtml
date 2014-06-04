@@ -23,12 +23,14 @@ if (empty($_method)) {
                 <input type="radio"
                        class="payment_form_customerType_0"
                        name="payment[svea_info][svea_customerType]" value="0"
+                       onclick="setCustomerTypeRadioThing.call(this);"
                        checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
             </label>
             <label>
                 <input type="radio"
                        class="payment_form_customerType_1"
                        name="payment[svea_info][svea_customerType]"
+                       onclick="setCustomerTypeRadioThing.call(this);"
                        value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
             </label>
         </div>
@@ -40,8 +42,8 @@ if (empty($_method)) {
     <!-- If Nordic countries show, show SSN input field -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
         <div class="field <?php if (in_array($_country, array('SE', 'DK'))): ?>float-btn<?php endif;?>">
-            <label for="payment_form_ssn_<?php echo $_code ?>" class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') ?></label>
-            <label style="display:none;"
+            <label class="label_ssn_customerType_0" for="payment_form_ssn_<?php echo $_code ?>" class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_ssn') ?></label>
+            <label class="label_ssn_customerType_1" style="display:none;"
                    for="payment_form_ssn_<?php echo $_code ?>" class="required">
                 <em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no'); ?>
             </label>
@@ -69,10 +71,8 @@ if (empty($_method)) {
 
         <!-- Hide address select box for FI, NL, NO and DE -->
         <?php if (in_array($_country, array('SE', 'DK'))): ?>
-            <div class="field">
-                <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
-                        style="display:none;margin-top:8px"></select>
-            </div>
+            <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
+                    style="display:none;margin-top:8px"></select>
             <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
                 <div id="showAddressBox_<?php echo $_code ?>" class="field">
                     <label class="sveaShowAdressesLabel" for="sveaShowAddresses_<?php echo $_code ?>" style="display:none"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
