@@ -1,7 +1,8 @@
 @import "compass/css3";
 
 .form-list {
-    &.payment_form_svea_paymentplan {
+    &#payment_form_svea_paymentplan,
+    &#payment_form_svea_invoice {
         margin-top:10px;
         border: 1px solid #ccc;
         padding: 10px;
@@ -10,6 +11,13 @@
         @include border-radius(3px);
         @include box-sizing(border-box);
         max-width: 260px;
+        margin-left:18px;
+        #sveaPaymentPlanShowParams {
+            max-width:100%;
+            select {
+                max-width:100%;
+            }
+        }
     }
     .svea-ssn-container {
 

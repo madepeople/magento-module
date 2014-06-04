@@ -1,5 +1,5 @@
-/* line 4, ../sass/checkout.scss */
-.form-list.payment_form_svea_paymentplan {
+/* line 5, ../sass/checkout.scss */
+.form-list#payment_form_svea_paymentplan, .form-list#payment_form_svea_invoice {
   margin-top: 10px;
   border: 1px solid #ccc;
   padding: 10px;
@@ -16,34 +16,43 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
   max-width: 260px;
+  margin-left: 18px;
+}
+/* line 15, ../sass/checkout.scss */
+.form-list#payment_form_svea_paymentplan #sveaPaymentPlanShowParams, .form-list#payment_form_svea_invoice #sveaPaymentPlanShowParams {
+  max-width: 100%;
 }
 /* line 17, ../sass/checkout.scss */
+.form-list#payment_form_svea_paymentplan #sveaPaymentPlanShowParams select, .form-list#payment_form_svea_invoice #sveaPaymentPlanShowParams select {
+  max-width: 100%;
+}
+/* line 25, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field {
   float: none;
   margin-bottom: 8px;
   max-width: 100%;
 }
-/* line 21, ../sass/checkout.scss */
+/* line 29, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field .input-box {
   max-width: 100%;
 }
-/* line 23, ../sass/checkout.scss */
+/* line 31, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field .input-box input.input-text {
   max-width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-/* line 29, ../sass/checkout.scss */
+/* line 37, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field.float-btn .input-box {
   margin-bottom: 8px;
 }
-/* line 38, ../sass/checkout.scss */
+/* line 46, ../sass/checkout.scss */
 .form-list .svea-ssn-container #showAddressBox_svea_paymentplan label,
 .form-list .svea-ssn-container #showAddressBox_svea_invoice label {
   float: none;
 }
-/* line 44, ../sass/checkout.scss */
+/* line 52, ../sass/checkout.scss */
 .form-list #paymentplan_cost_text {
   background-color: #297ab7;
   -webkit-border-radius: 3px;
@@ -57,60 +66,60 @@
   margin-top: 10px;
   font-weight: bold;
 }
-/* line 56, ../sass/checkout.scss */
+/* line 64, ../sass/checkout.scss */
 .form-list #paymentplan_cost_text .cost {
   font-weight: bold;
 }
 
-/* line 61, ../sass/checkout.scss */
+/* line 69, ../sass/checkout.scss */
 .sp-methods .svea-payment-logos {
   margin-left: 18px;
 }
 
-/* line 73, ../sass/checkout.scss */
+/* line 81, ../sass/checkout.scss */
 .customer-type {
   margin-bottom: 20px !important;
 }
-/* line 75, ../sass/checkout.scss */
+/* line 83, ../sass/checkout.scss */
 .customer-type label:first-child {
   margin-right: 40px;
 }
 
-/* line 83, ../sass/checkout.scss */
+/* line 91, ../sass/checkout.scss */
 #streamcheckout .form-list .svea-ssn-container {
   margin-top: 0;
 }
-/* line 86, ../sass/checkout.scss */
+/* line 94, ../sass/checkout.scss */
 #streamcheckout .form-list .svea-ssn-container .field.float-btn .input-box {
   float: left;
   width: 59% !important;
   margin-right: 1%;
 }
-/* line 91, ../sass/checkout.scss */
+/* line 99, ../sass/checkout.scss */
 #streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn {
   clear: none;
   float: right;
   width: 39%;
 }
-/* line 95, ../sass/checkout.scss */
+/* line 103, ../sass/checkout.scss */
 #streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn button {
   width: 100%;
 }
-/* line 97, ../sass/checkout.scss */
+/* line 105, ../sass/checkout.scss */
 #streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn button > span {
   height: 25px !important;
 }
-/* line 100, ../sass/checkout.scss */
+/* line 108, ../sass/checkout.scss */
 #streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn button span {
   line-height: 25px !important;
 }
-/* line 108, ../sass/checkout.scss */
+/* line 116, ../sass/checkout.scss */
 #streamcheckout .sp-methods .svea-payment-logos {
   margin-left: 0;
   float: right;
   max-width: 100px;
 }
-/* line 112, ../sass/checkout.scss */
+/* line 120, ../sass/checkout.scss */
 #streamcheckout .sp-methods .svea-payment-logos img {
   max-width: 100%;
   float: left !important;
