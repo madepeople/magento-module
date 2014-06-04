@@ -1,10 +1,9 @@
 <?php
-$_country = Mage::getSingleton('checkout/session')->getQuote()->getBillingAddress()->getCountry();
 $_currency = Mage::app()->getStore()->getCurrentCurrencyCode();
 $_code = $this->getMethodCode();
-$_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 $_infoBlock = trim(Mage::getStoreConfig("payment/$_code/paymentplan_info"));
 $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
+$_ssnHtml = $this->getSsnHtml();
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
     <?php if (!empty($_infoBlock)): ?>
@@ -13,7 +12,11 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
         </li>
     <?php endif; ?>
 
-    <?php echo $this->getSsnHtml() ?>
+    <?php if (!empty($_ssnHtml)): ?>
+        <li>
+            <?php echo $_ssnHtml ?>
+        </li>
+    <?php endif ?>
 
     <!-- Show stored payment plan params -->
     <li id="showPaymentPlanParams">
@@ -73,5 +76,6 @@ $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
         }
     }
 
+    window._updatePaymentPlanPrice = _updatePaymentPlanPrice;
     _updatePaymentPlanPrice();
 </script>

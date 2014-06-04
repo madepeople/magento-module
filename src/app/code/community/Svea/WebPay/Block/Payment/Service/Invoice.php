@@ -10,11 +10,13 @@ class Svea_WebPay_Block_Payment_Service_Invoice
 
     protected function _construct()
     {
-        $invoiceInfo = trim(Mage::getStoreConfig('payment/svea_invoice/invoice_info'));
-        if (!empty($invoiceInfo)) {
-            if (Mage::helper('svea_webpay')->usingQuickCheckout()) {
+        if (Mage::helper('svea_webpay')->usingQuickCheckout()) {
+            $invoiceInfo = trim(Mage::getStoreConfig('payment/svea_invoice/invoice_info'));
+            if (!empty($invoiceInfo)) {
                 $this->setData('template', 'svea/payment/service/invoice.phtml');
             }
+        } else {
+            $this->setData('template', 'svea/payment/service/invoice.phtml');
         }
         return parent::_construct();
     }

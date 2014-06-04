@@ -1,19 +1,20 @@
 <?php
-$_country = Mage::getSingleton('checkout/session')
-    ->getQuote()
-    ->getBillingAddress()
-    ->getCountry();
-
 $_code = $this->getMethodCode();
-$_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
+$_infoBlock = trim(Mage::getStoreConfig("payment/$_code/paymentplan_info"));
+$_ssnHtml = $this->getSsnHtml();
 ?>
 
 <ul class="form-list" id="payment_form_<?php echo $_code ?>"
     style="display:none;">
+    <?php if (!empty($_infoBlock)): ?>
     <li>
-        <label for=""></label>
-        <?php echo(nl2br(Mage::getStoreConfig("payment/$_code/invoice_info"))); ?>
+        <?php echo(nl2br($_infoBlock)); ?>
     </li>
+    <?php endif ?>
 
-    <?php echo $this->getSsnHtml() ?>
+    <?php if (!empty($_ssnHtml)): ?>
+        <li>
+            <?php echo $_ssnHtml ?>
+        </li>
+    <?php endif ?>
 </ul>

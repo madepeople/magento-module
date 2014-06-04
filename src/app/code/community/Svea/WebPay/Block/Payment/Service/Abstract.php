@@ -18,6 +18,7 @@ abstract class Svea_WebPay_Block_Payment_Service_Abstract
 
         return $this->getLayout()
             ->createBlock('svea_webpay/payment_service_ssn')
+            ->setMethod($this->getMethod())
             ->toHtml();
     }
 }
