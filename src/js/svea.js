@@ -100,7 +100,7 @@ function sveaAddressChanged(addressSelector)
     }
 }
 
-$('svea_address_selectbox').observe('change', function (e) {
+$('svea_address_selectbox') && $('svea_address_selectbox').observe('change', function (e) {
     currentSveaAddress = $F('svea_address_selectbox');
     sveaAddressChanged(currentSveaAddress);
     $('svea_address_selector').value = currentSveaAddress;

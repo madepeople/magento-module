@@ -21,7 +21,9 @@ abstract class Svea_WebPay_Block_Payment_Abstract extends Mage_Payment_Block_For
         $head = $this->getLayout()
             ->getBlock('head');
 
-        $head->addCss('svea/css/checkout.css');
+        if (!empty($head)) {
+            $head->addCss('svea/css/checkout.css');
+        }
     }
 
     /**
