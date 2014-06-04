@@ -17,18 +17,22 @@ if (empty($_method)) {
 
 <div class="svea-ssn-container <?php echo $_class ?>">
     <div class="field">
-        <label style="margin-right: 30px;">
-            <input type="radio"
-                   class="payment_form_customerType_0"
-                   name="payment[svea_info][svea_customerType]" value="0"
-                   checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
-        </label>
-        <label>
-            <input type="radio"
-                   class="payment_form_customerType_1"
-                   name="payment[svea_info][svea_customerType]"
-                   value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
-        </label>
+        <?php if (empty($_code) || $_code === 'svea_invoice'): ?>
+            <label style="margin-right: 30px;">
+                <input type="radio"
+                       class="payment_form_customerType_0"
+                       name="payment[svea_info][svea_customerType]" value="0"
+                       checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
+            </label>
+            <label>
+                <input type="radio"
+                       class="payment_form_customerType_1"
+                       name="payment[svea_info][svea_customerType]"
+                       value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
+            </label>
+        <?php else: ?>
+            <input type="hidden" name="payment[svea_info][svea_customerType]" value="0">
+        <?php endif ?>
     </div>
 
     <!-- If Nordic countries show, show SSN input field -->
@@ -59,10 +63,9 @@ if (empty($_method)) {
                          src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>">
                 </div>
             <?php endif; ?>
-
-
         </div>
-        <!-- Hide get address button for FI, NL, NO and DE -->
+
+        <!-- Hide address select box for FI, NL, NO and DE -->
         <?php if (in_array($_country, array('SE', 'DK'))): ?>
             <div class="field">
                 <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
@@ -78,7 +81,6 @@ if (empty($_method)) {
                 </div>
             <?php endif ?>
         <?php endif; ?>
-
     <?php endif; ?>
 
     <!-- If DE or NL, show dropdowns for birth date -->
