@@ -60,7 +60,7 @@ if (empty($_method)) {
                          src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>">
                 </div>
                 <div class="field">
-                    <select class="svea_address_selectbox"
+                    <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
                             style="display:none;margin-top:8px"></select>
                 </div>
                 <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
