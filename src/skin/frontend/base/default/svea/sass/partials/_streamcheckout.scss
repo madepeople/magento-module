@@ -1,0 +1,60 @@
+// When Svea is used together with Stream Checkout
+
+#streamcheckout {
+    .form-list {
+        &#payment_form_svea_paymentplan,
+        &#payment_form_svea_invoice {
+            background:none;
+            @include box-shadow(none);
+            padding:0;
+            max-width:auto;
+            border:none;
+        }
+        .svea-ssn-container {
+            margin-top:0;
+            .field.float-btn {
+                .input-box {
+                    float: left;
+                    width: 59% !important;
+                    margin-right: 1%;
+                }
+                .get-address-btn {
+                    clear:none;
+                    float: right;
+                    width: 39%;
+                    button {
+                        width:100%;
+                        > span {
+                        height: 25px !important;
+                        }
+                        span {
+                            line-height: 25px !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #payment-method-block {
+        .sp-methods {
+            border-bottom:1px solid #eee;
+            dt {
+                border-top:1px solid #eee;
+                padding:5px 0;
+            }
+            dd {
+                margin-left:18px !important;
+            }
+            .svea-payment-logos {
+                margin-left:0;
+                float:right;
+                max-width: 100px;
+                img {
+                    max-width: 100%;
+                    float:left !important;
+                }
+            }
+        }
+    }
+}

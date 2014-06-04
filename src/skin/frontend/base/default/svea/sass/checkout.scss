@@ -43,6 +43,27 @@
                 float:none;
             }
         }
+        .get-address-btn {
+            button {
+                width:150px;
+                .loader {
+                    display:none;
+                }
+            }
+            &.loading {
+                button {
+                    .loader {
+                        display:inline-block;
+                        img {
+                            max-height: 100%;
+                        }
+                    }
+                    .inner {
+                        display:none;
+                    }
+                }
+            }
+        }
     }
     // Part payment cost calculation
     #paymentplan_cost_text {

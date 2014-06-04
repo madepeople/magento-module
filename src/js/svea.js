@@ -73,12 +73,18 @@ function sveaGetAddress(code)
 {
     function startLoading()
     {
-        $('sveaLoader') && $('sveaLoader').show();
+        var getAddressButton = _$('.get-address-btn', code);
+        if (getAddressButton) {
+            $(getAddressButton).addClassName('loading');
+        }
     }
 
     function stopLoading()
     {
-        $('sveaLoader') && $('sveaLoader').hide();
+        var getAddressButton = _$('.get-address-btn', code);
+        if (getAddressButton) {
+            $(getAddressButton).removeClassName('loading');
+        }
     }
 
     var ssn = _$('[name*=[svea_ssn]]', code).value,
@@ -89,8 +95,10 @@ function sveaGetAddress(code)
 
     new Ajax.Request(getAddressUrl, {
         parameters: {ssn: ssn, type: type, cc: currentCountry},
-        onSuccess: function (transport) {
+        onComplete: function (transport) {
             stopLoading();
+        },
+        onSuccess: function (transport) {
             var json = transport.responseText.evalJSON();
             if (json.accepted == false) {
                 if (usingQuickCheckout) {
