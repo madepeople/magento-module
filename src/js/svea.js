@@ -7,17 +7,18 @@ function _$(selector, code)
     if (typeof code !== 'undefined' && code !== '') {
         container = $$('.svea-ssn-container-' + code)[0];
     } else {
-        container = $$('.svea-ssn-container')[0];
+        var elements = $$('[class*=svea-ssn-container-]');
+        if (elements.length) {
+            container = elements[0];
+        } else {
+            container = $$('.svea-ssn-container')[0];
+        }
     }
     return $(container).down(selector);
 }
 
-function sveaAddressChanged(addressSelector)
+function sveaAddressChanged(addressSelector, container)
 {
-    if (typeof addressSelector === 'undefined' || addressSelector === '') {
-        addressSelector = Form.Element.Serializers.inputSelector('svea_address_selectbox');
-    }
-
     var address;
     for (var i = 0; i < customerIdentities.length; i++) {
         if (customerIdentities[i].addressSelector == addressSelector) {
@@ -29,7 +30,7 @@ function sveaAddressChanged(addressSelector)
         return;
     }
 
-    if ($('sveaShowAddresses')) {
+    if ($(container).down('.sveaShowAddresses')) {
         if (address.fullName == null) {
             var name = address.firstName + ' ' +
                 address.lastName + '<br>';
@@ -42,7 +43,7 @@ function sveaAddressChanged(addressSelector)
             address.zipCode + ' ' +
             address.locality;
 
-        $('sveaShowAddresses').insert(adress);
+        $(container).down('.sveaShowAddresses').insert(adress);
     }
 
     // For onestep checkouts, check if fields visible and auto-fill
@@ -95,7 +96,7 @@ function sveaGetAddress(code)
             }
 
             // Show dropdown if company, show only text if private customer
-            _$('.svea_address_selectbox', code).update('');
+            _$('.sveaShowAddresses', code).update('');
             customerIdentities = json.customerIdentity;
             if (customerIdentities.length > 1) {
                 customerIdentities.each(function (item) {
@@ -117,8 +118,9 @@ function sveaGetAddress(code)
                 _$('.svea_address_selectbox', code).hide();
             }
 
+            var container = _$('.svea_address_selectbox', code).up('.svea-ssn-container');
             currentSveaAddress = customerIdentities[0].addressSelector;
-            sveaAddressChanged(currentSveaAddress, code);
+            sveaAddressChanged(currentSveaAddress, container);
             _$('.svea_address_selector', code).value = currentSveaAddress;
         }
     });
@@ -150,9 +152,10 @@ $(document).observe('dom:loaded', function () {
     $$(".payment_form_customerType_0").invoke('observe', 'change', setCustomerTypeRadioThing);
     $$(".payment_form_customerType_1").invoke('observe', 'change', setCustomerTypeRadioThing);
 
-    $('svea_address_selectbox') && $('svea_address_selectbox').observe('change', function (e) {
-        currentSveaAddress = $F('svea_address_selectbox');
-        sveaAddressChanged(currentSveaAddress);
-        $('svea_address_selector').value = currentSveaAddress;
+    $$('.svea_address_selectbox').invoke('observe', 'change', function (e) {
+        currentSveaAddress = Form.Element.Serializers.inputSelector(this);
+        var container = $(this).up('.svea-ssn-container');
+        sveaAddressChanged(currentSveaAddress, container);
+        $(container).down('.svea_address_selector').value = currentSveaAddress;
     });
 });
