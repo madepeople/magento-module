@@ -12,12 +12,6 @@ $_ssnHtml = $this->getSsnHtml();
         </li>
     <?php endif; ?>
 
-    <?php if (!empty($_ssnHtml)): ?>
-        <li>
-            <?php echo $_ssnHtml ?>
-        </li>
-    <?php endif ?>
-
     <!-- Show stored payment plan params -->
     <li id="showPaymentPlanParams">
         <div id="sveaPaymentPlanShowParams" style="display:inline-block;">
@@ -55,6 +49,12 @@ $_ssnHtml = $this->getSsnHtml();
             </p>
         </div>
     </li>
+
+    <?php if (!empty($_ssnHtml)): ?>
+        <li>
+            <?php echo $_ssnHtml ?>
+        </li>
+    <?php endif ?>
 </ul>
 
 <script>
