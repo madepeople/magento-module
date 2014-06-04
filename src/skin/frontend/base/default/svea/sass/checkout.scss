@@ -20,8 +20,6 @@
         }
     }
     .svea-ssn-container {
-
-
         .field {
             float:none;
             margin-bottom:8px;
@@ -41,8 +39,6 @@
         }
         #showAddressBox_svea_paymentplan,
         #showAddressBox_svea_invoice {
-
-            //width:260px;
             label {
                 float:none;
             }
@@ -73,53 +69,5 @@
 
 
 
-
-
-
-
-
-.customer-type {
-    margin-bottom: 20px !important;
-    label:first-child {
-        margin-right: 40px;
-    }
-}
-
-// When Svea is used together with Stream Checkout
-#streamcheckout {
-    .form-list {
-        .svea-ssn-container {
-            margin-top:0;
-            .field.float-btn {
-                .input-box {
-                    float: left;
-                    width: 59% !important;
-                    margin-right: 1%;
-                }
-                .get-address-btn {
-                    clear:none;
-                    float: right;
-                    width: 39%;
-                    button {
-                        width:100%;
-                        > span {
-                        height: 25px !important;
-                        }
-                        span {
-                            line-height: 25px !important;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    .sp-methods .svea-payment-logos {
-        margin-left:0;
-        float:right;
-        max-width: 100px;
-        img {
-            max-width: 100%;
-            float:left !important;
-        }
-    }
-}
+// Include partials for third party checkout modules
+@import "partials/streamcheckout";
