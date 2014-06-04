@@ -13,5 +13,6 @@ src/app/locale/nn_NO/*                                  app/locale/nn_NO/
 src/app/locale/no_NO/*                                  app/locale/no_NO/
 src/app/locale/sv_SE/*                                  app/locale/sv_SE/
 src/media/svea/*                                        media/svea/
+src/js/*                                                js/
 src/skin/frontend/base/default/*                        skin/frontend/base/default/
 package.xml                                             var/connect/Svea_WebPay.xml

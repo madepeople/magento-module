@@ -17,6 +17,7 @@ class Svea_WebPay_Block_Payment_Hosted_Card extends Svea_WebPay_Block_Payment_Ab
             foreach ($cardLogos as $logo) {
                 $html .= '<img class="svea-method-logo" src="' . $this->getSkinUrl('svea/payment_logos/svea_' . $logo . '.png') . '"> ';
             }
+            $html = '<div class="svea-payment-logos">' . $html . '</div>';
             $this->setMethodLabelAfterHtml($html);
         }
 

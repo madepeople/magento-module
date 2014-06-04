@@ -1,0 +1,140 @@
+/* line 5, ../sass/checkout.scss */
+.form-list#payment_form_svea_paymentplan, .form-list#payment_form_svea_invoice {
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background: white;
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  max-width: 260px;
+  margin-left: 18px;
+}
+/* line 15, ../sass/checkout.scss */
+.form-list#payment_form_svea_paymentplan #sveaPaymentPlanShowParams, .form-list#payment_form_svea_invoice #sveaPaymentPlanShowParams {
+  max-width: 100%;
+}
+/* line 17, ../sass/checkout.scss */
+.form-list#payment_form_svea_paymentplan #sveaPaymentPlanShowParams select, .form-list#payment_form_svea_invoice #sveaPaymentPlanShowParams select {
+  max-width: 100%;
+}
+/* line 23, ../sass/checkout.scss */
+.form-list .svea-ssn-container .field {
+  float: none;
+  margin-bottom: 8px;
+  max-width: 100%;
+}
+/* line 27, ../sass/checkout.scss */
+.form-list .svea-ssn-container .field .input-box {
+  max-width: 100%;
+}
+/* line 29, ../sass/checkout.scss */
+.form-list .svea-ssn-container .field .input-box input.input-text {
+  max-width: 100%;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* line 35, ../sass/checkout.scss */
+.form-list .svea-ssn-container .field.float-btn .input-box {
+  margin-bottom: 8px;
+}
+/* line 42, ../sass/checkout.scss */
+.form-list .svea-ssn-container #showAddressBox_svea_paymentplan label,
+.form-list .svea-ssn-container #showAddressBox_svea_invoice label {
+  float: none;
+}
+/* line 48, ../sass/checkout.scss */
+.form-list #paymentplan_cost_text {
+  background-color: #297ab7;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  -ms-border-radius: 3px;
+  -o-border-radius: 3px;
+  border-radius: 3px;
+  color: white;
+  display: inline-block;
+  padding: 1px 6px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+/* line 60, ../sass/checkout.scss */
+.form-list #paymentplan_cost_text .cost {
+  font-weight: bold;
+}
+
+/* line 65, ../sass/checkout.scss */
+.sp-methods .svea-payment-logos {
+  margin-left: 18px;
+}
+
+/* line 6, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list#payment_form_svea_paymentplan, #streamcheckout .form-list#payment_form_svea_invoice {
+  background: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  padding: 0;
+  max-width: auto;
+  border: none;
+}
+/* line 13, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list .svea-ssn-container {
+  margin-top: 0;
+}
+/* line 16, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list .svea-ssn-container .field.float-btn .input-box {
+  float: left;
+  width: 59% !important;
+  margin-right: 1%;
+}
+/* line 21, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn {
+  clear: none;
+  float: right;
+  width: 39%;
+}
+/* line 25, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn button {
+  width: 100%;
+}
+/* line 27, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn button > span {
+  height: 25px !important;
+}
+/* line 30, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn button span {
+  line-height: 25px !important;
+}
+/* line 40, ../sass/partials/_streamcheckout.scss */
+#streamcheckout #payment-method-block .sp-methods {
+  border-bottom: 1px solid #eee;
+}
+/* line 42, ../sass/partials/_streamcheckout.scss */
+#streamcheckout #payment-method-block .sp-methods dt {
+  border-top: 1px solid #eee;
+  padding: 5px 0;
+}
+/* line 46, ../sass/partials/_streamcheckout.scss */
+#streamcheckout #payment-method-block .sp-methods dd {
+  margin-left: 18px !important;
+}
+/* line 49, ../sass/partials/_streamcheckout.scss */
+#streamcheckout #payment-method-block .sp-methods .svea-payment-logos {
+  margin-left: 0;
+  float: right;
+  max-width: 100px;
+}
+/* line 53, ../sass/partials/_streamcheckout.scss */
+#streamcheckout #payment-method-block .sp-methods .svea-payment-logos img {
+  max-width: 100%;
+  float: left !important;
+}

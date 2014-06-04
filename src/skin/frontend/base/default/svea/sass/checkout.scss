@@ -1,0 +1,73 @@
+@import "compass/css3";
+
+.form-list {
+    &#payment_form_svea_paymentplan,
+    &#payment_form_svea_invoice {
+        margin-top:10px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background: white;
+        @include box-shadow(0 1px 3px rgba(0,0,0,.15));
+        @include border-radius(3px);
+        @include box-sizing(border-box);
+        max-width: 260px;
+        margin-left:18px;
+        #sveaPaymentPlanShowParams {
+            max-width:100%;
+            select {
+                max-width:100%;
+            }
+        }
+    }
+    .svea-ssn-container {
+        .field {
+            float:none;
+            margin-bottom:8px;
+            max-width:100%;
+            .input-box {
+                max-width:100%;
+                input.input-text {
+                    max-width:100%;
+                    @include box-sizing(border-box);
+                }
+            }
+            &.float-btn {
+                .input-box {
+                    margin-bottom:8px;
+                }
+            }
+        }
+        #showAddressBox_svea_paymentplan,
+        #showAddressBox_svea_invoice {
+            label {
+                float:none;
+            }
+        }
+    }
+    // Part payment cost calculation
+    #paymentplan_cost_text {
+        background-color: #297ab7;
+        -webkit-border-radius: 3px;
+        -moz-border-radius: 3px;
+        -ms-border-radius: 3px;
+        -o-border-radius: 3px;
+        border-radius: 3px;
+        color: white;
+        display: inline-block;
+        padding: 1px 6px;
+        margin-top: 10px;
+        font-weight: bold;
+        .cost {
+            font-weight: bold;
+        }
+    }
+}
+.sp-methods .svea-payment-logos {
+    margin-left:18px;
+}
+
+
+
+
+// Include partials for third party checkout modules
+@import "partials/streamcheckout";

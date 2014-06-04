@@ -20,7 +20,7 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
 
     /**
      * Take the PaymentPlan path in Create Order object
-     * 
+     *
      * @param type $sveaObject
      * @return type
      */
@@ -32,13 +32,13 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
         } else {
             $order = $paymentInfo->getQuote();
         }
-        $object = $sveaObject->usePaymentPlanPayment($paymentInfo->getAdditionalInformation('svea_campaign'));
+        $object = $sveaObject->usePaymentPlanPayment($paymentInfo->getAdditionalInformation('campaign'));
         return $object;
     }
 
     /**
      * For Svea, Deliver order
-     * 
+     *
      * @param Varien_Object $payment
      * @param float $amount
      * @return type
@@ -69,28 +69,32 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
 
         if ($response->accepted == 1) {
             $successMessage = Mage::helper('svea_webpay')->__('delivered');
-            $order->addStatusToHistory($this->getConfigData('paid_order_status'), $successMessage, false);
-            $payment->setIsTransactionClosed(false);
-            $paymentInfo = $this->getInfoInstance();
-            $paymentInfo->setAdditionalInformation('svea_invoice_id', $response->invoiceId);
-            $order->save();
+            $orderStatus = $this->getConfigData('paid_order_status')
+                ?: $order->getStatus();
+            if (!empty($orderStatus)) {
+                $order->addStatusToHistory($orderStatus, $successMessage, false);
+            }
+            $rawDetails = $this->_sveaResponseToArray($response);
+            $payment->setTransactionId($response->contractNumber)
+                ->setIsTransactionClosed(false)
+                ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
+//            $order->addStatusToHistory($this->getConfigData('paid_order_status'), $successMessage, false);
+//            $payment->setIsTransactionClosed(false);
+//            $paymentInfo = $this->getInfoInstance();
+//            $paymentInfo->setAdditionalInformation('svea_invoice_id', $response->contractNumber);
+//            $order->save();
         } else {
             $errorMessage = $response->errormessage;
             $statusCode = $response->resultcode;
             $errorTranslated = Mage::helper('svea_webpay')->responseCodes($statusCode, $errorMessage);
-            if ($order->canCancel()) {
-                $order->addStatusToHistory($order->getStatus(), $errorTranslated, false);
-                $order->cancel();
-                $order->save();
-            }
-
-            return Mage::throwException($errorTranslated);
+            $order->addStatusToHistory($order->getStatus(), $errorTranslated, false);
+            Mage::throwException($errorTranslated);
         }
     }
 
     /**
      * End close order request
-     * 
+     *
      * @param type $sveaObject
      * @return type Svea Create order response
      */
@@ -99,11 +103,11 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
         return $sveaObject->closePaymentPlanOrder()
                 ->doRequest();
     }
-    
+
     /**
      * We shouldn't display PaymentPlan as an option if there are no payment
      * plans available
-     * 
+     *
      * @param Mage_Sales_Model_Quote $quote
      */
     public function isAvailable($quote = null)
@@ -111,7 +115,7 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
         if (!parent::isAvailable($quote)) {
             return false;
         }
-        
+
         $paymentPlans = Mage::helper('svea_webpay')->getPaymentPlanParams($quote);
         return count((array)$paymentPlans) > 0;
     }

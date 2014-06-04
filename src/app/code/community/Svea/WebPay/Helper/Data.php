@@ -442,4 +442,17 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                 && $block->getIdSuffix() !== '_clone'
                 && !strstr($block->getTemplate(), 'tierprices');
     }
+
+    /**
+     * Are we using a quick checkout module, such as onestepcheckout or
+     * stream checkout?
+     *
+     * @return bool
+     */
+    public function usingQuickCheckout()
+    {
+        return Mage::getStoreConfigFlag('streamcheckout/general/enabled')
+            // || anotherCriteria() ...
+            ;
+    }
 }
