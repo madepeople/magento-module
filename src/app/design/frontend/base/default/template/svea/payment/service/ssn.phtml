@@ -143,20 +143,21 @@ if (empty($_method)) {
 
     <!-- Hide get address button for FI, NL, NO and DE -->
     <?php if (in_array($_country, array('SE', 'DK'))): ?>
-        <div>
+
+        <div id="payment-method-buttons-container-<?php echo $_code ?>" class="field get-address-btn">
+            <button class="button"
+                    onclick="sveaGetAddress.call(this, '<?php echo $_code; ?>');"
+                    type="button">
+                <span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span>
+            </button>
+            <img id="sveaLoader_<?php echo $_code ?>"
+                 style="display:none; float: right; margin:4px 6px 0 0;"
+                 src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>">
+        </div>
+
+        <div class="field">
             <select class="svea_address_selectbox"
                     style="display:none;margin-top:8px"></select>
-
-            <div id="payment-method-buttons-container-<?php echo $_code ?>">
-                <button class="button"
-                        onclick="sveaGetAddress.call(this, '<?php echo $_code; ?>');"
-                        type="button">
-                    <span><span><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span></span>
-                </button>
-                <img id="sveaLoader_<?php echo $_code ?>"
-                     style="display:none; float: right; margin:4px 6px 0 0;"
-                     src="<?php echo $this->getSkinUrl('svea/images/ajax-loader.gif') ?>">
-            </div>
         </div>
         <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
             <div id="showAddressBox_<?php echo $_code ?>" class="field">
