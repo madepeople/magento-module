@@ -38,12 +38,17 @@ function sveaAddressChanged(addressSelector, container)
             var name = address.fullName + '<br>';
         }
 
-        var adress = name +
+        var label = $(container).down('.sveaShowAdressesLabel');
+        var newLabel = label.cloneNode(true);
+        $(newLabel).show();
+        var addressBox = '<address>' + name +
             address.street + '<br>' +
             address.zipCode + ' ' +
-            address.locality;
+            address.locality + '</address>';
 
-        $(container).down('.sveaShowAddresses').update(adress);
+        $(container).down('.sveaShowAddresses').update('')
+            .insert(newLabel)
+            .insert(addressBox);
     }
 
     // For onestep checkouts, check if fields visible and auto-fill

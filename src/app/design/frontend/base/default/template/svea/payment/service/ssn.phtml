@@ -75,8 +75,7 @@ if (empty($_method)) {
             </div>
             <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
                 <div id="showAddressBox_<?php echo $_code ?>" class="field">
-                    <label
-                        for="sveaShowAddresses_<?php echo $_code ?>"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
+                    <label class="sveaShowAdressesLabel" for="sveaShowAddresses_<?php echo $_code ?>" style="display:none"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
 
                     <div class="sveaShowAddresses"
                          id="sveaShowAddresses_<?php echo $_code ?>"></div>
