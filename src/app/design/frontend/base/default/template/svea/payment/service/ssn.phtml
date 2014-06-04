@@ -16,8 +16,9 @@ if (empty($_method)) {
 ?>
 
 <div class="svea-ssn-container <?php echo $_class ?>">
-    <div class="field">
-        <?php if (empty($_code) || $_code === 'svea_invoice'): ?>
+
+    <?php if (empty($_code) || $_code === 'svea_invoice'): ?>
+        <div class="field">
             <label style="margin-right: 30px;">
                 <input type="radio"
                        class="payment_form_customerType_0"
@@ -30,10 +31,11 @@ if (empty($_method)) {
                        name="payment[svea_info][svea_customerType]"
                        value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
             </label>
-        <?php else: ?>
-            <input type="hidden" name="payment[svea_info][svea_customerType]" value="0">
-        <?php endif ?>
-    </div>
+        </div>
+    <?php else: ?>
+        <input type="hidden" name="payment[svea_info][svea_customerType]" value="0">
+    <?php endif ?>
+
 
     <!-- If Nordic countries show, show SSN input field -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
