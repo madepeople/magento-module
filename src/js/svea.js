@@ -75,7 +75,7 @@ function sveaGetAddress(code)
     {
         var getAddressButton = _$('.get-address-btn', code);
         if (getAddressButton) {
-            $(getAddressButton).addClass('loading');
+            $(getAddressButton).addClassName('loading');
         }
     }
 
@@ -83,7 +83,7 @@ function sveaGetAddress(code)
     {
         var getAddressButton = _$('.get-address-btn', code);
         if (getAddressButton) {
-            $(getAddressButton).removeClass('loading');
+            $(getAddressButton).removeClassName('loading');
         }
     }
 
