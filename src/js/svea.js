@@ -91,10 +91,17 @@ function sveaGetAddress(code)
         typeElement = _$('input:checked[name*=customerType]', code),
         type = typeElement ? typeElement.value : 0;
 
-    startLoading();
+    var method = code || payment.currentMethod;
+    if (!method) {
+        method = $$('input:checked[name*=payment[method]]');
+        if (method.length) {
+            method = method[0].value;
+        }
+    }
 
+    startLoading();
     new Ajax.Request(getAddressUrl, {
-        parameters: {ssn: ssn, type: type, cc: currentCountry},
+        parameters: {ssn: ssn, type: type, cc: currentCountry, method: method},
         onComplete: function (transport) {
             stopLoading();
         },
