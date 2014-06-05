@@ -246,6 +246,19 @@
         </translate>
     </adminhtml>
 
+    <crontab>
+        <jobs>
+            <svea_cancel_old_pending_gateway_orders>
+                <schedule>
+                    <cron_expr>0 * * * *</cron_expr>
+                </schedule>
+                <run>
+                    <model>svea_webpay/sales_observer::cancelOldPendingGatewayOrders</model>
+                </run>
+            </svea_cancel_old_pending_gateway_orders>
+        </jobs>
+    </crontab>
+
     <default>
         <sales>
             <!-- Used by the quote to sort totals -->
