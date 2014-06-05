@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Svea_WebPay>
-            <version>4.0.21</version>
+            <version>4.0.22</version>
         </Svea_WebPay>
     </modules>
     <global>
@@ -245,19 +245,6 @@
             </modules>
         </translate>
     </adminhtml>
-
-    <crontab>
-        <jobs>
-            <svea_cancel_old_pending_gateway_orders>
-                <schedule>
-                    <cron_expr>0 * * * *</cron_expr>
-                </schedule>
-                <run>
-                    <model>svea_webpay/sales_observer::cancelOldPendingGatewayOrders</model>
-                </run>
-            </svea_cancel_old_pending_gateway_orders>
-        </jobs>
-    </crontab>
 
     <default>
         <sales>
