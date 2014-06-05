@@ -13,20 +13,21 @@
 abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstract
 {
 
-    protected $_canReviewPayment = true;
     protected $_isGateway = true;
+    protected $_isInitializeNeeded = true;
 
     /**
-     * Attempt to accept a payment that is under review
+     * Instantiate state and set it to state object
      *
-     * @param Mage_Payment_Model_Info $payment
-     * @return bool
-     * @throws Mage_Core_Exception
+     * @param string $paymentAction
+     * @param Varien_Object
      */
-    public function acceptPayment(Mage_Payment_Model_Info $payment)
+    public function initialize($paymentAction, $stateObject)
     {
-        parent::acceptPayment($payment);
-        return true;
+        $state = Mage_Sales_Model_Order::STATE_PENDING_PAYMENT;
+        $stateObject->setState($state);
+        $stateObject->setStatus('pending_payment');
+        $stateObject->setIsNotified(false);
     }
 
     /**
