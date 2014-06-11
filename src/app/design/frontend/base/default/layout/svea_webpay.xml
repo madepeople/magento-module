@@ -21,4 +21,10 @@
             </block>
         </reference>
     </streamcheckout_index_index>
+
+    <checkout_onepage_index>
+        <reference name="content">
+            <block type="core/template" name="svea_jsvars" template="svea/payment/service/jsvars.phtml" />
+        </reference>
+    </checkout_onepage_index>
 </layout>

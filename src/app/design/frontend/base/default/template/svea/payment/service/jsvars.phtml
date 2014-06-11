@@ -1,0 +1,11 @@
+<?php
+$_country = Mage::getSingleton('checkout/session')
+    ->getQuote()
+    ->getBillingAddress()
+    ->getCountry();
+?>
+<script>
+    var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
+    var usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
+    var getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+</script>
