@@ -183,7 +183,8 @@ if (empty($_method)) {
            class="svea_address_selector">
 </div>
 <script>
-    var currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
-    var usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
-    var getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+    var currentCountry, usingQuickCheckout, getAddressUrl;
+    window.currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
+    window.usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
+    window.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
 </script>
