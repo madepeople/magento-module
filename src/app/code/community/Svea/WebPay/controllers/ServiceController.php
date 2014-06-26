@@ -24,7 +24,7 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
         }
 
         $method = $this->getRequest()->getParam('method');
-        if (empty($method)) {
+        if (empty($method) || !preg_match('#svea_(invoice|paymentplan)#', $method)) {
             $method = 'svea_invoice';
         }
 
