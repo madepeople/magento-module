@@ -1,3 +1,0 @@
-[submodule "src/lib/php-integration"]
-	path = src/lib/php-integration
-	url = git@github.com:madepeople/php-integration.git
