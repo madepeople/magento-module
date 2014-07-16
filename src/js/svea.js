@@ -81,37 +81,29 @@
             }
 
             $(addressFields).each(function (field) {
-                var elements = $$('[name*="billing[' + field + ']"]');
+                var elements = $$('[name*="billing[' + field + '"]');
                 if (!elements.length) {
                     return;
                 }
 
-                var element;
-                $(elements).each(function (el) {
-                    if (!element) {
-                        // Assign the first one, because street addresses can
-                        // be more than one
-                        element = el;
+                $(elements).each(function (element) {
+                    action(element);
+                    var id = $(element).readAttribute('id');
+                    var label = $$('label[for=' + id + ']').length
+                        ? $$('label[for=' + id + ']')[0] : null;
+
+                    if (label) {
+                        action(label);
                     }
 
-                    action(el);
+                    // See if there is a container that we recognize. This one is
+                    // debatable, "field" is a general class name, but magento
+                    // core actually uses it for this specific purpose
+                    var container = $(element).up('.field');
+                    if (container) {
+                        action(container);
+                    }
                 });
-
-                var id = $(element).readAttribute('id');
-                var label = $$('label[for=' + id + ']').length
-                    ? $$('label[for=' + id + ']')[0] : null;
-
-                if (label) {
-                    action(label);
-                }
-
-                // See if there is a container that we recognize. This one is
-                // debatable, "field" is a general class name, but magento
-                // core actually uses it for this specific purpose
-                var container = $(element).up('.field');
-                if (container) {
-                    action(container);
-                }
             });
         }
 
