@@ -184,6 +184,25 @@
         </translate>
     </frontend>
     <adminhtml>
+        <acl>
+            <resources>
+                <admin>
+                    <children>
+                        <system>
+                            <children>
+                                <config>
+                                    <children>
+                                        <svea_webpay>
+                                            <title>Svea WebPay</title>
+                                        </svea_webpay>
+                                    </children>
+                                </config>
+                            </children>
+                        </system>
+                    </children>
+                </admin>
+            </resources>
+        </acl>
         <layout>
             <updates>
                 <svea_webpay>

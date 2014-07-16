@@ -1,456 +1,442 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
     <sections>
-        <payment>
+        <svea_webpay translate="label" module="svea_webpay">
+            <label><![CDATA[<img style="height:21px;" src="https://webpay.sveaekonomi.se/webpay/images/logo.png">]]></label>
+            <tab>sales</tab>
+            <frontend_type>text</frontend_type>
+            <sort_order>399</sort_order>
+            <show_in_default>1</show_in_default>
+            <show_in_website>1</show_in_website>
+            <show_in_store>1</show_in_store>
             <groups>
-                <svea_webpay translate="label comment" module="svea_webpay">
-                    <label><![CDATA[Svea WebPay Payment Solutions]]></label>
-                    <sort_order>21</sort_order>
-                    <expanded>1</expanded>
+                <svea_invoice translate="label" type="group">
+                    <label><![CDATA[Invoice Settings]]></label>
+                    <sort_order>1</sort_order>
                     <show_in_default>1</show_in_default>
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
-                    <frontend_class>complex</frontend_class>
-                    <frontend_model>adminhtml/system_config_form_fieldset</frontend_model>
-                    <comment><![CDATA[<img src="https://webpay.sveaekonomi.se/webpay/images/logo.png"><br>Receive Payments using Online Invoicing, Payment Plans, Credit Cards and Direct Bank Payment. <a href="http://www.sveawebpay.se/" target="_blank">Learn More</a>]]></comment>
+                    <expanded>0</expanded>
                     <fields>
-                        <svea_invoice translate="label" type="group">
-                            <label><![CDATA[Invoice Settings]]></label>
-                            <sort_order>1</sort_order>
+                        <active translate="label">
+                            <label>Enabled</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>10</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <expanded>0</expanded>
-                            <fields>
-                                <active translate="label">
-                                    <label>Enabled</label>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adminhtml/system_config_source_yesno</source_model>
-                                    <sort_order>10</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                </active>
-                                <test translate="label">
-                                    <label>Test Mode</label>
-                                    <frontend_type>select</frontend_type>
-                                    <source_model>adminhtml/system_config_source_yesno</source_model>
-                                    <sort_order>15</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                </test>
-                                <title translate="label">
-                                    <label>Title</label>
-                                    <comment>Displayed in the checkout process and on order confirmations.</comment>
-                                    <frontend_type>text</frontend_type>
-                                    <sort_order>16</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                </title>
-                                <account_settings translate="label" type="group">
-                                    <label>Account Settings</label>
-                                    <comment>The client number, username and password are specific to the country the customer orders from. For instance, Swedish invoice orders will use different account information than Norwegian orders.</comment>
-                                    <sort_order>20</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                    <expanded>1</expanded>
-                                    <fields>
-                                        <se translate="label" type="group">
-                                            <label>Swedish Settings</label>
-                                            <sort_order>10</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <expanded>1</expanded>
-                                            <fields>
-                                                <client_number translate="label">
-                                                    <label>Client Number</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>20</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/se/client_number</config_path>
-                                                </client_number>
-                                                <username translate="label">
-                                                    <label>Username</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>30</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/se/username</config_path>
-                                                </username>
-                                                <password translate="label">
-                                                    <label>Password</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>40</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/se/password</config_path>
-                                                </password>
-                                            </fields>
-                                        </se>
-                                        <no translate="label" type="group">
-                                            <label>Norwegian Settings</label>
-                                            <sort_order>20</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <expanded>0</expanded>
-                                            <fields>
-                                                <client_number translate="label">
-                                                    <label>Client Number</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>20</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/client_number</config_path>
-                                                </client_number>
-                                                <username translate="label">
-                                                    <label>Username</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>30</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/username</config_path>
-                                                </username>
-                                                <password translate="label">
-                                                    <label>Password</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>40</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/no/password</config_path>
-                                                </password>
-                                            </fields>
-                                        </no>
-                                        <fi translate="label" type="group">
-                                            <label>Finnish Settings</label>
-                                            <sort_order>20</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <expanded>0</expanded>
-                                            <fields>
-                                                <client_number translate="label">
-                                                    <label>Client Number</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>20</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/fi/client_number</config_path>
-                                                </client_number>
-                                                <username translate="label">
-                                                    <label>Username</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>30</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/fi/username</config_path>
-                                                </username>
-                                                <password translate="label">
-                                                    <label>Password</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>40</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/fi/password</config_path>
-                                                </password>
-                                            </fields>
-                                        </fi>
-                                        <dk translate="label" type="group">
-                                            <label>Danish Settings</label>
-                                            <sort_order>40</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <expanded>0</expanded>
-                                            <fields>
-                                                <client_number translate="label">
-                                                    <label>Client Number</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>20</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/dk/client_number</config_path>
-                                                </client_number>
-                                                <username translate="label">
-                                                    <label>Username</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>30</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/dk/username</config_path>
-                                                </username>
-                                                <password translate="label">
-                                                    <label>Password</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>40</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/dk/password</config_path>
-                                                </password>
-                                            </fields>
-                                        </dk>
-                                        <nl translate="label" type="group">
-                                            <label>Dutch (Netherlands) Settings</label>
-                                            <sort_order>50</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <expanded>0</expanded>
-                                            <fields>
-                                                <client_number translate="label">
-                                                    <label>Client Number</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>20</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/nl/client_number</config_path>
-                                                </client_number>
-                                                <username translate="label">
-                                                    <label>Username</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>30</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/nl/username</config_path>
-                                                </username>
-                                                <password translate="label">
-                                                    <label>Password</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>40</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/nl/password</config_path>
-                                                </password>
-                                            </fields>
-                                        </nl>
-                                        <de translate="label" type="group">
-                                            <label>German Settings</label>
-                                            <sort_order>60</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <expanded>0</expanded>
-                                            <fields>
-                                                <client_number translate="label">
-                                                    <label>Client Number</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>20</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/de/client_number</config_path>
-                                                </client_number>
-                                                <username translate="label">
-                                                    <label>Username</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>30</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/de/username</config_path>
-                                                </username>
-                                                <password translate="label">
-                                                    <label>Password</label>
-                                                    <frontend_type>text</frontend_type>
-                                                    <sort_order>40</sort_order>
-                                                    <show_in_default>1</show_in_default>
-                                                    <show_in_website>1</show_in_website>
-                                                    <show_in_store>1</show_in_store>
-                                                    <config_path>payment/svea_invoice/de/password</config_path>
-                                                </password>
-                                            </fields>
-                                        </de>
-                                    </fields>
-                                </account_settings>
-                                <payment_fee translate="label" type="group">
-                                    <label>Invoice Fee Settings</label>
-                                    <sort_order>30</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                    <group>svea_invoice</group>
-                                    <expanded>0</expanded>
-                                    <fields>
-                                        <amount translate="label">
-                                            <label>Amount</label>
-                                            <comment>Will be in the global currency or the selected website scope.</comment>
-                                            <frontend_type>text</frontend_type>
-                                            <sort_order>10</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/payment_fee_amount</config_path>
-                                        </amount>
-                                        <includes_tax translate="label">
-                                            <label>Invoice Fee Includes Tax</label>
-                                            <comment>Set to 'yes' if the entered invoice fee includes tax.</comment>
-                                            <frontend_type>select</frontend_type>
-                                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                                            <sort_order>20</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/payment_fee_includes_tax</config_path>
-                                        </includes_tax>
-                                        <tax_class translate="label">
-                                            <label>Tax Class</label>
-                                            <frontend_type>select</frontend_type>
-                                            <source_model>adminhtml/system_config_source_shipping_taxclass</source_model>
-                                            <sort_order>30</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/payment_fee_tax_class</config_path>
-                                        </tax_class>
-                                    </fields>
-                                </payment_fee>
-                                <advanced translate="label" type="group">
-                                    <label>Advanced Settings</label>
-                                    <sort_order>40</sort_order>
-                                    <show_in_default>1</show_in_default>
-                                    <show_in_website>1</show_in_website>
-                                    <show_in_store>1</show_in_store>
-                                    <group>svea_invoice</group>
-                                    <expanded>0</expanded>
-                                    <fields>
-                                        <allowspecific translate="label">
-                                            <label>Payment from Applicable Countries</label>
-                                            <frontend_type>allowspecific</frontend_type>
-                                            <sort_order>70</sort_order>
-                                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>0</show_in_store>
-                                            <config_path>payment/svea_invoice/allowspecific</config_path>
-                                        </allowspecific>
-                                        <specificcountry translate="label">
-                                            <label>Payment from Specific Countries</label>
-                                            <frontend_type>multiselect</frontend_type>
-                                            <sort_order>80</sort_order>
-                                            <source_model>adminhtml/system_config_source_country</source_model>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>0</show_in_store>
-                                            <config_path>payment/svea_invoice/specificcountry</config_path>
-                                        </specificcountry>
-                                        <payment_action translate="label">
-                                            <label>Payment Action</label>
-                                            <comment>"Authorize and Capture" means the invoice is activated directly when an order is placed, otherwise an invoice needs to be manually created and captured.</comment>
-                                            <frontend_type>select</frontend_type>
-                                            <source_model>paygate/authorizenet_source_paymentAction</source_model>
-                                            <sort_order>90</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>0</show_in_store>
-                                            <config_path>payment/svea_invoice/payment_action</config_path>
-                                        </payment_action>
-                                        <order_status translate="label">
-                                            <label>New Order Status</label>
-                                            <frontend_type>select</frontend_type>
-                                            <source_model>adminhtml/system_config_source_order_status_new</source_model>
-                                            <sort_order>100</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>0</show_in_store>
-                                            <config_path>payment/svea_invoice/order_status</config_path>
-                                        </order_status>
-                                        <min_order_total translate="label">
-                                            <label>Minimum Order Total</label>
-                                            <frontend_type>text</frontend_type>
-                                            <sort_order>110</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>0</show_in_store>
-                                            <config_path>payment/svea_invoice/min_order_total</config_path>
-                                        </min_order_total>
-                                        <max_order_total translate="label">
-                                            <label>Maximum Order Total</label>
-                                            <frontend_type>text</frontend_type>
-                                            <sort_order>120</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>0</show_in_store>
-                                            <config_path>payment/svea_invoice/max_order_total</config_path>
-                                        </max_order_total>
-                                        <sort_order translate="label">
-                                            <label>Sort Order</label>
-                                            <frontend_type>text</frontend_type>
-                                            <sort_order>130</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>0</show_in_store>
-                                            <frontend_class>validate-number</frontend_class>
-                                            <config_path>payment/svea_invoice/sort_order</config_path>
-                                        </sort_order>
-                                        <distribution_type translate="label">
-                                            <label>Invoice Distribution Type</label>
-                                            <comment>How the customer will receive the invoice. "Post" means they get normal letter, "E-mail" means they get it e-mailed. This must be the same as your account settings at Svea.</comment>
-                                            <frontend_type>select</frontend_type>
-                                            <source_model>svea_webpay/adminhtml_system_config_source_payment_distributiontype</source_model>
-                                            <sort_order>140</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/distribution_type</config_path>
-                                        </distribution_type>
-                                        <checkout_info translate="label">
-                                            <label>Checkout Textbox</label>
-                                            <comment>Optional text that will display when Invoice Payment is selected in the checkout.</comment>
-                                            <frontend_type>textarea</frontend_type>
-                                            <sort_order>150</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/checkout_info</config_path>
-                                        </checkout_info>
-                                        <address_template>
-                                            <label>Address Template</label>
-                                            <comment>Determines how the address information returned from the GetAddress call should be presented.</comment>
-                                            <frontend_type>textarea</frontend_type>
-                                            <sort_order>160</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/address_template</config_path>
-                                        </address_template>
-                                        <allow_separate_shipping_address>
-                                            <label>Allow Separate Shipping Address</label>
-                                            <comment><![CDATA[<strong style="color:red">Warning!</strong> Svea WebPay has to be consulted prior to enabling this option. When enabled, customers are allowed to choose a different shipping address than the one specified in the civil register. All such orders will be marked as "Suspected Fraud" and need manual inspection before authorized.]]></comment>
-                                            <frontend_type>select</frontend_type>
-                                            <source_model>adminhtml/system_config_source_yesno</source_model>
-                                            <sort_order>170</sort_order>
-                                            <show_in_default>1</show_in_default>
-                                            <show_in_website>1</show_in_website>
-                                            <show_in_store>1</show_in_store>
-                                            <config_path>payment/svea_invoice/allow_separate_shipping_address</config_path>
-                                        </allow_separate_shipping_address>
-                                    </fields>
-                                </advanced>
-                            </fields>
-                        </svea_invoice>
+                            <config_path>payment/svea_invoice/active</config_path>
+                        </active>
+                        <test translate="label">
+                            <label>Test Mode</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>15</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/test</config_path>
+                        </test>
+                        <title translate="label">
+                            <label>Title</label>
+                            <comment>Displayed in the checkout process and on order confirmations.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/title</config_path>
+                        </title>
+
+                        <heading_payment_fee translate="label">
+                            <label>Invoice Fee Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </heading_payment_fee>
+                        <payment_fee_amount translate="label">
+                            <label>Amount</label>
+                            <comment>Will be in the global currency or the selected website scope.</comment>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/payment_fee_amount</config_path>
+                        </payment_fee_amount>
+                        <payment_fee_includes_tax translate="label">
+                            <label>Invoice Fee Includes Tax</label>
+                            <comment>Set to 'yes' if the entered invoice fee includes tax.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/payment_fee_includes_tax</config_path>
+                        </payment_fee_includes_tax>
+                        <payment_fee_tax_class translate="label">
+                            <label>Tax Class</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_shipping_taxclass</source_model>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/payment_fee_tax_class</config_path>
+                        </payment_fee_tax_class>
+
+                        <heading_advanced_settings translate="label">
+                            <label>Advanced Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>65</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </heading_advanced_settings>
+                        <allowspecific translate="label">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>70</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <config_path>payment/svea_invoice/allowspecific</config_path>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>80</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <config_path>payment/svea_invoice/specificcountry</config_path>
+                        </specificcountry>
+                        <payment_action translate="label">
+                            <label>Payment Action</label>
+                            <comment>"Authorize and Capture" means the invoice is activated directly when an order is placed, otherwise an invoice needs to be manually created and captured.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>paygate/authorizenet_source_paymentAction</source_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <config_path>payment/svea_invoice/payment_action</config_path>
+                        </payment_action>
+                        <order_status translate="label">
+                            <label>New Order Status</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_order_status_new</source_model>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <config_path>payment/svea_invoice/order_status</config_path>
+                        </order_status>
+                        <min_order_total translate="label">
+                            <label>Minimum Order Total</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <config_path>payment/svea_invoice/min_order_total</config_path>
+                        </min_order_total>
+                        <max_order_total translate="label">
+                            <label>Maximum Order Total</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <config_path>payment/svea_invoice/max_order_total</config_path>
+                        </max_order_total>
+                        <sort_order translate="label">
+                            <label>Sort Order</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/svea_invoice/sort_order</config_path>
+                        </sort_order>
+                        <distribution_type translate="label">
+                            <label>Invoice Distribution Type</label>
+                            <comment>How the customer will receive the invoice. "Post" means they get normal letter, "E-mail" means they get it e-mailed. This must be the same as your account settings at Svea.</comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>svea_webpay/adminhtml_system_config_source_payment_distributiontype</source_model>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/distribution_type</config_path>
+                        </distribution_type>
+                        <checkout_info translate="label">
+                            <label>Checkout Textbox</label>
+                            <comment>Optional text that will display when Invoice Payment is selected in the checkout.</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/checkout_info</config_path>
+                        </checkout_info>
+                        <address_template>
+                            <label>Address Template</label>
+                            <comment>Determines how the address information returned from the GetAddress call should be presented.</comment>
+                            <frontend_type>textarea</frontend_type>
+                            <sort_order>160</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/address_template</config_path>
+                        </address_template>
+                        <allow_separate_shipping_address>
+                            <label>Allow Separate Shipping Address</label>
+                            <comment><![CDATA[<strong style="color:red">Warning!</strong> Svea WebPay has to be consulted prior to enabling this option. When enabled, customers are allowed to choose a different shipping address than the one specified in the civil register. All such orders will be marked as "Suspected Fraud" and need manual inspection before authorized.]]></comment>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/allow_separate_shipping_address</config_path>
+                        </allow_separate_shipping_address>
                     </fields>
-                </svea_webpay>
+                </svea_invoice>
+                <svea_invoice_account_settings translate="label" type="group">
+                    <label>Invoice Account Settings</label>
+                    <comment>The client number, username and password are specific to the country the customer orders from. For instance, Swedish invoice orders will use different account information than Norwegian orders.</comment>
+                    <sort_order>20</sort_order>
+                    <show_in_default>1</show_in_default>
+                    <show_in_website>1</show_in_website>
+                    <show_in_store>1</show_in_store>
+                    <expanded>1</expanded>
+                    <fields>
+                        <heading_se translate="label">
+                            <label>Swedish Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>10</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </heading_se>
+                        <se_client_number translate="label">
+                            <label>Client Number</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>20</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/se/client_number</config_path>
+                        </se_client_number>
+                        <se_username translate="label">
+                            <label>Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>30</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/se/username</config_path>
+                        </se_username>
+                        <se_password translate="label">
+                            <label>Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>40</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/se/password</config_path>
+                        </se_password>
+
+                        <heading_no translate="label">
+                            <label>Norwegian Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>50</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </heading_no>
+                        <no_client_number translate="label">
+                            <label>Client Number</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>60</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/no/client_number</config_path>
+                        </no_client_number>
+                        <no_username translate="label">
+                            <label>Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>70</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/no/username</config_path>
+                        </no_username>
+                        <no_password translate="label">
+                            <label>Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>80</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/no/password</config_path>
+                        </no_password>
+
+                        <heading_fi translate="label">
+                            <label>Finnish Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>90</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </heading_fi>
+                        <fi_client_number translate="label">
+                            <label>Client Number</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>100</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/fi/client_number</config_path>
+                        </fi_client_number>
+                        <fi_username translate="label">
+                            <label>Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>110</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/fi/username</config_path>
+                        </fi_username>
+                        <fi_password translate="label">
+                            <label>Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>120</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/fi/password</config_path>
+                        </fi_password>
+
+                        <heading_dk translate="label">
+                            <label>Danish Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>130</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </heading_dk>
+                        <dk_client_number translate="label">
+                            <label>Client Number</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>140</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/dk/client_number</config_path>
+                        </dk_client_number>
+                        <dk_username translate="label">
+                            <label>Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>150</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/dk/username</config_path>
+                        </dk_username>
+                        <dk_password translate="label">
+                            <label>Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>160</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/dk/password</config_path>
+                        </dk_password>
+
+                        <heading_nl translate="label">
+                            <label>Dutch (Netherlands) Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>170</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </heading_nl>
+                        <nl_client_number translate="label">
+                            <label>Client Number</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>180</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/nl/client_number</config_path>
+                        </nl_client_number>
+                        <nl_username translate="label">
+                            <label>Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>190</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/nl/username</config_path>
+                        </nl_username>
+                        <nl_password translate="label">
+                            <label>Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>200</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/nl/password</config_path>
+                        </nl_password>
+
+                        <heading_de translate="label">
+                            <label>German Settings</label>
+                            <frontend_model>adminhtml/system_config_form_field_heading</frontend_model>
+                            <sort_order>210</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </heading_de>
+                        <de_client_number translate="label">
+                            <label>Client Number</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>220</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/de/client_number</config_path>
+                        </de_client_number>
+                        <de_username translate="label">
+                            <label>Username</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>230</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/de/username</config_path>
+                        </de_username>
+                        <de_password translate="label">
+                            <label>Password</label>
+                            <frontend_type>text</frontend_type>
+                            <sort_order>240</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <config_path>payment/svea_invoice/de/password</config_path>
+                        </de_password>
+                    </fields>
+                </svea_invoice_account_settings>
             </groups>
-        </payment>
+        </svea_webpay>
     </sections>
 </config>
