@@ -332,11 +332,19 @@
                 address = obj.customerIdentity[0];
             }
 
+            // Keep track of the fields we've set to prevent for instance the
+            // street to be set twice
+            var setFields = {};
+
             for (var key in obj['_identity_parameter_map']) {
                 var name = obj['_identity_parameter_map'][key].toLowerCase();
-                $$('[name*="billing[' + name + ']"]').each(function (element) {
+                $$('[name*="billing[' + name + '"]').each(function (element) {
+                    if (key in setFields) {
+                        return;
+                    }
                     element.value = address[key];
                     element.setValue(address[key]);
+                    setFields[key] = true;
                 });
             }
 
