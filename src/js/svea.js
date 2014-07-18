@@ -12,6 +12,16 @@ var _sveaLastGetAddressRequest = {
     code: ''
 };
 
+/**
+ * Should hold the state of the input fields that a user filled in on its own,
+ * so we for instance know if "use_for_shipping" was clicked before invoice
+ * was selected
+ */
+var _customerAddressState = {
+    'use_for_shipping': null,
+    'form': {}
+};
+
 function _sveaGetSsnContainer(code) {
     var container;
     if (typeof code !== 'undefined' && code !== '') {
@@ -74,12 +84,19 @@ function sveaAddressChanged(addressSelector, container)
     }
 
     // Set values for onestep checkouts if billing:firstname is visible
-    if ($("billing:firstname").visible()) {
-        $("billing:firstname").value = address.firstName;
-        $("billing:lastname").value = address.lastName;
-        $("billing:street1").value = address.street;
-        $("billing:city").value = address.locality;
-        $("billing:postcode").value = address.zipCode;
+    if ($('billing:firstname').visible()) {
+        var sveaMagentoAddressMap = {
+            'firstname': 'firstName',
+            'lastname': 'lastName',
+            'street1': 'street',
+            'city': 'locality',
+            'postcode': 'zipCode'
+        };
+
+        _sveaGetReadOnlyElements().each(function(item) {
+            var key = item.readAttribute('id').replace(/.*:/, '');
+            item.value = address[sveaMagentoAddressMap[key]];
+        });
     }
 
     // Set selector values, one for the select and one for the hidden
@@ -118,12 +135,9 @@ function _sveaHandleGetAddressErrors() {
  */
 function _sveaHandleGetAddressAddresses()
 {
-    var code = _sveaLastGetAddressRequest.code;
-    if (!code) {
-        return;
-    }
+    var code = _sveaLastGetAddressRequest.code,
+        json = _sveaLastGetAddressRequest.json;
 
-    var json = _sveaLastGetAddressRequest.json;
     if (!json) {
         return;
     }
@@ -170,26 +184,49 @@ function _sveaHandleGetAddressAddresses()
     _$('.svea_address_selector', code).value = currentSveaAddress;
 }
 
-function _sveaSetupGui()
+function _sveaGetReadOnlyElements()
 {
     var readOnlyElements = [
-        'firstname',
-        'lastname',
-        'street1',
-        'city',
-        'postcode'
-    ],
-        $shipDiv = $$('.ship-to-different-address');
+            'firstname',
+            'lastname',
+            'street1',
+            'city',
+            'postcode'
+        ];
+
+    readOnlyElements.each(function (item, index) {
+        var id = 'billing:' + item,
+            $id = $(id);
+
+        readOnlyElements[index] = $id;
+    });
+
+    return readOnlyElements;
+}
+
+function _sveaSetupGui()
+{
+    var $shipDiv = $$('.ship-to-different-address');
+
+    _customerAddressState['use_for_shipping'] = $F('billing:use_for_shipping');
+    $$('.svea-ssn-input').invoke('addClassName', 'required-entry');
 
     $shipDiv = $$('.ship-to-different-address');
     if ($shipDiv.length === 1) {
+        var checkbox = $shipDiv[0].down('input');
+        if (checkbox.checked) {
+            $(checkbox).click();
+        }
         $shipDiv[0].addClassName('svea-hidden');
     }
-    readOnlyElements.each(function(item) {
-        var id = 'billing:' + item,
-            $id = $(id);
-        if ($id) {
-            $id.addClassName('svea-readonly');
+    _sveaGetReadOnlyElements().each(function(item) {
+        if (item) {
+            _customerAddressState.form[item.readAttribute('id')] = item.value;
+            item.addClassName('svea-readonly');
+            if (_sveaLastGetAddressRequest.json !== null) {
+                item.setValue('');
+            }
+            item.disable();
         }
     });
 
@@ -200,39 +237,42 @@ function _sveaSetupGui()
 // Also hides svea container
 function _sveaTeardownGui()
 {
-    var readOnlyElements = [
-        'firstname',
-        'lastname',
-        'street1',
-        'city',
-        'postcode'
-    ],
-        $shipDiv = $$('.ship-to-different-address');
+    var $shipDiv = $$('.ship-to-different-address');
+
+    $$('.svea-ssn-input').invoke('removeClassName', 'required-entry');
 
     if ($shipDiv.length === 1) {
         $shipDiv[0].removeClassName('svea-hidden');
+        if (_customerAddressState['use_for_shipping'] == 0) {
+            var checkbox = $shipDiv[0].down('input');
+            $(checkbox).click();
+        }
     }
 
-    readOnlyElements.each(function(item) {
-        var id = 'billing:' + item,
-            $id = $(id);
-        if ($id) {
-            $id.removeClassName('svea-readonly');
+    _sveaGetReadOnlyElements().each(function(item) {
+        if (item) {
+            item.removeClassName('svea-readonly');
+            item.enable();
+
+            var value = '';
+            if (item.readAttribute('id') in _customerAddressState.form) {
+                value = _customerAddressState.form[item.readAttribute('id')];
+            }
+
             // Remove value
-            $id.setValue('');
+            item.setValue(value);
         }
     });
 
     // Hide the whole ssn container
     _sveaGetSsnContainer(_sveaLastGetAddressRequest.code).hide();
-
 }
 
 function _sveaHandleLastGetAddress()
 {
+    _sveaSetupGui();
     _sveaHandleGetAddressErrors();
     _sveaHandleGetAddressAddresses();
-    _sveaSetupGui();
 }
 
 /** Get address from svea
@@ -339,16 +379,7 @@ function sveaAddressSelectChanged()
  */
 function _sveaOnPaymentMethodChange()
 {
-
-    var value = $$('input:checked[type="radio"][name="payment[method]"]').pluck("value")[0],
-        readOnlyElements = [
-            'firstname',
-            'lastname',
-            'street1',
-            'city',
-            'postcode'
-        ],
-        $shipDiv = null;
+    var value = $$('input:checked[type="radio"][name="payment[method]"]').pluck("value")[0];
 
     if (typeof value === 'undefined') {
         // Nothing has been chosen yet, which can be the case with many checkouts

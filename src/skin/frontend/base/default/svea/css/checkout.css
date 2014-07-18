@@ -1,4 +1,15 @@
-/* line 5, ../sass/checkout.scss */
+/* line 3, ../sass/checkout.scss */
+.svea-hidden {
+  display: none;
+}
+
+/* line 7, ../sass/checkout.scss */
+.svea-readonly {
+  cursor: not-allowed;
+  background: #e3e3e3 !important;
+}
+
+/* line 14, ../sass/checkout.scss */
 .form-list#payment_form_svea_paymentplan, .form-list#payment_form_svea_invoice {
   margin-top: 10px;
   border: 1px solid #ccc;
@@ -18,61 +29,61 @@
   max-width: 260px;
   margin-left: 18px;
 }
-/* line 15, ../sass/checkout.scss */
+/* line 24, ../sass/checkout.scss */
 .form-list#payment_form_svea_paymentplan #sveaPaymentPlanShowParams, .form-list#payment_form_svea_invoice #sveaPaymentPlanShowParams {
   max-width: 100%;
 }
-/* line 17, ../sass/checkout.scss */
+/* line 26, ../sass/checkout.scss */
 .form-list#payment_form_svea_paymentplan #sveaPaymentPlanShowParams select, .form-list#payment_form_svea_invoice #sveaPaymentPlanShowParams select {
   max-width: 100%;
 }
-/* line 23, ../sass/checkout.scss */
+/* line 32, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field {
   float: none;
   margin-bottom: 8px;
   max-width: 100%;
 }
-/* line 27, ../sass/checkout.scss */
+/* line 36, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field .input-box {
   max-width: 100%;
 }
-/* line 29, ../sass/checkout.scss */
+/* line 38, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field .input-box input.input-text {
   max-width: 100%;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-/* line 35, ../sass/checkout.scss */
+/* line 44, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field.float-btn .input-box {
   margin-bottom: 8px;
 }
-/* line 42, ../sass/checkout.scss */
+/* line 51, ../sass/checkout.scss */
 .form-list .svea-ssn-container #showAddressBox_svea_paymentplan label,
 .form-list .svea-ssn-container #showAddressBox_svea_invoice label {
   float: none;
 }
-/* line 47, ../sass/checkout.scss */
+/* line 56, ../sass/checkout.scss */
 .form-list .svea-ssn-container .get-address-btn button {
   width: 150px;
 }
-/* line 49, ../sass/checkout.scss */
+/* line 58, ../sass/checkout.scss */
 .form-list .svea-ssn-container .get-address-btn button .loader {
   display: none;
 }
-/* line 55, ../sass/checkout.scss */
+/* line 64, ../sass/checkout.scss */
 .form-list .svea-ssn-container .get-address-btn.loading button .loader {
   display: inline-block;
 }
-/* line 57, ../sass/checkout.scss */
+/* line 66, ../sass/checkout.scss */
 .form-list .svea-ssn-container .get-address-btn.loading button .loader img {
   max-height: 100%;
 }
-/* line 61, ../sass/checkout.scss */
+/* line 70, ../sass/checkout.scss */
 .form-list .svea-ssn-container .get-address-btn.loading button .inner {
   display: none;
 }
-/* line 69, ../sass/checkout.scss */
+/* line 78, ../sass/checkout.scss */
 .form-list #paymentplan_cost_text {
   background-color: #297ab7;
   -webkit-border-radius: 3px;
@@ -86,12 +97,12 @@
   margin-top: 10px;
   font-weight: bold;
 }
-/* line 81, ../sass/checkout.scss */
+/* line 90, ../sass/checkout.scss */
 .form-list #paymentplan_cost_text .cost {
   font-weight: bold;
 }
 
-/* line 86, ../sass/checkout.scss */
+/* line 95, ../sass/checkout.scss */
 .sp-methods .svea-payment-logos {
   margin-left: 18px;
 }
