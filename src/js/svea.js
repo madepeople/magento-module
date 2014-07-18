@@ -208,7 +208,9 @@ function _sveaSetupGui()
 {
     var $shipDiv = $$('.ship-to-different-address');
 
-    _customerAddressState['use_for_shipping'] = $F('billing:use_for_shipping');
+    if ($('billing:use_for_shipping')) {
+        _customerAddressState['use_for_shipping'] = $F('billing:use_for_shipping');
+    }
     $$('.svea-ssn-input').invoke('addClassName', 'required-entry');
 
     $shipDiv = $$('.ship-to-different-address');
