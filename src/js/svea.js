@@ -118,14 +118,18 @@ function _sveaHandleGetAddressErrors() {
  */
 function _sveaHandleGetAddressAddresses()
 {
-    var code = _sveaLastGetAddressRequest.code,
-        json = _sveaLastGetAddressRequest.json,
-        addressesBox = _$('.sveaShowAddresses', code),
-        container = _$('.svea_address_selectbox', code).up('.svea-ssn-container');
+    var code = _sveaLastGetAddressRequest.code;
+    if (!code) {
+        return;
+    }
 
+    var json = _sveaLastGetAddressRequest.json;
     if (!json) {
         return;
     }
+
+    var addressesBox = _$('.sveaShowAddresses', code),
+        container = _$('.svea_address_selectbox', code).up('.svea-ssn-container');
 
     // Show dropdown if company, show only text if private customer
     if (addressesBox) {
@@ -345,6 +349,11 @@ function _sveaOnPaymentMethodChange()
             'postcode'
         ],
         $shipDiv = null;
+
+    if (typeof value === 'undefined') {
+        // Nothing has been chosen yet, which can be the case with many checkouts
+        return;
+    }
 
     if (value.indexOf('svea_') === 0) {
         _sveaHandleLastGetAddress();
