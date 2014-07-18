@@ -1,5 +1,14 @@
 @import "compass/css3";
 
+.svea-hidden {
+    display: none;
+}
+
+.svea-readonly {
+    cursor: not-allowed;
+    background: #e3e3e3 !important;
+}
+
 .form-list {
     &#payment_form_svea_paymentplan,
     &#payment_form_svea_invoice {
