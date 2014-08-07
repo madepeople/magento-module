@@ -232,8 +232,10 @@ function _sveaSetupGui()
         }
     });
 
-    // Show the whole ssn container, always
-    _sveaGetSsnContainer(_sveaLastGetAddressRequest.code).show();
+    // Show the whole ssn container if it exists
+    if (_sveaLastGetAddressRequest.code) {
+        _sveaGetSsnContainer(_sveaLastGetAddressRequest.code).show();
+    }
 }
 
 // Also hides svea container
@@ -267,7 +269,9 @@ function _sveaTeardownGui()
     });
 
     // Hide the whole ssn container
-    _sveaGetSsnContainer(_sveaLastGetAddressRequest.code).hide();
+    if (_sveaLastGetAddressRequest.code) {
+        _sveaGetSsnContainer(_sveaLastGetAddressRequest.code).hide();
+    }
 }
 
 function _sveaHandleLastGetAddress()
