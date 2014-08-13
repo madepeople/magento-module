@@ -62,10 +62,13 @@ function _$(selector, paymentMethodCode)
  */
 function _sveaGetCustomerType(paymentMethodCode) {
 
-    var typeElement = _$('input:checked[name*=customerType]',
+    var selector = 'input[name="payment[svea_info][svea_customerType]"]',
+        typeElement = _$(selector,
                          paymentMethodCode || _sveaGetPaymentMethodCode());
+
+
     if (typeElement === null) {
-        typeElement = $$('input:checked[name*=customerType]');
+        typeElement = $$(selector);
         if (typeElement.length ) {
             return typeElement.value;
         } else {
@@ -301,31 +304,43 @@ var _SveaCustomer = Class.create({
             name,
             newLabel,
             label,
-            addressBox;
+            addressBox,
+            addressDiv;
 
         selectedAddress = this.getSelectedAddress();
 
         if (container) {
+
             // Update the selected address summary
-            if ($(container).down('.sveaShowAddresses')) {
+            addressDiv = $(container).down('.sveaShowAddresses');
 
-                label = $(container).down('.sveaShowAdressesLabel');
-                newLabel = label.cloneNode(true);
-                $(newLabel).show();
-                if (!selectedAddress.fullName) {
-                    name = selectedAddress.firstName + ' ' +
-                        selectedAddress.lastName + '<br>';
+            if (addressDiv) {
+
+                // Only update if there is an address selected - otherwise
+                // hide the whole address div
+                if (selectedAddress.addressSelector !== null) {
+                    label = $(container).down('.sveaShowAdressesLabel');
+                    newLabel = label.cloneNode(true);
+                    $(newLabel).show();
+                    if (!selectedAddress.fullName) {
+                        name = selectedAddress.firstName + ' ' +
+                            selectedAddress.lastName + '<br>';
+                    } else {
+                        name = selectedAddress.fullName + '<br>';
+                    }
+                    addressBox = '<address>' + name +
+                        (selectedAddress.street || '') + '<br>' +
+                        (selectedAddress.zipCode || '') + ' ' +
+                        (selectedAddress.locality || '') + '</address>';
+
+                    $(container).down('.sveaShowAddresses').update('')
+                        .insert(newLabel)
+                        .insert(addressBox);
+
+                    addressDiv.show();
                 } else {
-                    name = selectedAddress.fullName + '<br>';
+                    addressDiv.hide();
                 }
-                addressBox = '<address>' + name +
-                    (selectedAddress.street || '') + '<br>' +
-                    (selectedAddress.zipCode || '') + ' ' +
-                    (selectedAddress.locality || '') + '</address>';
-
-                $(container).down('.sveaShowAddresses').update('')
-                    .insert(newLabel)
-                    .insert(addressBox);
             }
         }
 
@@ -482,6 +497,8 @@ var _SveaController = Class.create({
     ],
     initialize: function() {
         this.customerStore = new _SveaCustomerStore();
+        // Store last state
+        this.lastState = this.getCurrentState();
     },
     /** Toggle visibility and state of 'ship to different address'-checkbox
      *
@@ -643,6 +660,51 @@ var _SveaController = Class.create({
         // Let the current customer setup gui
         this.customerStore.getCurrent().setupGui();
 
+
+        var newState = this.getCurrentState();
+
+        // If OneStepCheckout is used the current payment method
+        // and it's additional_data must be saved prior to finalizing
+        // the checkout. This is done with the OneStepCheckout method
+        // `get_separate_save_methods_function`.
+
+        /*global get_separate_save_methods_function */
+        if (typeof get_separate_save_methods_function === 'function') {
+            var url = window.sveaOneStepCheckoutSetMethodsSeparateUrl;
+
+            // Note: There is a setting in OneStepCheckout that disables
+            // this but even if you turn it of OneStepCheckout will
+            // still do these request so we need to do them always.
+
+            // If anything besides paymentMethod changed (onestepcheckout will
+            // handle the paymentMethod change.
+            if (!(newState.nationalIdNumber === this.lastState.nationalIdNumber &&
+                  newState.customerType === this.lastState.customerType &&
+                  newState.selectedAddressId === this.lastState.selectedAddressId)) {
+
+                // Don't do this if paymentMethodCode isn't set.
+                // Keeping this seperate from above because that expr. is annyoing
+                // as-is.
+                if (newState.paymentMethodCode) {
+                    get_separate_save_methods_function(url, false)();
+                }
+            }
+        }
+
+        // Store last state
+        this.lastState = newState;
+    },
+    /** Get current state that will determine which address svea should use
+     *
+     * @returns Object with all key: values that determines customer + address
+     */
+    getCurrentState: function() {
+        return {
+            nationalIdNumber: _sveaGetBillingNationalIdNumber(),
+            paymentMethodCode: _sveaGetPaymentMethodCode(),
+            customerType: _sveaGetCustomerType(),
+            selectedAddressId: ($$('input[name="payment[svea_info][svea_addressSelector]"]')[0] || {value: null}).value
+        };
     },
     /** Handle a response from svea getAddress()
      *
@@ -660,6 +722,7 @@ var _SveaController = Class.create({
 
         // Always call setup gui
         this.setupGui();
+
     },
     /** Setup observers
      *
@@ -744,11 +807,17 @@ function sveaGetAddress(paymentMethodCode)
 
 /** This is called from the template when customer type is changed
  *
+ * This needs to be bound to the input in question because the current value is
+ * read from $(this).value.
+ *
  * @returns undefined
  */
 function setCustomerTypeRadioThing()
 {
     var customerType = $(this).value;
+
+    // Set hidden input value
+    $$('input[name="payment[svea_info][svea_customerType]"]')[0].value = customerType;
 
     if (currentCountry == 'NL' || currentCountry == 'DE') {
         if (customerType == 1) {
