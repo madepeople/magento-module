@@ -75,7 +75,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 // new getAddress call and use the first address if only one is
                 // returned
                 $conf = Mage::getStoreConfig('payment/' . $this->getCode());
-                $conf['company'] = $_POST['payment'][$this->getCode() . '_customerType'] == 1;
+                $conf['company'] = $_POST['payment']['svea_info']['svea_customerType'] == 1;
 
                 $result = Mage::helper('svea_webpay')->getAddresses(
                     $sveaInformation['svea_ssn'],

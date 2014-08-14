@@ -1,5 +1,6 @@
 <_>
-   <form_key>TpnpC47Fi29zB8Xa</form_key>
+   <form_key>siLXCFXW7eF0Nx0l</form_key>
+   <_create/>
    <name>Svea_WebPay</name>
    <channel>community</channel>
    <version_ids>
@@ -16,7 +17,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
    </description>
    <license>Apache License, Version 2.0</license>
    <license_uri/>
-   <version>4.0.23</version>
+   <version>4.0.24</version>
    <stability>stable</stability>
    <notes>N/A</notes>
    <authors>
@@ -50,7 +51,7 @@ The supported countries are Sweden, Norway, Finland, Denmark, The Netherlands, G
             <max/>
          </max>
          <files>
-            <files>                                                                                                                                     </files>
+            <files>                                                                                                                                      </files>
          </files>
       </package>
       <extension>
