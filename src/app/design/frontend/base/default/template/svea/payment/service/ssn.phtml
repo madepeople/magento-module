@@ -18,26 +18,35 @@ if (empty($_method)) {
 <div class="svea-ssn-container <?php echo $_class ?>">
 
     <?php if (empty($_code) || $_code === 'svea_invoice'): ?>
+        <?php
+         /**
+            These radios are not the real values sent to the server because some
+            checkout sollutions doesn't handle radios very well. Instead the
+            `setCustomerTypeRadioThing` will copy the value into the hidden
+            input below.
+         */
+        ?>
         <div class="field">
             <label style="margin-right: 30px;">
                 <input type="radio"
                        class="payment_form_customerType_0"
-                       name="payment[svea_info][svea_customerType]" value="0"
+                       name="_svea_customerType"
+                       value="0"
                        onclick="setCustomerTypeRadioThing.call(this);"
                        checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
             </label>
             <label>
                 <input type="radio"
                        class="payment_form_customerType_1"
-                       name="payment[svea_info][svea_customerType]"
+                       name="_svea_customerType"
                        onclick="setCustomerTypeRadioThing.call(this);"
                        value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
             </label>
         </div>
-    <?php else: ?>
-        <input type="hidden" name="payment[svea_info][svea_customerType]" value="0">
     <?php endif ?>
 
+    <?php /* This is always used, if radios are used they will have to copy their current value to this input */ ?>
+    <input type="hidden" name="payment[svea_info][svea_customerType]" value="0">
 
     <!-- If Nordic countries show, show SSN input field -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
@@ -184,7 +193,9 @@ if (empty($_method)) {
 </div>
 <script>
     var currentCountry, usingQuickCheckout, getAddressUrl;
+
     window.currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
     window.usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
     window.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+    window.sveaOneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
 </script>

@@ -1,189 +1,154 @@
-/*global Ajax $ $$ $F currentCountry payment usingQuickCheckout getAddressUrl */
-
-/** Current selected address */
-var currentSveaAddress;
-/** List of customer addresses from svea */
-var customerIdentities;
-
-/** Last get address request that was made
+/*global Class $ $$ payment currentCountry $F Ajax */
+/** Svea magento module javascript part
+ *
+ * This module takes care of retrieving addresses from svea and modifying the gui
+ * so that inputs are hidden/shown enabled or disabled depending on payment
+ * method and billing country.
+ *
+ * @param paymentMethodCode Code for the payment method which has the ssn selector
+ *
+ * @returns Element or null. null should not happen if the dom is correct
  */
-var _sveaLastGetAddressRequest = {
-    json: null,
-    code: ''
-};
+function _sveaGetSsnContainer(paymentMethodCode) {
+    var elements,
+        container;
 
-/**
- * Should hold the state of the input fields that a user filled in on its own,
- * so we for instance know if "use_for_shipping" was clicked before invoice
- * was selected
- */
-var _customerAddressState = {
-    'use_for_shipping': null,
-    'form': {}
-};
+    paymentMethodCode = paymentMethodCode || _sveaGetPaymentMethodCode();
 
-function _sveaGetSsnContainer(code) {
-    var container;
-    if (typeof code !== 'undefined' && code !== '') {
-        container = $$('.svea-ssn-container-' + code)[0];
-    } else {
-        var elements = $$('[class*=svea-ssn-container-]');
+    if (typeof paymentMethodCode !== 'undefined' && paymentMethodCode !== '') {
+        elements = $$('.svea-ssn-container-' + paymentMethodCode);
         if (elements.length) {
-            container = elements[0];
-        } else {
-            container = $$('.svea-ssn-container')[0];
+            return elements[0];
         }
     }
-    return container;
+
+    elements = $$('[class*=svea-ssn-container-]');
+    if (elements.length) {
+        return elements[0];
+    } else {
+        elements = $$('.svea-ssn-container');
+        if (elements.length) {
+            return elements[0];
+        }
+    }
+
+    // console.warn("Cannot find ssn container for payment", paymentMethodCode);
+    return null;
 }
 
-/** Get element based on selector and code
+/** Get element relative a svea ssn container for a specific payment method
  *
  * @param selector What to select under the top element
- * @param code Code that decides which svea container that should be used as top-level, default null
+ * @param paymentMethodCode Code for the payment method that this element should belong to, see `_sveaGetSsnContainer`.
+ *
+ * @returns Element or null
  */
-function _$(selector, code)
+function _$(selector, paymentMethodCode)
 {
-    return _sveaGetSsnContainer(code).down(selector);
-}
-
-/** Called when an address was selected */
-function sveaAddressChanged(addressSelector, container)
-{
-    var address;
-    for (var i = 0; i < customerIdentities.length; i++) {
-        if (customerIdentities[i].addressSelector == addressSelector) {
-            address = customerIdentities[i];
-            break;
-        }
-    }
-
-    if (typeof address === 'undefined') {
-        return;
-    }
-
-    if ($(container).down('.sveaShowAddresses')) {
-        if (address.fullName == null) {
-            var name = address.firstName + ' ' +
-                address.lastName + '<br>';
-        } else {
-            var name = address.fullName + '<br>';
-        }
-
-        var label = $(container).down('.sveaShowAdressesLabel');
-        var newLabel = label.cloneNode(true);
-        $(newLabel).show();
-        var addressBox = '<address>' + name +
-            address.street + '<br>' +
-            address.zipCode + ' ' +
-            address.locality + '</address>';
-
-        $(container).down('.sveaShowAddresses').update('')
-            .insert(newLabel)
-            .insert(addressBox);
-    }
-
-    // Set values for onestep checkouts if billing:firstname is visible
-    if ($('billing:firstname').visible()) {
-        var sveaMagentoAddressMap = {
-            'firstname': 'firstName',
-            'lastname': 'lastName',
-            'street1': 'street',
-            'city': 'locality',
-            'postcode': 'zipCode'
-        };
-
-        _sveaGetReadOnlyElements().each(function(item) {
-            var key = item.readAttribute('id').replace(/.*:/, '');
-            item.value = address[sveaMagentoAddressMap[key]];
-        });
-    }
-
-    // Set selector values, one for the select and one for the hidden
-    _$('.svea_address_selectbox', _sveaLastGetAddressRequest.code).value = currentSveaAddress;
-    $(container).down('.svea_address_selector').value = currentSveaAddress;
-}
-
-/** Handle errors that was returned by getAddress and stored in _sveaLastGetAddressRequest
- */
-function _sveaHandleGetAddressErrors() {
-    var json = _sveaLastGetAddressRequest.json,
-        code = _sveaLastGetAddressRequest.code;
-
-    if (json) {
-        if (json.accepted == false) {
-            if (usingQuickCheckout) {
-                alert(json.errormessage);
-            } else {
-                _$('.sveaShowAddresses', code).update("<span style='color:red'>" + json.errormessage + "</span>");
-            }
-
-            // Clear old address data
-            ['firstname', 'lastname', 'street1', 'city', 'postcode']
-                .each(function(item) {
-                    var id = 'billing:' + item;
-                    if ($(id)) {
-                        $(id).value = '';
-                    }
-                });
-        }
-    }
-
-}
-
-/** Handle addresses that was returned by getAddress and stored in _sveaLastGetAddressRequest
- */
-function _sveaHandleGetAddressAddresses()
-{
-    var code = _sveaLastGetAddressRequest.code,
-        json = _sveaLastGetAddressRequest.json;
-
-    if (!json) {
-        return;
-    }
-
-    var addressesBox = _$('.sveaShowAddresses', code),
-        container = _$('.svea_address_selectbox', code).up('.svea-ssn-container');
-
-    // Show dropdown if company, show only text if private customer
-    if (addressesBox) {
-        addressesBox.update('');
-    }
-
-    _$('.svea_address_selectbox', code).update('');
-    customerIdentities = json.customerIdentity || [];
-
-    if (customerIdentities.length > 1) {
-        customerIdentities.each(function (item) {
-            var addressString = item.fullName + ', '
-                    + item.street + ', '
-                    + item.zipCode + ' '
-                    + item.locality;
-
-            var option = new Element('option', {
-                'value': item.addressSelector
-            }).update(addressString);
-
-            _$('.svea_address_selectbox', code).insert(option);
-        });
-        _$('.svea_address_selectbox', code).show();
+    var ssnContainer = _sveaGetSsnContainer(paymentMethodCode);
+    if (ssnContainer) {
+        return ssnContainer.down(selector);
     } else {
-        _$('.svea_address_selectbox', code).hide();
+        // console.warn("Cannot find ssn container sub-element for paymentMethodCode", paymentMethodCode, selector);
+        return null;
     }
-
-    // Store first address as current address if not already set
-    if (currentSveaAddress === null) {
-        currentSveaAddress = customerIdentities[0].addressSelector;
-    }
-
-    // Setup address because it changed. XXX: This will not be called if there was an
-    // error because then it returns, which is bad
-    sveaAddressChanged(currentSveaAddress, container);
-
-    // Set currentAddress in the address selector
-    _$('.svea_address_selector', code).value = currentSveaAddress;
 }
 
+/** Get selected SVEA customer type("0" or "1") for a specific payment method
+ *
+ * @param paymentMethodCode Code for the payment method that the customer type is selected on
+ *
+ * @returns customer type string id ("0" or "1") or null
+ */
+function _sveaGetCustomerType(paymentMethodCode) {
+
+    var selector = 'input[name="payment[svea_info][svea_customerType]"]',
+        typeElement = _$(selector,
+                         paymentMethodCode || _sveaGetPaymentMethodCode());
+
+
+    if (typeElement === null) {
+        typeElement = $$(selector);
+        if (typeElement.length ) {
+            return typeElement.value;
+        } else {
+            // console.warn('Failed to get svea customer type for paymentMethod', paymentMethodCode);
+            return null;
+        }
+    } else {
+        return typeElement.value;
+    }
+}
+
+/** Get selected payment method code
+ *
+ * @returns Element or null
+ */
+function _sveaGetPaymentMethodCode() {
+    var elem = $$('input:checked[name*=payment[method]]');
+
+    if (elem.length) {
+        return elem[0].value;
+    } else {
+        // console.warn("Cannot find payment method");
+        return null;
+    }
+}
+
+/** Get country code for selected billing country
+ *
+ * `currentCountry` is populated after country is changed so use this to get
+ * the current selected billing country code from the billing country select
+ * directly.
+ *
+ * @returns Billing country code or null
+ */
+function _sveaGetBillingCountryCode() {
+    var elem = $$('select[name="billing[country_id]"');
+
+    if (elem.length) {
+        return elem[0].value;
+    } else {
+        // console.warn("Cannot find country_id");
+        return null;
+    }
+}
+
+/** Get NationalIdNumber
+ *
+ * @param paymentMethodCode If set that payment method code will be used instead of the current selected payment methods code
+ *
+ * @returns NationalIdNumber or null
+ */
+function _sveaGetBillingNationalIdNumber(paymentMethodCode) {
+    var elem;
+
+    paymentMethodCode = paymentMethodCode ||_sveaGetPaymentMethodCode();
+    if (paymentMethodCode === null) {
+        // console.warn("Cannot find current payment method");
+        return null;
+    }
+
+    elem = _$('[name*=[svea_ssn]]', paymentMethodCode);
+    if (elem) {
+        return elem.value;
+    } else {
+        elem = $$('.svea-ssn-input');
+        if (elem.length) {
+            return elem[0].value;
+        } else {
+            // console.warn("Cannot find svea_ssn for method", paymentMethodCode);
+            return null;
+        }
+    }
+}
+
+/** Get array of elements that are considered read-only when svea is used
+ *
+ * These elements should be readonly when svea getaddress is required.
+ *
+ * @returns Array of elements
+ */
 function _sveaGetReadOnlyElements()
 {
     var readOnlyElements = [
@@ -198,106 +163,614 @@ function _sveaGetReadOnlyElements()
         var id = 'billing:' + item,
             $id = $(id);
 
-        readOnlyElements[index] = $id;
+        if ($id) {
+            readOnlyElements[index] = $id;
+        }
     });
 
     return readOnlyElements;
 }
 
-function _sveaSetupGui()
-{
-    var $shipDiv = $$('.ship-to-different-address');
-
-    if ($('billing:use_for_shipping')) {
-        _customerAddressState['use_for_shipping'] = $F('billing:use_for_shipping');
-    }
-    $$('.svea-ssn-input').invoke('addClassName', 'required-entry');
-
-    $shipDiv = $$('.ship-to-different-address');
-    if ($shipDiv.length === 1) {
-        var checkbox = $shipDiv[0].down('input');
-        if (checkbox.checked) {
-            $(checkbox).click();
-        }
-        $shipDiv[0].addClassName('svea-hidden');
-    }
-    _sveaGetReadOnlyElements().each(function(item) {
-        if (item) {
-            _customerAddressState.form[item.readAttribute('id')] = item.value;
-            item.addClassName('svea-readonly');
-            if (_sveaLastGetAddressRequest.json !== null) {
-                item.setValue('');
-            }
-            item.disable();
-        }
-    });
-
-    // Show the whole ssn container, always
-    _sveaGetSsnContainer(_sveaLastGetAddressRequest.code).show();
-}
-
-// Also hides svea container
-function _sveaTeardownGui()
-{
-    var $shipDiv = $$('.ship-to-different-address');
-
-    $$('.svea-ssn-input').invoke('removeClassName', 'required-entry');
-
-    if ($shipDiv.length === 1) {
-        $shipDiv[0].removeClassName('svea-hidden');
-        if (_customerAddressState['use_for_shipping'] == 0) {
-            var checkbox = $shipDiv[0].down('input');
-            $(checkbox).click();
-        }
-    }
-
-    _sveaGetReadOnlyElements().each(function(item) {
-        if (item) {
-            item.removeClassName('svea-readonly');
-            item.enable();
-
-            var value = '';
-            if (item.readAttribute('id') in _customerAddressState.form) {
-                value = _customerAddressState.form[item.readAttribute('id')];
-            }
-
-            // Remove value
-            item.setValue(value);
-        }
-    });
-
-    // Hide the whole ssn container
-    _sveaGetSsnContainer(_sveaLastGetAddressRequest.code).hide();
-}
-
-function _sveaHandleLastGetAddress()
-{
-    _sveaSetupGui();
-    _sveaHandleGetAddressErrors();
-    _sveaHandleGetAddressAddresses();
-}
-
-/** Get address from svea
+/** A customer read from SVEA
  *
- * @param code I don't know and it's very often null
+ * This customer may be invalid, check the attribute `valid` to see if it is.
  */
-function sveaGetAddress(code)
-{
-    var ssn = _$('[name*=[svea_ssn]]', code).value,
-        typeElement = _$('input:checked[name*=customerType]', code),
-        type = typeElement ? typeElement.value : 0,
-        method = code || payment.currentMethod;
+var _SveaCustomer = Class.create({
 
-    if (!method) {
-        method = $$('input:checked[name*=payment[method]]');
-        if (method.length) {
-            method = method[0].value;
+    valid: null,
+
+    countryCode: null,
+    customerType: null,
+    nationalIdNumber: null,
+    selectedAddressId: null,
+
+    addresses: null,
+
+    response: null,
+
+    initialize: function(config, response) {
+        /** Create a new Svea customer returned from svea getAddress
+         *
+         * @param config Object with countryCode, customerType and nationalIdNumber set
+         * @param response Response from getAddress
+         */
+        var i, l;
+
+        this.countryCode = config.countryCode;
+        this.customerType = config.customerType;
+        this.nationalIdNumber = config.nationalIdNumber;
+        this.selectedAddressId = null;
+        this.addresses = {};
+
+        if (this.countryCode === null ||
+            this.customerType === null ||
+            this.nationalIdNumber === null) {
+            /** This is invalid - set all to null to provide the same hash */
+
+            this.countryCode = this.customerType = this.nationalIdNumber = null;
+
+            this.response = null;
+            this.valid = false;
+
+        } else {
+
+            this.response = response;
+            this.valid = (this.response || {}).accepted || false;
+
+            if (this.valid) {
+                // Only valid customers has addresses and selectedAddressId
+                l = (response.customerIdentity || []).length;
+                if (l > 0) {
+                    // Assign addresses
+                    for (i = 0; i < l; i++) {
+                        this.addresses[response.customerIdentity[i].addressSelector] = response.customerIdentity[i];
+                    }
+                    // Set selectedAddressId to first address id
+                    this.selectedAddressId = response.customerIdentity[0].addressSelector;
+                }
+            } else {
+                // No additional setup required for invalid addresses
+            }
         }
+    },
+    /** Get hash for this Customer
+     *
+     * @returns String
+     */
+    getHash: function() {
+        return [
+            this.countryCode,
+            this.customerType,
+            this.nationalIdNumber
+            ].join("/");
+    },
+    /** Get selected address
+     *
+     * If no address is selected or a missing address is selected an empty
+     * address object will be returned, with fullName and addressSelector set to
+     * null. Other entries will be set to an empty string, ''.
+     *
+     * @returns Address object
+     */
+    getSelectedAddress: function() {
+        return this.addresses[this.selectedAddressId] || {
+            addressSelector: null,
+            fullName: null,
+            firstName: '',
+            lastName: '',
+            street: '',
+            locality: '',
+            zipCode: ''
+        };
+    },
+    /** Check if an address with a specific id exists
+     *
+     * @param id Address id
+     *
+     * @returns Boolean
+     */
+    hasAddress: function(id) {
+        return Object.keys(this.addresses).indexOf(id) !== -1;
+    },
+    /** Set selected address id
+     *
+     * If `id` is valid and this address is currently selected the gui will be
+     * updated. If the id isn't valid nothing will happen.
+     *
+     * @param id Address id
+     *
+     * @returns undefined
+     */
+    setSelectedAddressId: function(id) {
+
+        if (this.hasAddress(id)) {
+            this.selectedAddressId = id;
+            this.updateSelectedAddressGui();
+        }
+
+    },
+    /** Update the gui for selecting a specific address
+     *
+     * This also updates the address values from selected address. No check is done
+     * to see if this customer actually is the one that should update the gui.
+     *
+     * @returns undefined
+     */
+    updateSelectedAddressGui: function() {
+        var selectedAddress = null,
+            paymentMethodCode = _sveaGetPaymentMethodCode(),
+            addressSelectBox = _$('.svea_address_selectbox', paymentMethodCode),
+            container = addressSelectBox ? addressSelectBox.up('.svea-ssn-container') : null,
+            name,
+            newLabel,
+            label,
+            addressBox,
+            addressDiv;
+
+        selectedAddress = this.getSelectedAddress();
+
+        if (container) {
+
+            // Update the selected address summary
+            addressDiv = $(container).down('.sveaShowAddresses');
+
+            if (addressDiv) {
+
+                // Only update if there is an address selected - otherwise
+                // hide the whole address div
+                if (selectedAddress.addressSelector !== null) {
+                    label = $(container).down('.sveaShowAdressesLabel');
+                    newLabel = label.cloneNode(true);
+                    $(newLabel).show();
+                    if (!selectedAddress.fullName) {
+                        name = selectedAddress.firstName + ' ' +
+                            selectedAddress.lastName + '<br>';
+                    } else {
+                        name = selectedAddress.fullName + '<br>';
+                    }
+                    addressBox = '<address>' + name +
+                        (selectedAddress.street || '') + '<br>' +
+                        (selectedAddress.zipCode || '') + ' ' +
+                        (selectedAddress.locality || '') + '</address>';
+
+                    $(container).down('.sveaShowAddresses').update('')
+                        .insert(newLabel)
+                        .insert(addressBox);
+
+                    addressDiv.show();
+                } else {
+                    addressDiv.hide();
+                }
+            }
+        }
+
+
+        // Set hidden address selector value, it might not be present
+        // If it isn't present but svea is not required it's not a big deal but
+        // if svea is required and this is not present there is a problem and
+        // most likely the order cannot be completed.
+        ($$('input[name="payment[svea_info][svea_addressSelector]"]')[0] || {value: null}).value = this.selectedAddressId;
+
+        // Update address field values
+        this._setAddressFieldValues();
+    },
+    /** Set values in address input fields according to the selected address
+     *
+     * This method does not check if the customer in question is the current
+     * customer, it will always set the values.
+     *
+     * @returns undefined
+     */
+    _setAddressFieldValues: function() {
+        var keyMap = {
+            'billing:firstname': 'firstName',
+            'billing:lastname': 'lastName',
+            'billing:street1': 'street',
+            'billing:city': 'locality',
+            'billing:postcode': 'zipCode'
+        },
+            newValues = {},
+            selectedAddress = this.getSelectedAddress();
+
+        // New values
+        Object.keys(keyMap).each(function(key) {
+            newValues[key] = selectedAddress[keyMap[key]];
+        });
+
+        // Set values on elements
+        _sveaGetReadOnlyElements().each(function(item) {
+            item.value = newValues[item.readAttribute('id')];
+        });
+    },
+    /** Make changes in the GUI
+     *
+     * Does a setup or teardown on the gui. This method is always safe to call.
+     *
+     * @returns undefined
+     */
+    setupGui: function() {
+
+        var addressSelectBox = _$('.svea_address_selectbox',
+                                  _sveaGetPaymentMethodCode());
+
+        if (addressSelectBox) {
+            addressSelectBox.update('');
+
+            // Add all addresses to option element
+            if (Object.keys(this.addresses).length > 1) {
+                Object.keys(this.addresses).each(function (key) {
+                    var item = this.addresses[key],
+                        addressString,
+                        option;
+
+                    addressString = item.fullName + ', '
+                        + item.street + ', '
+                        + item.zipCode + ' '
+                        + item.locality;
+
+                    option = new Element('option', {
+                        value: item.addressSelector
+                    }).update(addressString);
+
+                    addressSelectBox.insert(option);
+                }.bind(this));
+
+                // Show
+                addressSelectBox.show();
+            } else {
+                // Hide
+                addressSelectBox.hide();
+            }
+        }
+
+        // Update selected address after the address select box is setup
+        // This also updates the address field values
+        this.updateSelectedAddressGui();
+
     }
+
+});
+
+/** Store for svea customers */
+var _SveaCustomerStore = Class.create({
+
+    customers: null,
+    initialize: function() {
+        this.customers = {};
+    },
+    /** Add a customer
+     *
+     * @param customer _SveaCustomer
+     *
+     * @return The added _SveaCustomer
+     */
+    add: function(customer) {
+
+        this.customers[customer.getHash()] = customer;
+
+        return customer;
+    },
+    /** Add a customer based on a response and selected country, paymentMethod and nationalIdNumber
+     *
+     * @return The created _SveaCustomer
+     */
+    addFromResponse: function(response) {
+        return this.add(new _SveaCustomer(
+            {
+                countryCode: _sveaGetBillingCountryCode(),
+                customerType: _sveaGetCustomerType(),
+                nationalIdNumber: _sveaGetBillingNationalIdNumber()
+            },
+            response));
+
+    },
+    /** Get current customer according to selected billing country, paymentMethod and nationalIdNumber
+     *
+     * @returns a _SveaCustomer that might be invalid
+     */
+    getCurrent: function() {
+        var invalidCustomer = new _SveaCustomer({
+            countryCode: _sveaGetBillingCountryCode(),
+            customerType: _sveaGetCustomerType(),
+            nationalIdNumber: _sveaGetBillingNationalIdNumber()
+        });
+
+        return this.customers[invalidCustomer.getHash()] || invalidCustomer;
+    }
+});
+
+/** GUI Controller for Svea
+ */
+var _SveaController = Class.create({
+
+    /** List of payment methods that must use SVEA getAddress if a valid country is selected
+     */
+    validPaymentMethods: [
+        'svea_invoice',
+        'svea_paymentplan'
+    ],
+    /** List of countries that must use SVEA getAddress if a valid payment method is selected
+     */
+    validCountries: [
+        'SE',
+        'DK'
+    ],
+    initialize: function() {
+        this.customerStore = new _SveaCustomerStore();
+        // Store last state
+        this.lastState = this.getCurrentState();
+    },
+    /** Toggle visibility and state of 'ship to different address'-checkbox
+     *
+     * @param visible If true the checkbox will be visible
+     * @param checked If true the checkbox will be checked
+     *
+     * @returns undefined
+     */
+    toggleShipToDifferentAddress: function(visible) {
+        var $div,
+            $elem;
+
+        // call shipping.setSameAsBilling just in case
+        /*global shipping */
+        if (visible) {
+            if (typeof shipping !== 'undefined') {
+                shipping.setSameAsBilling(true);
+            }
+        }
+
+        // Handle streamcheckout checkbox, should not be checked
+        $div = $$('.ship-to-different-address');
+        if ($div.length === 1) {
+            if (!visible) {
+
+                $elem = $($div[0].down('input'));
+                if ($elem.checked) {
+                    $elem.click();
+                }
+
+                $div[0].addClassName('svea-hidden');
+
+            } else {
+                $div[0].removeClassName('svea-hidden');
+            }
+        }
+
+        // Handle onestepcheckout checkbox, should be checked
+        $div = $$('.input-different-shipping');
+        if ($div.length === 1) {
+            if (!visible) {
+
+                $elem = $($div[0].down('input'));
+                if (!$elem.checked) {
+                    $elem.click();
+                }
+
+                $div[0].addClassName('svea-hidden');
+
+            } else {
+                $div[0].removeClassName('svea-hidden');
+            }
+        }
+
+        // Hide actual #shipping_address element because magento doesn't handle
+        // it correctly in all cases.
+        if (!visible) {
+            ($$('#shipping_address')[0] || {hide: function () {}}).hide();
+        }
+
+    },
+    /** Toggle readonly on readonly elements
+     *
+     * @param readonly If true the elements will be set to readonly
+     *
+     * @returns undefined
+     */
+    toggleReadOnlyElements: function(readonly) {
+        _sveaGetReadOnlyElements().each(function(item) {
+            if (readonly) {
+                item.addClassName('svea-readonly');
+                // item.disable();
+            } else {
+                item.removeClassName('svea-readonly');
+                // item.enable();
+            }
+        });
+    },
+    /** Check if a svea address is required in the checkout
+     *
+     * @returns Boolean
+     */
+    sveaAddressIsRequired: function() {
+        var paymentMethod = _sveaGetPaymentMethodCode(),
+            countryCode = _sveaGetBillingCountryCode();
+
+        if (paymentMethod === null) {
+            return false;
+        }
+        if (countryCode === null) {
+            return false;
+        }
+
+        return this.validPaymentMethods.indexOf(paymentMethod) !== -1 && this.validCountries.indexOf(countryCode) !== -1;
+    },
+    /** Check if svea getAddress may be used
+     *
+     * This is not the same as it _must_ be used even though it currently returns
+     * the same value. When this returns `false` the svea ssn container should be
+     * hidden, when true it should be visible.
+     *
+     * @returns Boolean
+     */
+    canUseSveaGetAddress: function() {
+        return this.sveaAddressIsRequired();
+    },
+    /** Toggle visibility of ssn container
+     *
+     * @param visible If true the container will be visible
+     *
+     * @returns undefined
+     */
+    toggleSsnContainer: function(visible) {
+        var ssnContainer = _sveaGetSsnContainer();
+        if (ssnContainer === null) {
+            return;
+        }
+        if (visible) {
+            ssnContainer.show();
+        } else {
+            ssnContainer.hide();
+        }
+    },
+    /** Setup gui
+     *
+     * This method should always be called when something that may affect svea
+     * is changed.
+     *
+     * @returns undefined
+     */
+    setupGui: function() {
+
+        if (this.sveaAddressIsRequired()) {
+
+            // svea-ssn-inputs are required entries
+            $$('.svea-ssn-input').invoke('addClassName', 'required-entry');
+
+            this.toggleReadOnlyElements(true);
+            this.toggleShipToDifferentAddress(false);
+
+        } else {
+
+            // svea-ssn-inputs are no longer required entries
+            $$('.svea-ssn-input').invoke('removeClassName', 'required-entry');
+
+            // Unlock readonly elements
+            this.toggleReadOnlyElements(false);
+            // Toggle shipToDifferentAddress
+            this.toggleShipToDifferentAddress(true);
+        }
+
+        if (this.canUseSveaGetAddress()) {
+            // Show ssn-container
+            this.toggleSsnContainer(true);
+        } else {
+            // Hide ssn-container
+            this.toggleSsnContainer(false);
+        }
+        // Let the current customer setup gui
+        this.customerStore.getCurrent().setupGui();
+
+
+        var newState = this.getCurrentState();
+
+        // If OneStepCheckout is used the current payment method
+        // and it's additional_data must be saved prior to finalizing
+        // the checkout. This is done with the OneStepCheckout method
+        // `get_separate_save_methods_function`.
+
+        /*global get_separate_save_methods_function */
+        if (typeof get_separate_save_methods_function === 'function') {
+            var url = window.sveaOneStepCheckoutSetMethodsSeparateUrl;
+
+            // Note: There is a setting in OneStepCheckout that disables
+            // this but even if you turn it of OneStepCheckout will
+            // still do these request so we need to do them always.
+
+            // If anything besides paymentMethod changed (onestepcheckout will
+            // handle the paymentMethod change.
+            if (!(newState.nationalIdNumber === this.lastState.nationalIdNumber &&
+                  newState.customerType === this.lastState.customerType &&
+                  newState.selectedAddressId === this.lastState.selectedAddressId)) {
+
+                // Don't do this if paymentMethodCode isn't set.
+                // Keeping this seperate from above because that expr. is annyoing
+                // as-is.
+                if (newState.paymentMethodCode) {
+                    get_separate_save_methods_function(url, false)();
+                }
+            }
+        }
+
+        // Store last state
+        this.lastState = newState;
+    },
+    /** Get current state that will determine which address svea should use
+     *
+     * @returns Object with all key: values that determines customer + address
+     */
+    getCurrentState: function() {
+        return {
+            nationalIdNumber: _sveaGetBillingNationalIdNumber(),
+            paymentMethodCode: _sveaGetPaymentMethodCode(),
+            customerType: _sveaGetCustomerType(),
+            selectedAddressId: ($$('input[name="payment[svea_info][svea_addressSelector]"]')[0] || {value: null}).value
+        };
+    },
+    /** Handle a response from svea getAddress()
+     *
+     * @param data Response data
+     *
+     * @returns undefined
+     */
+    handleResponse: function(data) {
+
+        this.customerStore.addFromResponse(data);
+
+        if (data.accepted === false) {
+            alert(data.errormessage);
+        }
+
+        // Always call setup gui
+        this.setupGui();
+
+    },
+    /** Setup observers
+     *
+     * Payment method change events are handled elsewhere, so is customer
+     * type change.
+     *
+     * @returns undefined
+     */
+    setupObservers: function() {
+        var changeCb = this.changeCb.bind(this),
+            selectors = [
+                'select[name="billing[country_id]"'
+            ];
+
+        selectors.each(function(selector) {
+            $$(selector).invoke('observe',
+                                'change',
+                                changeCb);
+            });
+    },
+    /** Callback for when something has changed
+     */
+    changeCb: function() {
+        // Called when something changed
+        this.setupGui();
+    }
+});
+
+/** _SveaController instance
+ */
+var _sveaController = new _SveaController();
+
+/** Get and update address from svea with an AJAX request
+ *
+ * @param paymentMethodCode Payment method code, if not set current selected code will be used
+ */
+function sveaGetAddress(paymentMethodCode)
+{
+    var ssn = _sveaGetBillingNationalIdNumber(),
+        typeElement = _$('input:checked[name*=customerType]', paymentMethodCode),
+        countryCode = currentCountry,
+        customerType = typeElement ? typeElement.value : 0;
+
+    paymentMethodCode = paymentMethodCode || payment.currentMethod || _sveaGetPaymentMethodCode();
 
     function startLoading()
     {
-        var getAddressButton = _$('.get-address-btn', code);
+        var getAddressButton = _$('.get-address-btn', paymentMethodCode);
         if (getAddressButton) {
             $(getAddressButton).addClassName('loading');
         }
@@ -305,7 +778,7 @@ function sveaGetAddress(code)
 
     function stopLoading()
     {
-        var getAddressButton = _$('.get-address-btn', code);
+        var getAddressButton = _$('.get-address-btn', paymentMethodCode);
         if (getAddressButton) {
             $(getAddressButton).removeClassName('loading');
         }
@@ -314,23 +787,17 @@ function sveaGetAddress(code)
     function onSuccess(transport) {
         var json = transport.responseText.evalJSON();
 
-        // Store last request
-        _sveaLastGetAddressRequest = {
-            json: json,
-            code: code
-        };
-
-        // Reset current address
-        currentSveaAddress = null;
-
-        // Call setup
-        _sveaHandleLastGetAddress();
-
+        try {
+            _sveaController.handleResponse(transport.responseText.evalJSON());
+        } catch (e) {
+            // console.warn('_sveaController.handleResponse error', e, transport);
+            return;
+        }
     }
 
     startLoading();
-    new Ajax.Request(getAddressUrl, {
-        parameters: {ssn: ssn, type: type, cc: currentCountry, method: method},
+    new Ajax.Request(window.getAddressUrl, {
+        parameters: {ssn: ssn, type: customerType, cc: countryCode, method: paymentMethodCode},
         onComplete: function (transport) {
             stopLoading();
         },
@@ -338,9 +805,20 @@ function sveaGetAddress(code)
     });
 }
 
+/** This is called from the template when customer type is changed
+ *
+ * This needs to be bound to the input in question because the current value is
+ * read from $(this).value.
+ *
+ * @returns undefined
+ */
 function setCustomerTypeRadioThing()
 {
     var customerType = $(this).value;
+
+    // Set hidden input value
+    $$('input[name="payment[svea_info][svea_customerType]"]')[0].value = customerType;
+
     if (currentCountry == 'NL' || currentCountry == 'DE') {
         if (customerType == 1) {
             $$(".forNLDE").invoke('hide');
@@ -358,60 +836,57 @@ function setCustomerTypeRadioThing()
             $$(".label_ssn_customerType_0").invoke('show');
         }
     }
+
+    // Forward to _sveaController
+    _sveaController.setupGui();
 }
 
 /** Callback for when an address is selected
  *
- * Must be bound to the address select element when called
+ * This function must be bound to the address select element when called.
  */
 function sveaAddressSelectChanged()
 {
-    currentSveaAddress = $F(this);
-    var container = $(this).up('.svea-ssn-container');
-    sveaAddressChanged(currentSveaAddress, container);
-}
-
-/** Toggle readonly on address inputs and shipping address when payment method changes.
- *
- * This is buggy because if other modules does the same they might interfere
- * with this but magento has no way of handling unset/set payment method
- *
- * The 'ship to different address' div will have the class 'svea-hidden' if
- * it should be hidden.
- */
-function _sveaOnPaymentMethodChange()
-{
-    var value = $$('input:checked[type="radio"][name="payment[method]"]').pluck("value")[0];
-
-    if (typeof value === 'undefined') {
-        // Nothing has been chosen yet, which can be the case with many checkouts
-        return;
-    }
-
-    if (value.indexOf('svea_') === 0) {
-        _sveaHandleLastGetAddress();
-    } else {
-        _sveaTeardownGui();
-    }
-}
-
-/** Setup all observers required by svea
- */
-function _sveaSetupObservers()
-{
-    // Address selector
-    $$('.svea_address_selectbox').invoke('observe', 'change', sveaAddressSelectChanged);
-
-    // Selector for customer type 0 (person)
-    $$('.payment_form_customerType_0').invoke('observe', 'change', setCustomerTypeRadioThing);
-    // Selector for customer type 1 (company)
-    $$('.payment_form_customerType_1').invoke('observe', 'change', setCustomerTypeRadioThing);
-
-    // On payment method change
-    $$('input[name="payment[method]"]').invoke('observe', 'change', _sveaOnPaymentMethodChange);
+    // Update the selected address id on the current address
+    _sveaController.customerStore.getCurrent().setSelectedAddressId($F(this));
 }
 
 $(document).observe('dom:loaded', function () {
-    _sveaSetupObservers();
-    _sveaOnPaymentMethodChange();
+
+    /** Patch methods that are used to change payment method
+     *
+     * The payment selector is fetched with an AJAX request and inserted in the
+     * document. In order to react on payment method changes we patch
+     * whatever function the method selector might call.
+     */
+    (function() {
+        "use strict";
+        /*global Payment Streamcheckout */
+
+        var _oldPaymentSwitchMethod,
+            _oldStreamcheckoutSwitchMethod;
+
+        // Patch 'Payment'
+        if (typeof Payment !== 'undefined') {
+            _oldPaymentSwitchMethod = Payment.prototype.switchMethod;
+
+            Payment.prototype.switchMethod = function(method) {
+                _sveaController.changeCb();
+                return _oldPaymentSwitchMethod.call(this, method);
+            };
+        }
+
+        // Patch 'Streamcheckout'
+        if (typeof Streamcheckout !== 'undefined') {
+            _oldStreamcheckoutSwitchMethod = Streamcheckout.prototype.switchPaymentBlock;
+
+            Streamcheckout.prototype.switchPaymentBlock = function(method) {
+                _sveaController.changeCb();
+                return _oldStreamcheckoutSwitchMethod.call(this, method);
+            };
+        }
+    })();
+
+    _sveaController.setupObservers();
+    _sveaController.setupGui();
 });
