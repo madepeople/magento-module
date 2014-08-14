@@ -104,7 +104,7 @@ function _sveaGetPaymentMethodCode() {
  * @returns Billing country code or null
  */
 function _sveaGetBillingCountryCode() {
-    var elem = $$('select[name="billing[country_id]"');
+    var elem = $$('select[name="billing[country_id]"]');
 
     if (elem.length) {
         return elem[0].value;
