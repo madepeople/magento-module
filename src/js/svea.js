@@ -5,83 +5,92 @@
  * so that inputs are hidden/shown enabled or disabled depending on payment
  * method and billing country.
  *
+ * TODO: Lock everything in 'the box' until the getAddress request returns, otherwise one can change customertype during the request >:/
  */
 
-/* Get nationalIdNumber container for a specific payment method
+
+
+/** Check if a specific form key should be used
  *
- * @param paymentMethodCode Code for the payment method which has the ssn selector
+ * If a specific form key should be used it will be stored in `window.sveaFormKey`.
+ *
+ * @returns bool
+ */
+function _sveaUseFormKey() {
+    return window.sveaUseFormKey;
+}
+
+/** Get the form key that svea uses for it's inputs
+ *
+ * The formKey is the key used in input names. Example:
+ *
+ * name=payment[svea_info][svea_customerType]
+ *   vs
+ * name=payment[svea_paymentplan][svea_customerType]
+ *
+ * If window.sveaUseFormKey is set a single set of inputs are used for all svea
+ * payment methods and the formKey should be stored in `window.sveaFormKey`.
+ * If not the current payment method will be used as form key. This means that
+ * the formKey returned here can be non-svea payment method code.
+ *
+ * @returns string
+ */
+function _sveaGetFormKey() {
+    return _sveaUseFormKey() ? window.sveaFormKey : _sveaGetPaymentMethodCode();
+}
+
+/* Get nationalIdNumber container
  *
  * @returns Element or null. null should not happen if the dom is correct
  */
-function _sveaGetSsnContainer(paymentMethodCode) {
+function _sveaGetSsnContainer() {
     var elements,
-        container;
+        container,
+        formKey = _sveaGetFormKey();
 
-    paymentMethodCode = paymentMethodCode || _sveaGetPaymentMethodCode();
-
-    if (typeof paymentMethodCode !== 'undefined' && paymentMethodCode !== '') {
-        elements = $$('.svea-ssn-container-' + paymentMethodCode);
-        if (elements.length) {
-            return elements[0];
-        }
-    }
-
-    elements = $$('[class*=svea-ssn-container-]');
+    elements = $$('.svea-ssn-container-' + formKey);
     if (elements.length) {
         return elements[0];
     } else {
-        elements = $$('.svea-ssn-container');
-        if (elements.length) {
-            return elements[0];
-        }
+        console.warn("Cannot find ssn container for payment", formKey);
+        return null;
     }
 
-    // console.warn("Cannot find ssn container for payment", paymentMethodCode);
-    return null;
 }
 
 /** Get element relative a svea ssn container for a specific payment method
  *
  * @param selector What to select under the top element
- * @param paymentMethodCode Code for the payment method that this element should belong to, see `_sveaGetSsnContainer`.
  *
  * @returns Element or null
  */
-function _$(selector, paymentMethodCode)
+function _$(selector)
 {
-    var ssnContainer = _sveaGetSsnContainer(paymentMethodCode);
+    var ssnContainer = _sveaGetSsnContainer();
     if (ssnContainer) {
         return ssnContainer.down(selector);
     } else {
-        // console.warn("Cannot find ssn container sub-element for paymentMethodCode", paymentMethodCode, selector);
+        console.warn("Cannot find ssn container sub-element for selector", selector);
         return null;
     }
 }
 
 /** Get selected SVEA customer type("0" or "1") for a specific payment method
  *
- * @param paymentMethodCode Code for the payment method that the customer type is selected on
- *
  * @returns customer type string id ("0" or "1") or null
  */
-function _sveaGetCustomerType(paymentMethodCode) {
+function _sveaGetCustomerType() {
 
-    var selector = 'input[name="payment[svea_info][svea_customerType]"]',
-        typeElement = _$(selector,
-                         paymentMethodCode || _sveaGetPaymentMethodCode());
+    var selector = 'input[name="payment[' + _sveaGetFormKey() + '][svea_customerType]"]',
+        typeElement = _$(selector);
 
-
-    if (typeElement === null) {
-        typeElement = $$(selector);
-        if (typeElement.length ) {
-            return typeElement.value;
-        } else {
-            // console.warn('Failed to get svea customer type for paymentMethod', paymentMethodCode);
-            return null;
-        }
-    } else {
+    if (typeElement !== null) {
         return typeElement.value;
+    } else {
+        console.warn('Failed to get svea customer type');
+        return null;
     }
+
 }
 
 /** Get selected payment method code
@@ -120,30 +129,18 @@ function _sveaGetBillingCountryCode() {
 
 /** Get NationalIdNumber
  *
- * @param paymentMethodCode If set that payment method code will be used instead of the current selected payment methods code
- *
  * @returns NationalIdNumber or null
  */
-function _sveaGetBillingNationalIdNumber(paymentMethodCode) {
-    var elem;
+function _sveaGetBillingNationalIdNumber() {
+    var elem,
+        formKey = _sveaGetFormKey();
 
-    paymentMethodCode = paymentMethodCode ||_sveaGetPaymentMethodCode();
-    if (paymentMethodCode === null) {
-        // console.warn("Cannot find current payment method");
-        return null;
-    }
-
-    elem = _$('[name*=[svea_ssn]]', paymentMethodCode);
+    elem = _$('[name*=[svea_ssn]]');
     if (elem) {
         return elem.value;
     } else {
-        elem = $$('.svea-ssn-input');
-        if (elem.length) {
-            return elem[0].value;
-        } else {
-            // console.warn("Cannot find svea_ssn for method", paymentMethodCode);
-            return null;
-        }
+        console.warn("Cannot find svea_ssn");
+        return null;
     }
 }
 
@@ -302,8 +299,7 @@ var _SveaCustomer = Class.create({
      */
     updateSelectedAddressGui: function() {
         var selectedAddress = null,
-            paymentMethodCode = _sveaGetPaymentMethodCode(),
-            addressSelectBox = _$('.svea_address_selectbox', paymentMethodCode),
+            addressSelectBox = _$('.svea_address_selectbox'),
             container = addressSelectBox ? addressSelectBox.up('.svea-ssn-container') : null,
             name,
             newLabel,
@@ -353,7 +349,7 @@ var _SveaCustomer = Class.create({
         // If it isn't present but svea is not required it's not a big deal but
         // if svea is required and this is not present there is a problem and
         // most likely the order cannot be completed.
-        ($$('input[name="payment[svea_info][svea_addressSelector]"]')[0] || {value: null}).value = this.selectedAddressId;
+        ($$('input[name="payment[' + _sveaGetFormKey() + '][svea_addressSelector]"]')[0] || {value: null}).value = this.selectedAddressId;
 
         // Update address field values
         this._setAddressFieldValues();
@@ -394,8 +390,7 @@ var _SveaCustomer = Class.create({
      */
     setupGui: function() {
 
-        var addressSelectBox = _$('.svea_address_selectbox',
-                                  _sveaGetPaymentMethodCode());
+        var addressSelectBox = _$('.svea_address_selectbox');
 
         if (addressSelectBox) {
             addressSelectBox.update('');
@@ -796,7 +791,7 @@ var _SveaController = Class.create({
             nationalIdNumber: _sveaGetBillingNationalIdNumber(),
             paymentMethodCode: _sveaGetPaymentMethodCode(),
             customerType: _sveaGetCustomerType(),
-            selectedAddressId: ($$('input[name="payment[svea_info][svea_addressSelector]"]')[0] || {value: null}).value
+            selectedAddressId: ($$('input[name="payment[' + _sveaGetFormKey() + '][svea_addressSelector]"]')[0] || {value: null}).value
         };
     },
     /** Handle a response from svea getAddress()
@@ -850,20 +845,17 @@ var _sveaController = new _SveaController();
 
 /** Get and update address from svea with an AJAX request
  *
- * @param paymentMethodCode Payment method code, if not set current selected code will be used
  */
-function sveaGetAddress(paymentMethodCode)
+function sveaGetAddress()
 {
     var ssn = _sveaGetBillingNationalIdNumber(),
-        typeElement = _$('input:checked[name*=customerType]', paymentMethodCode),
+        typeElement = _$('input:checked[name*=customerType]'),
         countryCode = currentCountry,
         customerType = typeElement ? typeElement.value : 0;
 
-    paymentMethodCode = paymentMethodCode || payment.currentMethod || _sveaGetPaymentMethodCode();
-
     function startLoading()
     {
-        var getAddressButton = _$('.get-address-btn', paymentMethodCode);
+        var getAddressButton = _$('.get-address-btn');
         if (getAddressButton) {
             $(getAddressButton).addClassName('loading');
         }
@@ -871,7 +863,7 @@ function sveaGetAddress(paymentMethodCode)
 
     function stopLoading()
     {
-        var getAddressButton = _$('.get-address-btn', paymentMethodCode);
+        var getAddressButton = _$('.get-address-btn');
         if (getAddressButton) {
             $(getAddressButton).removeClassName('loading');
         }
@@ -890,7 +882,7 @@ function sveaGetAddress(paymentMethodCode)
 
     startLoading();
     new Ajax.Request(window.getAddressUrl, {
-        parameters: {ssn: ssn, type: customerType, cc: countryCode, method: paymentMethodCode},
+        parameters: {ssn: ssn, type: customerType, cc: countryCode, method: _sveaGetPaymentMethodCode()},
         onComplete: function (transport) {
             stopLoading();
         },
@@ -910,7 +902,7 @@ function setCustomerTypeRadioThing()
     var customerType = $(this).value;
 
     // Set hidden input value
-    $$('input[name="payment[svea_info][svea_customerType]"]')[0].value = customerType;
+    $$('input[name="payment[' + _sveaGetFormKey() + '][svea_customerType]"]')[0].value = customerType;
 
     if (currentCountry == 'NL' || currentCountry == 'DE') {
         if (customerType == 1) {

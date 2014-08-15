@@ -69,13 +69,24 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 Mage::throwException('Could not load the quote associated with the order');
             }
             $address = null;
+            // Huh?
             $additionalData = unserialize($quote->getPayment()->getAdditionalData());
             if (empty($additionalData) || empty($additionalData['getaddresses_response'])) {
                 // The getAddress button might not have been clicked, issue a
                 // new getAddress call and use the first address if only one is
                 // returned
                 $conf = Mage::getStoreConfig('payment/' . $this->getCode());
-                $conf['company'] = $_POST['payment']['svea_info']['svea_customerType'] == 1;
+
+                // Select company from $_POST
+                // NOPUSH: TODO: Explain why this happens and why setting
+                // company to false is ok.
+
+                $conf['company'] = false;
+                foreach (array($payment->getMethod(), 'svea_info') as $formKey) {
+                    if (array_key_exists($formKey, $_POST['payment'])) {
+                        $conf['company'] = $_POST['payment'][$formKey]['svea_customerType'] === 1;
+                    }
+                }
 
                 $result = Mage::helper('svea_webpay')->getAddresses(
                     $sveaInformation['svea_ssn'],

@@ -51,20 +51,40 @@ class Svea_WebPay_Model_Checkout_Observer
         }
     }
 
+    /** Add additional information to a payment
+     *
+     * Additional information may come from one of two places $data. It will either
+     * be set in $data['svea_info'] or $data[$payment->getMethod()] but never in
+     * both.
+     *
+     * @returns Mage_Sales_Model_Quote_Payment $payment
+     */
     protected function _addAdditionalInfoToPayment($data, $payment)
     {
-        if (empty($data['svea_info'])) {
-            return;
+        $paymentMethodCode = $payment->getMethod();
+
+        // Sorry about this but $data is a Varien_Object and it doens't support
+        // array_key_exists
+        if ($additionalData = $data['svea_info']) {
+        } elseif ($additionalData = $data[$paymentMethodCode]) {
+        } else {
+            $additionalData = array();
         }
 
-        foreach ($data['svea_info'] as $key => $value) {
+        if (empty($additionalData)) {
+            return $payment;
+        }
+
+        foreach ($additionalData as $key => $value) {
             $payment->setAdditionalInformation($key, $value);
         }
 
         $method = $data['method'];
+
         if ($method == 'svea_paymentplan'){
             $payment->setAdditionalInformation('svea_customerType', '0');
         }
+
         return $payment;
     }
 
