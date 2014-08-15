@@ -1,9 +1,13 @@
-/*global Class $ $$ payment currentCountry $F Ajax */
+/*global Class $ $$ payment currentCountry $F $H Ajax */
 /** Svea magento module javascript part
  *
  * This module takes care of retrieving addresses from svea and modifying the gui
  * so that inputs are hidden/shown enabled or disabled depending on payment
  * method and billing country.
+ *
+ */
+
+/* Get nationalIdNumber container for a specific payment method
  *
  * @param paymentMethodCode Code for the payment method which has the ssn selector
  *
@@ -499,6 +503,16 @@ var _SveaController = Class.create({
         this.customerStore = new _SveaCustomerStore();
         // Store last state
         this.lastState = this.getCurrentState();
+        // If the last state required SVEA
+        this.lastStateRequiredSvea = this.sveaAddressIsRequired();
+
+        // Store current address values
+        if (!this.sveaAddressIsRequired()) {
+            this.lastStateAddressValues = this.getCurrentReadonlyAddressValues();
+        } else {
+            // If we started as SVEA have a blank address
+            this.lastStateAddressValues = {};
+        }
     },
     /** Toggle visibility and state of 'ship to different address'-checkbox
      *
@@ -570,10 +584,10 @@ var _SveaController = Class.create({
         _sveaGetReadOnlyElements().each(function(item) {
             if (readonly) {
                 item.addClassName('svea-readonly');
-                // item.disable();
+                item.writeAttribute('readonly', true);
             } else {
                 item.removeClassName('svea-readonly');
-                // item.enable();
+                item.writeAttribute('readonly', false);
             }
         });
     },
@@ -622,16 +636,59 @@ var _SveaController = Class.create({
             ssnContainer.hide();
         }
     },
+    /** Get current values for all readonly fields
+     *
+     * @returns Object with current elementId => value
+     */
+    getCurrentReadonlyAddressValues: function() {
+        var rc = {};
+        _sveaGetReadOnlyElements().each(function(elem) {
+            rc[elem.id] = elem.value;
+        });
+        return rc;
+    },
+    /** Check if an objects values are all falsy
+     */
+    hasOnlyEmptyValues: function(obj) {
+        var values = Object.values(obj),
+            l = values.length,
+            i;
+
+        for (i = 0; i < l; i++) {
+            if (values[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    },
     /** Setup gui
      *
      * This method should always be called when something that may affect svea
      * is changed.
      *
+     * - If we go from non-svea to svea the current readonly values will be stored.
+     * - If we go from svea to non-svea the stored readonly values will be restored _unless_ they are missing or all of them are falsy(empty but not string with only spaces in it), in that case the svea values will remain.
+     * - If the user went from non-svea to svea with only empty values the svea values will remain
+     *
+     * Because of everything listed above the following will happen:
+     * - User has non-svea selected
+     * - User switches to svea with empty values
+     * - User fetches correct address from svea
+     * - User switches to non-svea, since the original values were all empty the svea address will remain
+     * - User svitches back to svea directly
+     * - User fetches a _different_ valid address from svea
+     * - User switches to non-svea
+     * - Now the values from the _first_ address from svea will be set
+     *
      * @returns undefined
      */
     setupGui: function() {
+        var newState = this.getCurrentState(),
+            newStateRequiresSvea = this.sveaAddressIsRequired(),
+            newStateAddressValues = this.getCurrentReadonlyAddressValues();
 
-        if (this.sveaAddressIsRequired()) {
+        if (newStateRequiresSvea) {
 
             // svea-ssn-inputs are required entries
             $$('.svea-ssn-input').invoke('addClassName', 'required-entry');
@@ -648,6 +705,7 @@ var _SveaController = Class.create({
             this.toggleReadOnlyElements(false);
             // Toggle shipToDifferentAddress
             this.toggleShipToDifferentAddress(true);
+
         }
 
         if (this.canUseSveaGetAddress()) {
@@ -657,11 +715,44 @@ var _SveaController = Class.create({
             // Hide ssn-container
             this.toggleSsnContainer(false);
         }
+
         // Let the current customer setup gui
+        // This clears the readonly fields if this doesn't require svea
         this.customerStore.getCurrent().setupGui();
 
+        // Restore new values and then last values if we went from svea to non-svea
+        if (this.lastStateRequiredSvea && !newStateRequiresSvea) {
+            var hasOldValues = false;
 
-        var newState = this.getCurrentState();
+            if (this.hasOnlyEmptyValues(this.lastStateAddressValues)) {
+                // We restore the new values here because if lastStateAddressValues
+                // aren't set we want to fill in the current values so they can
+                // be used. This is very hackish but time is short.
+                $H(newStateAddressValues).each(function(pair){
+                    $(pair.key).value = pair.value;
+                });
+            } else {
+                // Restore all values that are saved since they have at least
+                // one value
+                $H(this.lastStateAddressValues).each(function(pair){
+                    $(pair.key).value = pair.value;
+                });
+            }
+        }
+
+        // Restore _current_ address values if we went from non-svea to non-svea
+        // because they might have been overwritten by the call to
+        // this.customerStore.getCurrent().setupGui()
+        if (!this.lastStateRequiredSvea && !newStateRequiresSvea) {
+            $H(newStateAddressValues).each(function(pair){
+                $(pair.key).value = pair.value;
+            });
+        }
+
+        // Store lastStateAddressValues unless this is a svea -> svea change
+        if (!(newStateRequiresSvea && this.lastStateRequiredSvea)) {
+            this.lastStateAddressValues = newStateAddressValues;
+        }
 
         // If OneStepCheckout is used the current payment method
         // and it's additional_data must be saved prior to finalizing
@@ -693,6 +784,8 @@ var _SveaController = Class.create({
 
         // Store last state
         this.lastState = newState;
+        // Store if last state required SVEA
+        this.lastStateRequiredSvea = newStateRequiresSvea;
     },
     /** Get current state that will determine which address svea should use
      *
