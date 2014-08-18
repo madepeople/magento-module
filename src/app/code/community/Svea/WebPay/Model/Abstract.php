@@ -195,7 +195,19 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         }
         $paymentMethodConfig = $this->getSveaStoreConfClass();
         Mage::helper('svea_webpay')->getPaymentRequest($order, $paymentMethodConfig);
-        $sveaRequest = $this->getSveaPaymentObject($order, $paymentInfo->getAdditionalInformation());
+        $additionalInformation = $paymentInfo->getAdditionalInformation();
+        if (empty($additionalInformation)) {
+            $paymentData = $paymentInfo->getData();
+            $code = isset($paymentData[$this->getCode()])
+                ? $this->getCode() : 'svea_info';
+
+            if (isset($paymentData[$code])) {
+                $additionalInformation = $paymentData[$this->getCode()];
+            } else {
+                $additionalInformation = array();
+            }
+        }
+        $sveaRequest = $this->getSveaPaymentObject($order, $additionalInformation);
         $sveaRequest = $this->_choosePayment($sveaRequest);
         $errors = $sveaRequest->validateOrder();
         if (count($errors) > 0) {

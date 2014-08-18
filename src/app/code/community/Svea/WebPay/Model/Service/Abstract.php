@@ -84,7 +84,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 $conf['company'] = false;
                 foreach (array($payment->getMethod(), 'svea_info') as $formKey) {
                     if (array_key_exists($formKey, $_POST['payment'])) {
-                        $conf['company'] = $_POST['payment'][$formKey]['svea_customerType'] === 1;
+                        $conf['company'] = (int)$sveaInformation['svea_customerType'] === 1;
                     }
                 }
 
@@ -97,8 +97,11 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     throw new Mage_Payment_Exception("Can't fetch address information for order. Please contact support.");
                 }
 
-                if (count($result->customerIdentity) == 1) {
-                    $address = $result->customerIdentity[0];
+                foreach ($result->customerIdentity as $identity) {
+                    if ($identity->addressSelector === $sveaInformation['svea_addressSelector']) {
+                        $address = $identity;
+                        break;
+                    }
                 }
             } else {
                 $addressData = $additionalData['getaddresses_response'];
