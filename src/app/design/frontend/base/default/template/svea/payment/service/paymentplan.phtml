@@ -1,4 +1,18 @@
 <?php
+// This key will be used in forms if there is only one set of inputs for svea
+$_unifiedInterfaceFormKey = 'svea_info';
+
+// If no method is set it's assumed that the frontend uses a single set of inputs
+// for all svea payment methods. The key which these inputs will use will then be
+// $_unifiedInterfaceFormKey
+$_useUnifiedGui = empty($_method);
+
+if ($_useUnifiedGui) {
+    $_formKey = $_unifiedInterfaceFormKey;
+} else {
+    $_formKey = $_method->getCode();
+}
+
 $_currency = Mage::app()->getStore()->getCurrentCurrencyCode();
 $_code = $this->getMethodCode();
 $_infoBlock = trim(Mage::getStoreConfig("payment/$_code/paymentplan_info"));
@@ -16,7 +30,7 @@ $_ssnHtml = $this->getSsnHtml();
     <li id="showPaymentPlanParams">
         <div id="sveaPaymentPlanShowParams" style="display:inline-block;">
             <select onchange="_updatePaymentPlanPrice();"
-                    id="paymentplan_campaign_chooser" name="payment[svea_info][campaign]">
+                    id="paymentplan_campaign_chooser" name="payment[<?php echo $_formKey ?>][campaign]">
                 <?php
                 $_i = 0;
                 $_campaigns = array();

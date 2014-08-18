@@ -1,4 +1,8 @@
 <?php
+
+// This key will be used in forms if there is only one set of inputs for svea
+$_unifiedInterfaceFormKey = 'svea_info';
+
 $_country = Mage::getSingleton('checkout/session')
     ->getQuote()
     ->getBillingAddress()
@@ -6,18 +10,31 @@ $_country = Mage::getSingleton('checkout/session')
 
 $_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
 
+// Payment method
 $_method = $this->getMethod();
-if (empty($_method)) {
-    $_class = $_code = '';
+
+
+// If no method is set it's assumed that the frontend uses a single set of inputs
+// for all svea payment methods. The key which these inputs will use will then be
+// 'svea_info'
+$_useUnifiedGui = empty($_method);
+
+if ($_useUnifiedGui) {
+    $_code = $_unifiedInterfaceFormKey;
 } else {
     $_code = $_method->getCode();
-    $_class = 'svea-ssn-container-' . $_code;
 }
+
+// Add class regardless of unified interface or not
+$_class = 'svea-ssn-container-' . $_code;
+
+$_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'));
+
 ?>
 
 <div class="svea-ssn-container <?php echo $_class ?>">
 
-    <?php if (empty($_code) || $_code === 'svea_invoice'): ?>
+    <?php if ($_useCustomerTypeSelector): ?>
         <?php
          /**
             These radios are not the real values sent to the server because some
@@ -46,7 +63,7 @@ if (empty($_method)) {
     <?php endif ?>
 
     <?php /* This is always used, if radios are used they will have to copy their current value to this input */ ?>
-    <input type="hidden" name="payment[svea_info][svea_customerType]" value="0">
+    <input type="hidden" name="payment[<?php echo $_code ?>][svea_customerType]" value="0">
 
     <!-- If Nordic countries show, show SSN input field -->
     <?php if (in_array($_country, array('SE', 'DK', 'NO', 'FI'))): ?>
@@ -60,7 +77,7 @@ if (empty($_method)) {
             <div class="input-box">
                 <input type="text" id="payment_form_ssn_<?php echo $_code ?>"
                        class="svea-ssn-input input-text required-entry"
-                       name="payment[svea_info][svea_ssn]"/>
+                       name="payment[<?php echo $_code ?>][svea_ssn]"/>
             </div>
 
             <!-- Hide get address button for FI, NL, NO and DE -->
@@ -104,7 +121,7 @@ if (empty($_method)) {
 
             <div class="input-box">
                 <select id="payment_form_birthYear_<?php echo $_code ?>"
-                        name="payment[svea_info][svea_birthYear]"
+                        name="payment[<?php echo $_code ?>][svea_birthYear]"
                         class="required validate-select">
                     <option
                         value=""><?php echo $this->__('-- Select --') ?></option>
@@ -123,7 +140,7 @@ if (empty($_method)) {
 
             <div class="input-box">
                 <select id="payment_form_birthMonth_<?php echo $_code ?>"
-                        name="payment[svea_info][svea_birthMonth]"
+                        name="payment[<?php echo $_code ?>][svea_birthMonth]"
                         class="required validate-select">
                     <option
                         value=""><?php echo $this->__('-- Select --') ?></option>
@@ -141,7 +158,7 @@ if (empty($_method)) {
 
             <div class="input-box">
                 <select id="payment_form_birthDay_<?php echo $_code ?>"
-                        name="payment[svea_info][svea_birthDay]"
+                        name="payment[<?php echo $_code ?>][svea_birthDay]"
                         class="required validate-select">
                     <option
                         value=""><?php echo $this->__('-- Select --') ?></option>
@@ -166,7 +183,7 @@ if (empty($_method)) {
                        title="payment_form_vatNo"
                        class="input-text required-entry"
                        id="payment_form_vatNo_<?php echo $_code ?>"
-                       name="payment[svea_info][svea_vatNo]"/>
+                       name="payment[<?php echo $_code ?>][svea_vatNo]"/>
             </div>
         </div>
     <?php endif; ?>
@@ -183,12 +200,12 @@ if (empty($_method)) {
                        title="payment_form_initials"
                        class="input-text required-entry"
                        id="payment_form_initials_<?php echo $_code ?>"
-                       name="payment[svea_info][svea_initials]"/>
+                       name="payment[<?php echo $_code ?>][svea_initials]"/>
             </div>
         </div>
     <?php endif; ?>
 
-    <input type="hidden" name="payment[svea_info][svea_addressSelector]"
+    <input type="hidden" name="payment[<?php echo $_code ?>][svea_addressSelector]"
            class="svea_address_selector">
 </div>
 <script>
@@ -198,4 +215,6 @@ if (empty($_method)) {
     window.usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
     window.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
     window.sveaOneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
+    window.sveaUseFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
+    window.sveaFormKey = <?php echo $_useUnifiedGui ? "'$_code'" : 'null' ?>;
 </script>
