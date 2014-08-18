@@ -934,6 +934,9 @@ function sveaAddressSelectChanged()
 {
     // Update the selected address id on the current address
     _sveaController.customerStore.getCurrent().setSelectedAddressId($F(this));
+
+    // The database needs to find out about the newly selected address
+    _sveaController.setupGui();
 }
 
 $(document).observe('dom:loaded', function () {
