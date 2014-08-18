@@ -5,6 +5,7 @@ $_unifiedInterfaceFormKey = 'svea_info';
 // If no method is set it's assumed that the frontend uses a single set of inputs
 // for all svea payment methods. The key which these inputs will use will then be
 // $_unifiedInterfaceFormKey
+$_method = $this->getMethod();
 $_useUnifiedGui = empty($_method);
 
 if ($_useUnifiedGui) {

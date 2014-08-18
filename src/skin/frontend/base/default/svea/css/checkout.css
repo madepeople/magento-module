@@ -170,11 +170,15 @@
   float: left !important;
 }
 
-/* line 2, ../sass/partials/_onestepcheckout.scss */
-.onestepcheckout-index-index #container_payment_method_svea_invoice {
+/* line 3, ../sass/partials/_onestepcheckout.scss */
+.onestepcheckout-index-index #container_payment_method_svea_invoice,
+.onestepcheckout-index-index #container_payment_method_svea_paymentplan {
   padding-left: 0 !important;
 }
-/* line 5, ../sass/partials/_onestepcheckout.scss */
-.onestepcheckout-index-index #container_payment_method_svea_invoice #payment_form_svea_invoice {
+/* line 7, ../sass/partials/_onestepcheckout.scss */
+.onestepcheckout-index-index #container_payment_method_svea_invoice #payment_form_svea_invoice,
+.onestepcheckout-index-index #container_payment_method_svea_invoice #payment_form_svea_paymentplan,
+.onestepcheckout-index-index #container_payment_method_svea_paymentplan #payment_form_svea_invoice,
+.onestepcheckout-index-index #container_payment_method_svea_paymentplan #payment_form_svea_paymentplan {
   margin: 10px 0 10px 0 !important;
 }
