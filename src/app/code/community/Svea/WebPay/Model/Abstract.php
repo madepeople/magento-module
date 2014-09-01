@@ -77,6 +77,11 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             $price = $item->getPrice();
             $priceInclTax = $item->getPriceInclTax();
             $taxPercent = $item->getTaxPercent();
+            if (!(int)$taxPercent) {
+                // If it's a bundle item we have to calculate the tax from
+                // the including/excluding tax values
+                $taxPercent = round(100*(($priceInclTax/$price)-1));
+            }
             $name = $item->getName();
 
             $parentItem = $item->getParentItem();
