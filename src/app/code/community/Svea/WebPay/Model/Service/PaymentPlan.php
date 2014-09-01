@@ -27,11 +27,6 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
     protected function _choosePayment($sveaObject)
     {
         $paymentInfo = $this->getInfoInstance();
-        if ($paymentInfo instanceof Mage_Sales_Model_Order_Payment) {
-            $order = $paymentInfo->getOrder();
-        } else {
-            $order = $paymentInfo->getQuote();
-        }
         $object = $sveaObject->usePaymentPlanPayment($paymentInfo->getAdditionalInformation('campaign'));
         return $object;
     }
@@ -78,11 +73,6 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
             $payment->setTransactionId($response->contractNumber)
                 ->setIsTransactionClosed(false)
                 ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
-//            $order->addStatusToHistory($this->getConfigData('paid_order_status'), $successMessage, false);
-//            $payment->setIsTransactionClosed(false);
-//            $paymentInfo = $this->getInfoInstance();
-//            $paymentInfo->setAdditionalInformation('svea_invoice_id', $response->contractNumber);
-//            $order->save();
         } else {
             $errorMessage = $response->errormessage;
             $statusCode = $response->resultcode;
