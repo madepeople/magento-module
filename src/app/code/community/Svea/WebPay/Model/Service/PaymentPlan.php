@@ -27,11 +27,6 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
     protected function _choosePayment($sveaObject)
     {
         $paymentInfo = $this->getInfoInstance();
-        if ($paymentInfo instanceof Mage_Sales_Model_Order_Payment) {
-            $order = $paymentInfo->getOrder();
-        } else {
-            $order = $paymentInfo->getQuote();
-        }
         $object = $sveaObject->usePaymentPlanPayment($paymentInfo->getAdditionalInformation('campaign'));
         return $object;
     }

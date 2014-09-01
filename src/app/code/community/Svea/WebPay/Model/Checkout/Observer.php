@@ -51,7 +51,8 @@ class Svea_WebPay_Model_Checkout_Observer
         }
     }
 
-    /** Add additional information to a payment
+    /**
+     * Add additional information to a payment
      *
      * Additional information may come from one of two places $data. It will either
      * be set in $data['svea_info'] or $data[$payment->getMethod()] but never in
@@ -83,6 +84,7 @@ class Svea_WebPay_Model_Checkout_Observer
 
         if ($method == 'svea_paymentplan'){
             $payment->setAdditionalInformation('svea_customerType', '0');
+            $payment->setAdditionalInformation('campaign', $data[$method]['campaign']);
         }
 
         return $payment;
