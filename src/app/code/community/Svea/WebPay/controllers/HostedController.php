@@ -118,7 +118,9 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
             }
 
             $payment->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
-            $payment->registerCaptureNotification($response->response->amount);
+
+            // Capture the whole amount
+            $payment->capture(null);
 
             $newOrderStatus = $order->getPayment()
                 ->getMethodInstance()
