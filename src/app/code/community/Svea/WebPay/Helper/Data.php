@@ -154,6 +154,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $price = $orderItem->getPrice();
             $priceInclTax = $orderItem->getPriceInclTax();
             $taxPercent = $orderItem->getTaxPercent();
+            if (!(int)$taxPercent) {
+                // If it's a bundle item we have to calculate the tax from
+                // the including/excluding tax values
+                $taxPercent = round(100*(($priceInclTax/$price)-1));
+            }
+
             $name = $item->getName();
 
             $parentItem = $orderItem->getParentItem();
@@ -300,6 +306,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $price = $orderItem->getPrice();
             $priceInclTax = $orderItem->getPriceInclTax();
             $taxPercent = $orderItem->getTaxPercent();
+            if (!(int)$taxPercent) {
+                // If it's a bundle item we have to calculate the tax from
+                // the including/excluding tax values
+                $taxPercent = round(100*(($priceInclTax/$price)-1));
+            }
+
             $name = $item->getName();
             $qty = $item->getQty();
 
