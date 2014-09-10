@@ -6,8 +6,45 @@
  * method and billing country.
  *
  * TODO: Lock everything in 'the box' until the getAddress request returns, otherwise one can change customertype during the request >:/
+ *
  */
 
+
+/** SVEA Private customer type denominator for the select element
+ */
+var _sveaCustomerTypePrivateIntegerValue = 0;
+
+/** SVEA Private customer type denominator in a customerIdentity
+ */
+var _sveaCustomerTypePrivateStringValue = 'Business';
+
+/** SVEA Company customer type denominator for the select element
+ */
+var _sveaCustomerTypeCompanyIntegerValue = 1;
+
+/** Array of partial element names that whould be readonly for all customer identity types
+ *
+ */
+var _sveaCommonReadOnlyElements = [
+    'street1',
+    'city',
+    'postcode'
+];
+
+/** Array of partial element names that whould be readonly for private identity types
+ *
+ */
+var _sveaPrivateReadOnlyElements = [
+    'firstname',
+    'lastname'
+];
+
+/** Array of partial element names that whould be readonly for company identity types
+ *
+ */
+var _sveaCompanyReadOnlyElements = [
+    'company'
+];
 
 
 /** Check if a specific form key should be used
@@ -52,7 +89,7 @@ function _sveaGetSsnContainer() {
     if (elements.length) {
         return elements[0];
     } else {
-        console.warn("Cannot find ssn container for payment", formKey);
+        // console.warn("Cannot find ssn container for payment", formKey);
         return null;
     }
 
@@ -70,7 +107,7 @@ function _$(selector)
     if (ssnContainer) {
         return ssnContainer.down(selector);
     } else {
-        console.warn("Cannot find ssn container sub-element for selector", selector);
+        // console.warn("Cannot find ssn container sub-element for selector", selector);
         return null;
     }
 }
@@ -87,7 +124,7 @@ function _sveaGetCustomerType() {
     if (typeElement !== null) {
         return typeElement.value;
     } else {
-        console.warn('Failed to get svea customer type');
+        // console.warn('Failed to get svea customer type');
         return null;
     }
 
@@ -139,37 +176,65 @@ function _sveaGetBillingNationalIdNumber() {
     if (elem) {
         return elem.value;
     } else {
-        console.warn("Cannot find svea_ssn");
+        // console.warn("Cannot find svea_ssn");
         return null;
     }
 }
 
-/** Get array of elements that are considered read-only when svea is used
- *
- * These elements should be readonly when svea getaddress is required.
+/** Get all elements that might have been considered readonly by svea, regardless of customer identity type
  *
  * @returns Array of elements
  */
-function _sveaGetReadOnlyElements()
+function _sveaGetAllPossibleReadOnlyElements()
 {
-    var readOnlyElements = [
-            'firstname',
-            'lastname',
-            'street1',
-            'city',
-            'postcode'
-        ];
+    var readOnlyElements = _sveaCommonReadOnlyElements.concat(_sveaPrivateReadOnlyElements).concat(_sveaCompanyReadOnlyElements),
+        rc = [];
 
     readOnlyElements.each(function (item, index) {
         var id = 'billing:' + item,
             $id = $(id);
 
         if ($id) {
-            readOnlyElements[index] = $id;
+            rc[index] = $id;
         }
     });
 
-    return readOnlyElements;
+    return rc;
+}
+
+/** Get array of elements that are considered read-only when svea is used and according to the current customer identity type.
+ *
+ * These elements should be readonly when svea getaddress is required. However, since the
+ * list here changes depending on the customertype it cannot be used to remove the readonly
+ * flag. Then a complete list should be used which can be retrieved with
+ * `_sveaGetAllPossibleReadOnlyElements`.
+ *
+ * @returns Array of elements
+ */
+function _sveaGetCurrentReadOnlyElements()
+{
+    var customerType = _sveaGetCustomerType(),
+        readOnlyElements = _sveaCommonReadOnlyElements,
+        rc = [];
+
+    // Company and Private customer identities has separate sets of readonly elements
+    // according to SVEA-28.
+    if (parseInt(customerType, 10) === _sveaCustomerTypePrivateIntegerValue) {
+        readOnlyElements = readOnlyElements.concat(_sveaPrivateReadOnlyElements);
+    } else {
+        readOnlyElements = readOnlyElements.concat(_sveaCompanyReadOnlyElements);
+    }
+
+    readOnlyElements.each(function (item, index) {
+        var id = 'billing:' + item,
+            $id = $(id);
+
+        if ($id) {
+            rc[index] = $id;
+        }
+    });
+
+    return rc;
 }
 
 /** A customer read from SVEA
@@ -367,7 +432,8 @@ var _SveaCustomer = Class.create({
             'billing:lastname': 'lastName',
             'billing:street1': 'street',
             'billing:city': 'locality',
-            'billing:postcode': 'zipCode'
+            'billing:postcode': 'zipCode',
+            'billing:company': 'fullName'
         },
             newValues = {},
             selectedAddress = this.getSelectedAddress();
@@ -378,8 +444,19 @@ var _SveaCustomer = Class.create({
         });
 
         // Set values on elements
-        _sveaGetReadOnlyElements().each(function(item) {
-            item.value = newValues[item.readAttribute('id')];
+        // This uses _sveaGetAllPossibleReadOnlyElements because identity type specific
+        // elements should be cleared.
+        _sveaGetAllPossibleReadOnlyElements().each(function(item) {
+            var itemId = item.readAttribute('id'),
+                newValue;
+
+            if (newValues.hasOwnProperty(itemId)) {
+                newValue = newValues[itemId];
+            } else {
+                newValue = '';
+            }
+            item.value = newValue;
+
         });
     },
     /** Make changes in the GUI
@@ -569,21 +646,37 @@ var _SveaController = Class.create({
         }
 
     },
-    /** Toggle readonly on readonly elements
+    /** Toggle readonly elements
      *
      * @param readonly If true the elements will be set to readonly
      *
      * @returns undefined
      */
     toggleReadOnlyElements: function(readonly) {
-        _sveaGetReadOnlyElements().each(function(item) {
-            if (readonly) {
-                item.addClassName('svea-readonly');
-                item.writeAttribute('readonly', true);
-            } else {
-                item.removeClassName('svea-readonly');
-                item.writeAttribute('readonly', false);
-            }
+        var allReadOnlyElements = _sveaGetAllPossibleReadOnlyElements(),
+            readOnlyElements = [],
+            notReadOnlyElements = [];
+
+        if (readonly) {
+            readOnlyElements = _sveaGetCurrentReadOnlyElements();
+            // All elements in allReadOnlyElements but not in readOnlyElements should not be
+            // read-only
+            allReadOnlyElements.each(function(item, key) {
+                if (readOnlyElements.indexOf(item) === -1) {
+                    notReadOnlyElements.push(item);
+                }
+            });
+        } else {
+            notReadOnlyElements = allReadOnlyElements;
+        }
+
+        readOnlyElements.each(function(item) {
+            item.addClassName('svea-readonly');
+            item.writeAttribute('readonly', true);
+        });
+        notReadOnlyElements.each(function(item) {
+            item.removeClassName('svea-readonly');
+            item.writeAttribute('readonly', false);
         });
     },
     /** Check if a svea address is required in the checkout
@@ -631,13 +724,13 @@ var _SveaController = Class.create({
             ssnContainer.hide();
         }
     },
-    /** Get current values for all readonly fields
+    /** Get current values for all current readonly fields
      *
      * @returns Object with current elementId => value
      */
     getCurrentReadonlyAddressValues: function() {
         var rc = {};
-        _sveaGetReadOnlyElements().each(function(elem) {
+        _sveaGetAllPossibleReadOnlyElements().each(function(elem) {
             rc[elem.id] = elem.value;
         });
         return rc;
