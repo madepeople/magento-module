@@ -12,6 +12,17 @@
 class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
 {
 
+    /** Value that denotes a company in a getAddress response
+     *
+     * In a response this will be set in the parameter 'type'. It might be a string or integer
+     * so when comparing the type parameter should be convert to a string. Doing it the other
+     * way is not a good idea in PHP since a lot of strings becomes the integer 0 when
+     * converted to integer.
+     *
+     * @var string
+     */
+    const TYPE_COMPANY = '1';
+
     public function getAddressesAction()
     {
         $ssn = $this->getRequest()->getParam('ssn');
@@ -30,7 +41,7 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
 
         // Credentials
         $conf = Mage::getStoreConfig('payment/' . $method);
-        $conf['company'] = $this->getRequest()->getParam('type') == 1;
+        $conf['company'] = (string)$this->getRequest()->getParam('type') === self::TYPE_COMPANY;
 
         try {
             $result = Mage::helper('svea_webpay')->getAddresses($ssn, $countryCode, $conf);
@@ -40,6 +51,9 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
                 if ($quote && $quote->getId()) {
                     // Update the billing address so the fetched information is used
                     // in the order object request
+
+                    // The reason for choosing the first identity is that it will be
+                    // selected by default in the gui.
                     $identity = $result->customerIdentity[0];
                     $identityParameterMap = array(
                         'firstName' => 'Firstname',
@@ -49,6 +63,13 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
                         'locality' => 'City',
                         'street' => 'street',
                     );
+
+                    // If this address is a company the 'fullName' attribute should be
+                    // stored as a company on the billing address
+                    if ((string)$this->getRequest()->getParam('type') === self::TYPE_COMPANY) {
+                        $identityParameterMap['fullName'] = 'Company';
+                    }
+
 
                     $billingAddress = $quote->getBillingAddress();
                     foreach ($identityParameterMap as $source => $target) {
@@ -76,6 +97,7 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
                     $payment->setAdditionalData(serialize($additionalData));
                     $payment->save();
                 }
+
             }
         } catch (Exception $e) {
             $result = $e->getMessage();
