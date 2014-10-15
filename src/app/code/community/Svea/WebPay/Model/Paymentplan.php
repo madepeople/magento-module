@@ -41,8 +41,8 @@ class Svea_WebPay_Model_Paymentplan extends Mage_Core_Model_Abstract
 
         $conf = new SveaMageConfigProvider($paymentMethodConfig);
         $sveaObject = WebPay::getPaymentPlanParams($conf);
-        $response = $sveaObject->setCountryCode('SE')
-                ->doRequest();
+        $response = $sveaObject->setCountryCode($paymentMethodConfig['client_country'])
+                               ->doRequest();
 
         if ($response->accepted == 1) {
             return $this->formatResponse($response);
