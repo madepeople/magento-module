@@ -16,14 +16,17 @@ if ($_useUnifiedGui) {
 
 $_currency = Mage::app()->getStore()->getCurrentCurrencyCode();
 $_code = $this->getMethodCode();
-$_infoBlock = trim(Mage::getStoreConfig("payment/$_code/paymentplan_info"));
+
+$_infoHtml = $this->getInfoHtml();
 $_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
 $_ssnHtml = $this->getSsnHtml();
+
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
-    <?php if (!empty($_infoBlock)): ?>
+
+    <?php if (!empty($_infoHtml)): ?>
         <li>
-            <?php echo nl2br($_infoBlock); ?>
+            <?php echo $_infoHtml; ?>
         </li>
     <?php endif; ?>
 

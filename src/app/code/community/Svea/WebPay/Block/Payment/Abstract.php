@@ -25,4 +25,15 @@ abstract class Svea_WebPay_Block_Payment_Abstract extends Mage_Payment_Block_For
             $head->addJs('svea.js');
         }
     }
+
+    /**
+     * Get current payment plan information as HTML
+     *
+     * @return string
+     */
+    public function getInfoHtml()
+    {
+        return nl2br(trim(Mage::getStoreConfig("payment/{$this->getMethodCode()}/paymentplan_info")));
+    }
+
 }
