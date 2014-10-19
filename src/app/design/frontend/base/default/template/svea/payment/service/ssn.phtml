@@ -101,7 +101,10 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
         <?php if (in_array($_country, array('SE', 'DK'))): ?>
             <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
                     style="display:none;margin-top:8px;width:100%"></select>
-            <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
+            <?php
+            ?>
+
+            <?php if ($this->helper('svea_webpay')->showSsnSelectorInPaymentMethod()): ?>
                 <div id="showAddressBox_<?php echo $_code ?>" class="field">
                     <label class="sveaShowAdressesLabel" for="sveaShowAddresses_<?php echo $_code ?>" style="display:none"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
 
@@ -109,6 +112,7 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
                          id="sveaShowAddresses_<?php echo $_code ?>"></div>
                 </div>
             <?php endif ?>
+
         <?php endif; ?>
     <?php endif; ?>
 
@@ -209,10 +213,9 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
            class="svea_address_selector">
 </div>
 <script>
-    var currentCountry, usingQuickCheckout, getAddressUrl;
+    var currentCountry, getAddressUrl;
 
     window.currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
-    window.usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
     window.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
     window.sveaOneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
     window.sveaUseFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
