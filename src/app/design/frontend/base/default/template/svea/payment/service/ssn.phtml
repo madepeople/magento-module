@@ -83,7 +83,7 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
             <?php if (in_array($_country, array('SE', 'DK'))): ?>
                 <div id="payment-method-buttons-container-<?php echo $_code ?>" class="field get-address-btn">
                     <button class="button"
-                            onclick="sveaGetAddress.call(this, '<?php echo $_code; ?>');"
+                            onclick="(function(){$$('body')[0].fire('svea:getAddressFromServer');})();"
                             type="button">
                         <span>
                             <span class="inner"><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span>
@@ -214,32 +214,31 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
 
 <script>
 
-    // This html is loaded by ajax some times, so only overwrite window._svea if it
-    // isn't set
-    if (!window._svea) {
-        window._svea = {};
-    }
-    // URL for the getAddress request
-    window._svea.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+    $(document).observe('dom:loaded', function() {
 
-    // The URL OneStepCheckout uses to save payment method and payment method
-    // additional data
-    window._svea.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
+        console.log("SVEA HTML SCRIPT");
+        // This html is loaded by ajax some times, so only overwrite window._svea if it
+        // isn't set
+        if (!window._svea) {
+            console.log("First time SVEA");
+            window._svea = {};
+        }
+        // The URL OneStepCheckout uses to save payment method and payment method
+        // additional data
+        window._svea.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
 
-    // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
-    window._svea.useFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
-    // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
-    window._svea.formKey = <?php echo $_useUnifiedGui ? "'$_code'" : 'null' ?>;
+        // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
+        window._svea.useFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
+        // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
+        window._svea.formKey = <?php echo $_useUnifiedGui ? "'$_code'" : 'null' ?>;
 
-    // Create svea controller if the controller doesn't exist
-    if (!window._svea.controller) {
+        // Create svea controller if the controller doesn't exist
+        if (!window._svea.controller) {
+            var config = {};
+            config.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+            window._svea.controller = new _SveaController(config);
+        }
 
-        window._svea.controller = new _SveaController();
-
-        $(document).observe('dom:loaded', function() {
-            window._svea.controller.setupObservers();
-            window._svea.controller.setupGui();
-        });
-    }
+    });
 
 </script>

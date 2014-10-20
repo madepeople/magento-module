@@ -570,10 +570,14 @@ var _SveaController = Class.create({
         'SE',
         'DK'
     ],
-    initialize: function() {
+    getAddressUrl: null,
+    initialize: function(config) {
         /** Create a new Svea controller
          *
          */
+
+        this.reconfigure(config);
+
         this.customerStore = new _SveaCustomerStore();
         // Store last state
         this.lastState = this.getCurrentState();
@@ -587,6 +591,20 @@ var _SveaController = Class.create({
             // If we started as SVEA have a blank address
             this.lastStateAddressValues = {};
         }
+
+        // Setup gui
+        this.setupGui();
+
+        // Setup observers
+        this.setupObservers();
+
+    },
+    reconfigure: function(config) {
+        if (!config.getAddressUrl) {
+            throw "config.getAddressUrl not set but required";
+        }
+        // Url for the getAddress request
+        this.getAddressUrl = config.getAddressUrl;
     },
     /** Toggle visibility and state of 'ship to different address'-checkbox
      *
@@ -931,6 +949,11 @@ var _SveaController = Class.create({
                           'svea:customerTypeChanged',
                           this.customerTypeChangedCb.bind(this));
 
+        // Listen to svea:getAddress event
+        $$('body').invoke('observe',
+                          'svea:getAddressFromServer',
+                          this.getAddressFromServer.bind(this));
+
     },
     /** Callback for when something has changed
      */
@@ -976,55 +999,81 @@ var _SveaController = Class.create({
 
         // Run setupGui
         this.setupGui();
+    },
+
+    /** Get and update address from svea with an AJAX request
+     *
+     */
+    getAddressFromServer: function() {
+
+        var ssn = _sveaGetBillingNationalIdNumber(),
+        typeElement = _$('input:checked[name*=customerType]'),
+        countryCode = _sveaGetBillingCountryCode(),
+        customerType = typeElement ? typeElement.value : 0;
+
+        /**
+         * Adds class 'loading' on the getAddressButton
+         */
+        function startLoading() {
+            var getAddressButton = _$('.get-address-btn');
+            if (getAddressButton) {
+                $(getAddressButton).addClassName('loading');
+            }
+        }
+
+        /**
+         * Removed class 'loading' on the getAddressButton
+         */
+        function stopLoading() {
+            var getAddressButton = _$('.get-address-btn');
+            if (getAddressButton) {
+                $(getAddressButton).removeClassName('loading');
+            }
+        }
+
+        /** OnSuccess callback that must be bound to this instance
+         */
+        function onSuccess(transport) {
+            var json = transport.responseText.evalJSON();
+
+            try {
+                this.handleResponse(transport.responseText.evalJSON());
+            } catch (e) {
+                // console.warn('_svea.controller.handleResponse error', e, transport);
+                return;
+            }
+        }
+
+        startLoading();
+        new Ajax.Request(this.getAddressUrl, {
+            parameters: {
+                ssn: ssn,
+                type: customerType,
+                cc: countryCode,
+                method: _sveaGetPaymentMethodCode()
+            },
+            onComplete: function (transport) {
+                stopLoading();
+            },
+            onSuccess: onSuccess.bind(this)
+        });
     }
 
 });
 
 /** Get and update address from svea with an AJAX request
  *
+ * @deprecated This should be replaced with emitting a 'svea:getAddressFromServer'
+ * event on <body> with the new type as argument.
+ *
+ * Example for a radio with the values 0 or 1:
+ *     onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
+ *
  */
 function sveaGetAddress()
 {
-    var ssn = _sveaGetBillingNationalIdNumber(),
-        typeElement = _$('input:checked[name*=customerType]'),
-        countryCode = _sveaGetBillingCountryCode(),
-        customerType = typeElement ? typeElement.value : 0;
-
-    function startLoading()
-    {
-        var getAddressButton = _$('.get-address-btn');
-        if (getAddressButton) {
-            $(getAddressButton).addClassName('loading');
-        }
-    }
-
-    function stopLoading()
-    {
-        var getAddressButton = _$('.get-address-btn');
-        if (getAddressButton) {
-            $(getAddressButton).removeClassName('loading');
-        }
-    }
-
-    function onSuccess(transport) {
-        var json = transport.responseText.evalJSON();
-
-        try {
-            window._svea.controller.handleResponse(transport.responseText.evalJSON());
-        } catch (e) {
-            // console.warn('_svea.controller.handleResponse error', e, transport);
-            return;
-        }
-    }
-
-    startLoading();
-    new Ajax.Request(window._svea.getAddressUrl, {
-        parameters: {ssn: ssn, type: customerType, cc: countryCode, method: _sveaGetPaymentMethodCode()},
-        onComplete: function (transport) {
-            stopLoading();
-        },
-        onSuccess: onSuccess
-    });
+    console.warn("This method is deprecated. See comments");
+    $$('body')[0].fire('svea:getAddressFromServer');
 }
 
 /** This is called from the template when customer type is changed
