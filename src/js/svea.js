@@ -945,7 +945,7 @@ function sveaGetAddress()
 {
     var ssn = _sveaGetBillingNationalIdNumber(),
         typeElement = _$('input:checked[name*=customerType]'),
-        countryCode = window._svea.currentCountry,
+        countryCode = _sveaGetBillingCountryCode(),
         customerType = typeElement ? typeElement.value : 0;
 
     function startLoading()
@@ -994,12 +994,13 @@ function sveaGetAddress()
  */
 function setCustomerTypeRadioThing()
 {
-    var customerType = $(this).value;
+    var customerType = $(this).value,
+    countryCode = _sveaGetBillingCountryCode();
 
     // Set hidden input value
     $$('input[name="payment[' + _sveaGetFormKey() + '][svea_customerType]"]')[0].value = customerType;
 
-    if (window._svea.currentCountry == 'NL' || window._svea.currentCountry == 'DE') {
+    if (countryCode == 'NL' || countryCode == 'DE') {
         if (customerType == 1) {
             $$(".forNLDE").invoke('hide');
             $$(".forNLDEcompany").invoke('show');

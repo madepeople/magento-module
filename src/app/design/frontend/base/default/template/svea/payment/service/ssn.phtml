@@ -227,8 +227,6 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
     // additional data
     window._svea.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
 
-    // TODO: Why not use the country selector to find country?
-    window._svea.currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
     // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
     window._svea.useFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
     // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
