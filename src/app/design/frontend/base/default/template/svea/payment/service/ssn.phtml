@@ -212,12 +212,37 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
     <input type="hidden" name="payment[<?php echo $_code ?>][svea_addressSelector]"
            class="svea_address_selector">
 </div>
-<script>
-    var currentCountry, getAddressUrl;
 
-    window.currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
-    window.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
-    window.sveaOneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
-    window.sveaUseFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
-    window.sveaFormKey = <?php echo $_useUnifiedGui ? "'$_code'" : 'null' ?>;
+<script>
+
+    // This html is loaded by ajax some times, so only overwrite window._svea if it
+    // isn't set
+    if (!window._svea) {
+        window._svea = {};
+    }
+    // URL for the getAddress request
+    window._svea.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+
+    // The URL OneStepCheckout uses to save payment method and payment method
+    // additional data
+    window._svea.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
+
+    // TODO: Why not use the country selector to find country?
+    window._svea.currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
+    // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
+    window._svea.useFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
+    // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
+    window._svea.formKey = <?php echo $_useUnifiedGui ? "'$_code'" : 'null' ?>;
+
+    // Create svea controller if the controller doesn't exist
+    if (!window._svea.controller) {
+
+        window._svea.controller = new _SveaController();
+
+        $(document).observe('dom:loaded', function() {
+            window._svea.controller.setupObservers();
+            window._svea.controller.setupGui();
+        });
+    }
+
 </script>

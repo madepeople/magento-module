@@ -1,14 +1,15 @@
-/*global Class $ $$ payment currentCountry $F $H Ajax */
+/*global window Class $ $$ payment $F $H Ajax */
 /** Svea magento module javascript part
  *
  * This module takes care of retrieving addresses from svea and modifying the gui
  * so that inputs are hidden/shown enabled or disabled depending on payment
  * method and billing country.
  *
+ * The window._svea object is setup in ssn.phtml.
+ *
  * TODO: Lock everything in 'the box' until the getAddress request returns, otherwise one can change customertype during the request >:/
  *
  */
-
 
 /** SVEA Private customer type denominator for the select element
  */
@@ -49,12 +50,13 @@ var _sveaCompanyReadOnlyElements = [
 
 /** Check if a specific form key should be used
  *
- * If a specific form key should be used it will be stored in `window.sveaFormKey`.
+ * If a specific form key should be used it will be stored in
+ * `window._svea.formKey`.
  *
  * @returns bool
  */
 function _sveaUseFormKey() {
-    return window.sveaUseFormKey;
+    return window._svea.useFormKey;
 }
 
 /** Get the form key that svea uses for it's inputs
@@ -65,15 +67,16 @@ function _sveaUseFormKey() {
  *   vs
  * name=payment[svea_paymentplan][svea_customerType]
  *
- * If window.sveaUseFormKey is set a single set of inputs are used for all svea
- * payment methods and the formKey should be stored in `window.sveaFormKey`.
+ * If window._svea.useFormKey is set a single set of inputs are used for all
+ * svea payment methods and the formKey should be stored in
+ * `window._svea.formKey`.
  * If not the current payment method will be used as form key. This means that
  * the formKey returned here can be non-svea payment method code.
  *
  * @returns string
  */
 function _sveaGetFormKey() {
-    return _sveaUseFormKey() ? window.sveaFormKey : _sveaGetPaymentMethodCode();
+    return _sveaUseFormKey() ? window._svea.formKey : _sveaGetPaymentMethodCode();
 }
 
 /* Get nationalIdNumber container
@@ -147,7 +150,7 @@ function _sveaGetPaymentMethodCode() {
 
 /** Get country code for selected billing country
  *
- * `currentCountry` is populated after country is changed so use this to get
+ * `window._svea` is populated after country is changed so use this to get
  * the current selected billing country code from the billing country select
  * directly.
  *
@@ -572,6 +575,9 @@ var _SveaController = Class.create({
         'DK'
     ],
     initialize: function() {
+        /** Create a new Svea controller
+         *
+         */
         this.customerStore = new _SveaCustomerStore();
         // Store last state
         this.lastState = this.getCurrentState();
@@ -849,7 +855,7 @@ var _SveaController = Class.create({
 
         /*global get_separate_save_methods_function */
         if (typeof get_separate_save_methods_function === 'function') {
-            var url = window.sveaOneStepCheckoutSetMethodsSeparateUrl;
+            var url = window._svea.oneStepCheckoutSetMethodsSeparateUrl;
 
             // Note: There is a setting in OneStepCheckout that disables
             // this but even if you turn it of OneStepCheckout will
@@ -932,10 +938,6 @@ var _SveaController = Class.create({
     }
 });
 
-/** _SveaController instance
- */
-var _sveaController = new _SveaController();
-
 /** Get and update address from svea with an AJAX request
  *
  */
@@ -943,7 +945,7 @@ function sveaGetAddress()
 {
     var ssn = _sveaGetBillingNationalIdNumber(),
         typeElement = _$('input:checked[name*=customerType]'),
-        countryCode = currentCountry,
+        countryCode = window._svea.currentCountry,
         customerType = typeElement ? typeElement.value : 0;
 
     function startLoading()
@@ -966,15 +968,15 @@ function sveaGetAddress()
         var json = transport.responseText.evalJSON();
 
         try {
-            _sveaController.handleResponse(transport.responseText.evalJSON());
+            window._svea.controller.handleResponse(transport.responseText.evalJSON());
         } catch (e) {
-            // console.warn('_sveaController.handleResponse error', e, transport);
+            // console.warn('_svea.controller.handleResponse error', e, transport);
             return;
         }
     }
 
     startLoading();
-    new Ajax.Request(window.getAddressUrl, {
+    new Ajax.Request(window._svea.getAddressUrl, {
         parameters: {ssn: ssn, type: customerType, cc: countryCode, method: _sveaGetPaymentMethodCode()},
         onComplete: function (transport) {
             stopLoading();
@@ -997,7 +999,7 @@ function setCustomerTypeRadioThing()
     // Set hidden input value
     $$('input[name="payment[' + _sveaGetFormKey() + '][svea_customerType]"]')[0].value = customerType;
 
-    if (currentCountry == 'NL' || currentCountry == 'DE') {
+    if (window._svea.currentCountry == 'NL' || window._svea.currentCountry == 'DE') {
         if (customerType == 1) {
             $$(".forNLDE").invoke('hide');
             $$(".forNLDEcompany").invoke('show');
@@ -1015,8 +1017,8 @@ function setCustomerTypeRadioThing()
         }
     }
 
-    // Forward to _sveaController
-    _sveaController.setupGui();
+    // Forward to _svea.controller
+    window._svea.controller.setupGui();
 }
 
 /** Callback for when an address is selected
@@ -1026,13 +1028,13 @@ function setCustomerTypeRadioThing()
 function sveaAddressSelectChanged()
 {
     // Update the selected address id on the current address
-    _sveaController.customerStore.getCurrent().setSelectedAddressId($F(this));
+    window._svea.controller.customerStore.getCurrent().setSelectedAddressId($F(this));
 
     // The database needs to find out about the newly selected address
-    _sveaController.setupGui();
+    window._svea.controller.setupGui();
 }
 
-$(document).observe('dom:loaded', function () {
+$(document).observe('dom:loaded', function() {
 
     /** Patch methods that are used to change payment method
      *
@@ -1052,7 +1054,7 @@ $(document).observe('dom:loaded', function () {
             _oldPaymentSwitchMethod = Payment.prototype.switchMethod;
 
             Payment.prototype.switchMethod = function(method) {
-                _sveaController.changeCb();
+                window._svea.controller.changeCb();
                 return _oldPaymentSwitchMethod.call(this, method);
             };
         }
@@ -1062,12 +1064,10 @@ $(document).observe('dom:loaded', function () {
             _oldStreamcheckoutSwitchMethod = Streamcheckout.prototype.switchPaymentBlock;
 
             Streamcheckout.prototype.switchPaymentBlock = function(method) {
-                _sveaController.changeCb();
+                window._svea.controller.changeCb();
                 return _oldStreamcheckoutSwitchMethod.call(this, method);
             };
         }
     })();
 
-    _sveaController.setupObservers();
-    _sveaController.setupGui();
 });
