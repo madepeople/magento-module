@@ -571,6 +571,7 @@ var _SveaController = Class.create({
         'DK'
     ],
     getAddressUrl: null,
+    oneStepCheckoutSetMethodsSeparateUrl: null,
     initialize: function(config) {
         /** Create a new Svea controller
          *
@@ -605,6 +606,10 @@ var _SveaController = Class.create({
         }
         // Url for the getAddress request
         this.getAddressUrl = config.getAddressUrl;
+
+        // The URL OneStepCheckout uses to save payment method and payment
+        // method additional data, optional if OneStepCheckout isn't used.
+        this.oneStepCheckoutSetMethodsSeparateUrl = config.oneStepCheckoutSetMethodsSeparateUrl || null;
     },
     /** Toggle visibility and state of 'ship to different address'-checkbox
      *
@@ -869,7 +874,10 @@ var _SveaController = Class.create({
 
         /*global get_separate_save_methods_function */
         if (typeof get_separate_save_methods_function === 'function') {
-            var url = window._svea.oneStepCheckoutSetMethodsSeparateUrl;
+            var url = this.oneStepCheckoutSetMethodsSeparateUrl;
+            if (!url) {
+                throw "config option 'oneStepCheckoutSetMethodsSeparateUrl' not set but required";
+            }
 
             // Note: There is a setting in OneStepCheckout that disables
             // this but even if you turn it of OneStepCheckout will

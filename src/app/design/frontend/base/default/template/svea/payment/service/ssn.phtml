@@ -223,9 +223,6 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
             console.log("First time SVEA");
             window._svea = {};
         }
-        // The URL OneStepCheckout uses to save payment method and payment method
-        // additional data
-        window._svea.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
 
         // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
         window._svea.useFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
@@ -236,6 +233,7 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
         if (!window._svea.controller) {
             var config = {};
             config.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+            config.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
             window._svea.controller = new _SveaController(config);
         }
 
