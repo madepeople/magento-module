@@ -8,8 +8,6 @@ $_country = Mage::getSingleton('checkout/session')
     ->getBillingAddress()
     ->getCountry();
 
-$_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
-
 // Payment method
 $_method = $this->getMethod();
 
