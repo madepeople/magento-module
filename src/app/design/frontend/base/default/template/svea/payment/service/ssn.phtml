@@ -38,9 +38,8 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
         <?php
          /**
             These radios are not the real values sent to the server because some
-            checkout sollutions doesn't handle radios very well. Instead the
-            `setCustomerTypeRadioThing` will copy the value into the hidden
-            input below.
+            checkout sollutions doesn't handle radios very well. They will notify
+            the SVEA controller by firing an event on <body>.
          */
         ?>
         <div class="field">
@@ -49,14 +48,14 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
                        class="payment_form_customerType_0"
                        name="_svea_customerType"
                        value="0"
-                       onclick="setCustomerTypeRadioThing.call(this);"
+                       onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
                        checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
             </label>
             <label>
                 <input type="radio"
                        class="payment_form_customerType_1"
                        name="_svea_customerType"
-                       onclick="setCustomerTypeRadioThing.call(this);"
+                       onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
                        value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
             </label>
         </div>

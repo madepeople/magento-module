@@ -929,13 +929,59 @@ var _SveaController = Class.create({
                                 'change',
                                 changeCb);
             });
+
+        // Listen to svea:customerTypeChanged event
+        $$('body').invoke('observe',
+                          'svea:customerTypeChanged',
+                          this.customerTypeChangedCb.bind(this));
+
     },
     /** Callback for when something has changed
      */
     changeCb: function() {
         // Called when something changed
         this.setupGui();
+    },
+
+    customerTypeChangedCb: function(event) {
+        /** Callback for svea:customerTypeChanged event on <body>
+         *
+         * The event should be fired with a single value which is the new
+         * customer type with the value "0" or "1".
+         */
+
+        var customerType = event.memo,
+        countryCode = _sveaGetBillingCountryCode();
+
+        if (customerType !== "1" && customerType !== "0") {
+            throw ["Got invalid customer type", customerType];
+        }
+
+        // Set hidden input value
+        $$('input[name="payment[' + _sveaGetFormKey() + '][svea_customerType]"]')[0].value = customerType;
+
+        if (countryCode == 'NL' || countryCode == 'DE') {
+            if (customerType == 1) {
+                $$(".forNLDE").invoke('hide');
+                $$(".forNLDEcompany").invoke('show');
+            } else {
+                $$(".forNLDEcompany").invoke('hide');
+                $$(".forNLDE").invoke('show');
+            }
+        } else {
+            if (customerType == 1) {
+                $$(".label_ssn_customerType_0").invoke('hide');
+                $$(".label_ssn_customerType_1").invoke('show');
+            } else {
+                $$(".label_ssn_customerType_1").invoke('hide');
+                $$(".label_ssn_customerType_0").invoke('show');
+            }
+        }
+
+        // Run setupGui
+        this.setupGui();
     }
+
 });
 
 /** Get and update address from svea with an AJAX request
@@ -990,36 +1036,18 @@ function sveaGetAddress()
  * This needs to be bound to the input in question because the current value is
  * read from $(this).value.
  *
+ * @deprecated This should be replaced with emitting a 'svea:customerTypeChanged'
+ * event on <body> with the new type as argument.
+ *
+ * Example for a radio with the values 0 or 1:
+ *     onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
+ *
  * @returns undefined
  */
 function setCustomerTypeRadioThing()
 {
-    var customerType = $(this).value,
-    countryCode = _sveaGetBillingCountryCode();
-
-    // Set hidden input value
-    $$('input[name="payment[' + _sveaGetFormKey() + '][svea_customerType]"]')[0].value = customerType;
-
-    if (countryCode == 'NL' || countryCode == 'DE') {
-        if (customerType == 1) {
-            $$(".forNLDE").invoke('hide');
-            $$(".forNLDEcompany").invoke('show');
-        } else {
-            $$(".forNLDEcompany").invoke('hide');
-            $$(".forNLDE").invoke('show');
-        }
-    } else {
-        if (customerType == 1) {
-            $$(".label_ssn_customerType_0").invoke('hide');
-            $$(".label_ssn_customerType_1").invoke('show');
-        } else {
-            $$(".label_ssn_customerType_1").invoke('hide');
-            $$(".label_ssn_customerType_0").invoke('show');
-        }
-    }
-
-    // Forward to _svea.controller
-    window._svea.controller.setupGui();
+    console.warn("This method is deprecated, see comments.");
+    $$('body')[0].fire('svea:customerTypeChanged', $(this).value);
 }
 
 /** Callback for when an address is selected
