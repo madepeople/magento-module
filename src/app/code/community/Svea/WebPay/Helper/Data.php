@@ -480,7 +480,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function showSsnSelectorInPaymentMethod()
     {
-        return Mage::getStoreConfigFlag('svea_webpay/general/display_ssn_selector_with_payment_method');
+        return Mage::getStoreConfigFlag('payment/svea_general/display_ssn_selector_with_payment_method');
     }
 
 }

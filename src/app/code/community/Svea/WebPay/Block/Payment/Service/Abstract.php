@@ -15,7 +15,7 @@ abstract class Svea_WebPay_Block_Payment_Service_Abstract
      */
     public function getSsnHtml()
     {
-        if (Mage::helper('svea_webpay')->showSsnSelectorInPaymentMethod()) {
+        if (!Mage::helper('svea_webpay')->showSsnSelectorInPaymentMethod()) {
             return '';
         } else {
             return $this->getLayout()
