@@ -15,10 +15,6 @@
  */
 var _sveaCustomerTypePrivateIntegerValue = 0;
 
-/** SVEA Private customer type denominator in a customerIdentity
- */
-var _sveaCustomerTypePrivateStringValue = 'Business';
-
 /** SVEA Company customer type denominator for the select element
  */
 var _sveaCustomerTypeCompanyIntegerValue = 1;
