@@ -1,32 +1,21 @@
 <?php
 
-// This key will be used in forms if there is only one set of inputs for svea
-$_unifiedInterfaceFormKey = 'svea_info';
-
-$_country = Mage::getSingleton('checkout/session')
-    ->getQuote()
-    ->getBillingAddress()
-    ->getCountry();
-
-// Payment method
-$_method = $this->getMethod();
-
-
-// If no method is set it's assumed that the frontend uses a single set of inputs
-// for all svea payment methods. The key which these inputs will use will then be
-// 'svea_info'
-$_useUnifiedGui = empty($_method);
-
-if ($_useUnifiedGui) {
-    $_code = $_unifiedInterfaceFormKey;
-} else {
-    $_code = $_method->getCode();
+if (!$this->shouldRenderTemplate()) {
+    return;
 }
+
+$_code = $this->getFrontendId();
 
 // Add class regardless of unified interface or not
 $_class = 'svea-ssn-container-' . $_code;
 
 $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'));
+
+// Get country for later
+$_country = Mage::getSingleton('checkout/session')
+    ->getQuote()
+    ->getBillingAddress()
+    ->getCountry();
 
 ?>
 
@@ -223,9 +212,9 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
         }
 
         // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
-        window._svea.useFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
+        window._svea.useFormKey = <?php echo $_code === 'svea_info' ? 'true' : 'false' ?>;
         // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
-        window._svea.formKey = <?php echo $_useUnifiedGui ? "'$_code'" : 'null' ?>;
+        window._svea.formKey = <?php echo $_code === 'svea_info' ? "'$_code'" : 'null' ?>;
 
         // Create svea controller if the controller doesn't exist
         if (!window._svea.controller) {
