@@ -203,11 +203,9 @@ $_country = Mage::getSingleton('checkout/session')
 
     $(document).observe('dom:loaded', function() {
 
-        console.log("SVEA HTML SCRIPT");
         // This html is loaded by ajax some times, so only overwrite window._svea if it
         // isn't set
         if (!window._svea) {
-            console.log("First time SVEA");
             window._svea = {};
         }
 
