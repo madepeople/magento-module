@@ -554,7 +554,73 @@ var _SveaCustomerStore = Class.create({
     }
 });
 
-/** GUI Controller for Svea
+
+/** ssn selector controller */
+var _SveaSsnController = Class.create({
+
+    id: null,
+    element: null,
+    ssnInput: null,
+    initialize: function(config) {
+        this.id = config.id;
+        this.element = $$('.svea-ssn-container-' + this.id)[0];
+        this.setupObservers();
+    },
+    setupObservers: function() {
+        // Listen to changes in the elements we own
+
+        this.element.select('.payment_form_customerType_0').invoke(
+            'observe',
+            'change',
+            this.onCustomerTypeCb.bind(this));
+
+        this.element.select('.payment_form_customerType_1').invoke(
+            'observe',
+            'change',
+            this.onCustomerTypeCb.bind(this));
+
+        this.element.select('button.get_address').invoke(
+            'observe',
+            'click',
+            this.onGetAddressCb.bind(this));
+
+        this.element.select('input.svea-ssn-input').invoke(
+            'observe',
+            'change',
+            function() { console.log('ssn changed'); });
+    },
+    getSsn: function() {
+        /** Get current ssn */
+        return this.element.select('input.svea-ssn-input').value;
+    },
+    getCustomerType: function() {
+        /** Get current customer type */
+        return this.getHiddenCustomerTypeInput().value;
+    },
+    getHiddenCustomerTypeInput: function() {
+        return this.element.select('input[name="payment[' + this.id + '][svea_customerType]"]')[0];
+    },
+    onCustomerTypeCb: function(event) {
+        /** Called when customertype is changed
+         *
+         * Will copy the new value to the hidden which is the real input - not
+         * allowed to use radios in magento.
+         */
+        this.getHiddenCustomerTypeInput().value = event.target.value;
+
+        // Now we must tell the main controller because you cannot observe
+        // the changes in the hidden input correctly.
+
+        console.log('TODO: notify main controller');
+    },
+    onGetAddressCb: function() {
+        /** Called when the get address button is clicked */
+        console.log('TODO: notify main controller');
+    }
+
+});
+
+/** Controller for Svea
  */
 var _SveaController = Class.create({
 
@@ -570,31 +636,17 @@ var _SveaController = Class.create({
         'SE',
         'DK'
     ],
+    lastState: null,
+    lastStateRequiredSvea: null,
+    ssnControllers: {},
     getAddressUrl: null,
     oneStepCheckoutSetMethodsSeparateUrl: null,
-    initialize: function(config) {
+    lastStateAddressValues: null,
+    initialize: function() {
         /** Create a new Svea controller
-         *
          */
 
-        this.reconfigure(config);
-
         this.customerStore = new _SveaCustomerStore();
-        // Store last state
-        this.lastState = this.getCurrentState();
-        // If the last state required SVEA
-        this.lastStateRequiredSvea = this.sveaAddressIsRequired();
-
-        // Store current address values
-        if (!this.sveaAddressIsRequired()) {
-            this.lastStateAddressValues = this.getCurrentReadonlyAddressValues();
-        } else {
-            // If we started as SVEA have a blank address
-            this.lastStateAddressValues = {};
-        }
-
-        // Setup gui
-        this.setupGui();
 
         // Setup observers
         this.setupObservers();
@@ -801,12 +853,31 @@ var _SveaController = Class.create({
             newStateRequiresSvea = this.sveaAddressIsRequired(),
             newStateAddressValues = this.getCurrentReadonlyAddressValues();
 
+        // Store last state
+        if (this.lastState === null) {
+            this.lastState = this.getCurrentState();
+        }
+        // If the last state required SVEA
+        if (this.lastStateRequiredSvea === null) {
+            this.lastStateRequiredSvea = this.sveaAddressIsRequired();
+        }
+
+        // Store current address values
+        if (this.lastStateAddressValues === null) {
+            if (!this.sveaAddressIsRequired()) {
+                this.lastStateAddressValues = this.getCurrentReadonlyAddressValues();
+            } else {
+                // If we started as SVEA have a blank address
+                this.lastStateAddressValues = {};
+            }
+        }
+
         if (newStateRequiresSvea) {
 
             // svea-ssn-inputs are required entries
             $$('.svea-ssn-input').invoke('addClassName', 'required-entry');
 
-            this.toggleReadOnlyElements(window._svea.lockRequiredFields);
+            this.toggleReadOnlyElements(true);
             this.toggleShipToDifferentAddress(false);
 
         } else {
@@ -962,10 +1033,33 @@ var _SveaController = Class.create({
                           'svea:getAddressFromServer',
                           this.getAddressFromServer.bind(this));
 
+        // Listen to configChange event
+        $$('body').invoke('observe',
+                          'svea:configChange',
+                          this.configChangeCb.bind(this));
+
+        // Listen to newSelector event
+        $$('body').invoke('observe',
+                          'svea:newSsnSelector',
+                          this.newSsnSelectorCb.bind(this));
     },
-    /** Callback for when something has changed
-     */
+    newSsnSelectorCb: function(event) {
+        var selectorId = event.memo;
+        if (this.ssnControllers.hasOwnProperty(selectorId)) {
+            // TODO: The ssncontroller should unregister it's observers
+            delete this.ssnControllers[selectorId];
+        }
+        // Add new selector
+        console.log('Creating new ssncontroller', selectorId);
+        this.ssnControllers[selectorId] = new _SveaSsnController({id: selectorId});
+    },
+    configChangeCb: function(event) {
+        /** Sets new configuration */
+        this.reconfigure(event.memo);
+    },
     changeCb: function() {
+        /** Callback for when something has changed
+        */
         // Called when something changed
         this.setupGui();
     },
@@ -1152,4 +1246,5 @@ $(document).observe('dom:loaded', function() {
         }
     })();
 
+    new _SveaController();
 });

@@ -483,4 +483,14 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         return Mage::getStoreConfigFlag('payment/svea_general/display_ssn_selector_with_payment_method');
     }
 
+    /**
+     * Check if required address fields should be locked
+     *
+     * @return bool
+     */
+    public function lockRequiredFields()
+    {
+        return Mage::getStoreConfigFlag('payment/svea_general/lock_required_fields');
+    }
+
 }

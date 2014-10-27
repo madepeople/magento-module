@@ -50,4 +50,9 @@ class Svea_WebPay_Block_Payment_Service_Ssn extends Mage_Core_Block_Template
         }
     }
 
+    public function shouldLockRequiredFields()
+    {
+        return Mage::helper('svea_webpay')->lockRequiredFields();
+    }
+
 }

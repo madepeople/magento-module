@@ -806,7 +806,7 @@ var _SveaController = Class.create({
             // svea-ssn-inputs are required entries
             $$('.svea-ssn-input').invoke('addClassName', 'required-entry');
 
-            this.toggleReadOnlyElements(window._svea.lockRequiredFields);
+            this.toggleReadOnlyElements(true);
             this.toggleShipToDifferentAddress(false);
 
         } else {

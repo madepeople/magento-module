@@ -14,4 +14,6 @@ if ($usingQuickCheckout) {
 
 $installer->setConfigData("svea_webpay/general/display_ssn_selector_with_payment_method", $displaySsnSelector);
 
+$installer->setConfigData("svea_webpay/general/lock_required_fields", 1);
+
 $installer->endSetup();
