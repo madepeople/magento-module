@@ -209,9 +209,7 @@ $_country = Mage::getSingleton('checkout/session')
             window._svea = {};
         }
 
-        // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
         window._svea.useFormKey = <?php echo $_code === 'svea_info' ? 'true' : 'false' ?>;
-        // TODO: Is this the same as displaySsnSelectorInPaymentMethod?
         window._svea.formKey = <?php echo $_code === 'svea_info' ? "'$_code'" : 'null' ?>;
         window._svea.lockRequiredFields = <?php echo $this->shouldLockRequiredFields() ? 'true': 'false' ?>;
 
