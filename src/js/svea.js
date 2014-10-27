@@ -630,6 +630,14 @@ var _SveaController = Class.create({
             }
         }
 
+        // Handle onepage billing:use_for_shipping
+        $elem = $('billing:use_for_shipping_yes');
+        if ($elem !== null) {
+            if (!$elem.checked) {
+                $elem.click();
+            }
+        }
+
         // Handle streamcheckout checkbox, should not be checked
         $div = $$('.ship-to-different-address');
         if ($div.length === 1) {
