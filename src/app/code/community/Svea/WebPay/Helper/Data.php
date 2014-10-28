@@ -58,34 +58,55 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Calls from checkout frontend
+     * Get paymentplans that are valid for a specific quote
      *
-     * @return Calculated params array
+     * The arrays in the result has the following keys:
+     *
+     * - pricePerMonth: int
+     * - campaignCode: The campaign code
+     * - isCampaign: If this is a campaign
+     * - description: Translated free text description
+     * - paymentPlan: Svea_Model_PaymentPlan
+     *
+     * @param $quote The quote
+     *
+     * @returns array List of arrays.
      */
-    public function getPaymentPlanParams($quote = null)
+    public function getPaymentPlansForQuote($quote)
     {
-        if ($quote === null) {
-            $quote = Mage::getSingleton('checkout/session')->getQuote();
-        }
-
-        $orderTotal = $quote->getGrandTotal() - $quote->getShippingAmount();
-        $params = Mage::getModel('svea_webpay/paymentplan')->getCollection();
-
+        // TODO: Should we also round total and shipping amount?
+        $orderTotal = round($quote->getGrandTotal() - $quote->getShippingAmount());
         $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams($quote->getStoreId());
 
-        // Get most recent and filter out campaigns that does not fit the
-        // order amount
-        $paramsArray = array();
-        foreach ($params as &$cc) {
-            if ($cc->timestamp == $latestTimestamp) {
-                if ($orderTotal >= $cc->fromamount && $orderTotal <= $cc->toamount) {
-                    $cc->monthlyamount = round($orderTotal * $cc->monthlyannuityfactor);
-                    $paramsArray[] = $cc;
-                }
-            }
+        $paymentPlans = array();
+        $paymentPlansAsObjects = new stdClass();
+        $paymentPlansAsObjects->campaignCodes = array();
+
+        foreach (Mage::getModel('svea_webpay/paymentplan')->getCollection()->addFieldToFilter('timestamp', $latestTimestamp) as $paymentPlan) {
+            // XXX: it _is_ called 'campaincode' without 'g' in the database
+            $campaignCode = $paymentPlan->getData('campaincode');
+            $paymentPlans[$campaignCode] = $paymentPlan;
+            $paymentPlansAsObjects->campaignCodes[$campaignCode] = $paymentPlan->asSveaResponse();
         }
 
-        return (object) $paramsArray;
+        $validPaymentPlans = array();
+
+        foreach(WebPay::paymentPlanPricePerMonth($orderTotal, $paymentPlansAsObjects)->values as $validCampaign) {
+            $campaignCode = $validCampaign['campaignCode'];
+            $paymentPlan = $paymentPlans[$campaignCode];
+
+            $validCampaign['paymentPlan'] = $paymentPlan;
+            $validCampaign['notificationFee'] = $paymentPlan->notificationfee;
+            // XXX: This rounding was present in previous code, however, I don't
+            // know _how_ it should be rounded(UP, DOWN etc).
+            $validCampaign['pricePerMonth'] = round($validCampaign['pricePerMonth']);
+
+            $validCampaign['isCampaign'] = $paymentPlan->paymentfreemonths && ($paymentPlan->interestfreemonths == $paymentPlan->paymentfreemonths);
+
+            $validPaymentPlans[] = $validCampaign;
+        }
+
+        return $validPaymentPlans;
     }
 
     /**

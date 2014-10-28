@@ -106,7 +106,7 @@ class Svea_WebPay_Model_Service_PaymentPlan extends Svea_WebPay_Model_Service_Ab
             return false;
         }
 
-        $paymentPlans = Mage::helper('svea_webpay')->getPaymentPlanParams($quote);
+        $paymentPlans = Mage::helper('svea_webpay')->getPaymentPlansForQuote($quote);
         return count((array)$paymentPlans) > 0;
     }
 }

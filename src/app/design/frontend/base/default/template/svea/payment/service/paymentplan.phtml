@@ -17,7 +17,7 @@ if ($_useUnifiedGui) {
 $_currency = Mage::app()->getStore()->getCurrentCurrencyCode();
 $_code = $this->getMethodCode();
 $_infoBlock = trim(Mage::getStoreConfig("payment/$_code/paymentplan_info"));
-$_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
+$_resultParams = $this->getPaymentPlans();
 $_ssnHtml = $this->getSsnHtml();
 ?>
 <ul class="form-list" id="payment_form_<?php echo $_code ?>" style="display:none;">
@@ -36,23 +36,23 @@ $_ssnHtml = $this->getSsnHtml();
                 $_i = 0;
                 $_campaigns = array();
                 foreach ($_resultParams as $_campaign): $_i++;
-                    $_isCampaign = $_campaign->paymentfreemonths && ($_campaign->interestfreemonths == $_campaign->paymentfreemonths);
                     ?>
                     <?php $_selected = ($_i === 1) ? "selected" : "" ?>
-                    <?php if ($_isCampaign): ?>
+                    <?php if ($_campaign['isCampaign']): ?>
                         <option <?php echo $_selected ?>
-                            value="<?php echo $_campaign->campaincode; ?>"> <?php echo $_campaign->description; ?></option>
+                            value="<?php echo $_campaign['campaignCode']; ?>"> <?php echo $_campaign['description']; ?></option>
                     <?php else: ?>
                         <option <?php echo $_selected ?>
-                            value="<?php echo $_campaign->campaincode; ?>"> <?php echo $_campaign->contractlength; ?>
+                            value="<?php echo $_campaign['campaignCode'] ?>"> <?php echo $_campaign['paymentPlan']->contractlength; ?>
                             mån
                         </option>
                     <?php endif; ?>
                     <?php
                     $_campaigns[] = array(
-                        'code' => $_campaign->campaincode,
-                        'amount' => $_campaign->monthlyamount,
-                        'is_campaign' => $_isCampaign
+                        'code' => $_campaign['campaignCode'],
+                        'amount' => $_campaign['pricePerMonth'],
+                        'notification_fee' => $_campaign['notificationFee'],
+                        'is_campaign' => $_campaign['isCampaign']
                     );
                 endforeach;
                 ?>
@@ -62,6 +62,11 @@ $_ssnHtml = $this->getSsnHtml();
             <p id="paymentplan_cost_text" style="display:none">
                 Din månadskostnad: <span class="cost"><span id="paymentplan_cost"></span> <?php echo $_currency . "/" . Mage::helper('svea_webpay')->__('month') ?></span>
             </p>
+
+            <p id="paymentplan_notification_fee_text" style="display:none">
+                <?php echo Mage::helper('svea_webpay')->__('Notification fee') ?>: <span class="cost"><span id="paymentplan_notification_fee"></span> <?php echo $_currency ?></span>
+            </p>
+
         </div>
     </li>
 
@@ -86,6 +91,12 @@ $_ssnHtml = $this->getSsnHtml();
                 } else {
                     $('paymentplan_cost_text').show();
                     $('paymentplan_cost').update(available_campaigns[i].amount);
+                }
+                if (available_campaigns[i].notification_fee) {
+                    $('paymentplan_notification_fee_text').show();
+                    $('paymentplan_notification_fee').update(available_campaigns[i].notification_fee);
+                } else {
+                    $('paymentplan_notification_fee_text').hide();
                 }
             }
         }
