@@ -16,7 +16,6 @@ class Svea_Webpay_Model_Paymentplan_Client_Country_Options extends Mage_Eav_Mode
         'SE',
         'NO',
         'DK',
-        'NL',
         'FI',
     );
 
