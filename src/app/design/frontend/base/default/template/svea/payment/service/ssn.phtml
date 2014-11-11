@@ -1,34 +1,21 @@
 <?php
 
-// This key will be used in forms if there is only one set of inputs for svea
-$_unifiedInterfaceFormKey = 'svea_info';
-
-$_country = Mage::getSingleton('checkout/session')
-    ->getQuote()
-    ->getBillingAddress()
-    ->getCountry();
-
-$_lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
-
-// Payment method
-$_method = $this->getMethod();
-
-
-// If no method is set it's assumed that the frontend uses a single set of inputs
-// for all svea payment methods. The key which these inputs will use will then be
-// 'svea_info'
-$_useUnifiedGui = empty($_method);
-
-if ($_useUnifiedGui) {
-    $_code = $_unifiedInterfaceFormKey;
-} else {
-    $_code = $_method->getCode();
+if (!$this->shouldRenderTemplate()) {
+    return;
 }
+
+$_code = $this->getFrontendId();
 
 // Add class regardless of unified interface or not
 $_class = 'svea-ssn-container-' . $_code;
 
 $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'));
+
+// Get country for later
+$_country = Mage::getSingleton('checkout/session')
+    ->getQuote()
+    ->getBillingAddress()
+    ->getCountry();
 
 ?>
 
@@ -38,9 +25,8 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
         <?php
          /**
             These radios are not the real values sent to the server because some
-            checkout sollutions doesn't handle radios very well. Instead the
-            `setCustomerTypeRadioThing` will copy the value into the hidden
-            input below.
+            checkout sollutions doesn't handle radios very well. They will notify
+            the SVEA controller by firing an event on <body>.
          */
         ?>
         <div class="field">
@@ -49,14 +35,14 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
                        class="payment_form_customerType_0"
                        name="_svea_customerType"
                        value="0"
-                       onclick="setCustomerTypeRadioThing.call(this);"
+                       onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
                        checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
             </label>
             <label>
                 <input type="radio"
                        class="payment_form_customerType_1"
                        name="_svea_customerType"
-                       onclick="setCustomerTypeRadioThing.call(this);"
+                       onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
                        value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
             </label>
         </div>
@@ -84,7 +70,7 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
             <?php if (in_array($_country, array('SE', 'DK'))): ?>
                 <div id="payment-method-buttons-container-<?php echo $_code ?>" class="field get-address-btn">
                     <button class="button"
-                            onclick="sveaGetAddress.call(this, '<?php echo $_code; ?>');"
+                            onclick="(function(){$$('body')[0].fire('svea:getAddressFromServer');})();"
                             type="button">
                         <span>
                             <span class="inner"><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span>
@@ -101,7 +87,10 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
         <?php if (in_array($_country, array('SE', 'DK'))): ?>
             <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
                     style="display:none;margin-top:8px;width:100%"></select>
-            <?php if (!$this->helper('svea_webpay')->usingQuickCheckout()): ?>
+            <?php
+            ?>
+
+            <?php if ($this->helper('svea_webpay')->showSsnSelectorInPaymentMethod()): ?>
                 <div id="showAddressBox_<?php echo $_code ?>" class="field">
                     <label class="sveaShowAdressesLabel" for="sveaShowAddresses_<?php echo $_code ?>" style="display:none"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
 
@@ -109,6 +98,7 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
                          id="sveaShowAddresses_<?php echo $_code ?>"></div>
                 </div>
             <?php endif ?>
+
         <?php endif; ?>
     <?php endif; ?>
 
@@ -208,13 +198,28 @@ $_useCustomerTypeSelector = in_array($_code, array('svea_invoice', 'svea_info'))
     <input type="hidden" name="payment[<?php echo $_code ?>][svea_addressSelector]"
            class="svea_address_selector">
 </div>
-<script>
-    var currentCountry, usingQuickCheckout, getAddressUrl;
 
-    window.currentCountry = <?php echo Mage::helper('core')->jsonEncode($_country) ?>;
-    window.usingQuickCheckout = <?php echo Mage::helper('core')->jsonEncode($this->helper('svea_webpay')->usingQuickCheckout()) ?>;
-    window.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
-    window.sveaOneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
-    window.sveaUseFormKey = <?php echo $_useUnifiedGui ? 'true' : 'false' ?>;
-    window.sveaFormKey = <?php echo $_useUnifiedGui ? "'$_code'" : 'null' ?>;
+<script>
+
+    $(document).observe('dom:loaded', function() {
+
+        // This html is loaded by ajax some times, so only overwrite window._svea if it
+        // isn't set
+        if (!window._svea) {
+            window._svea = {};
+        }
+
+        window._svea.useFormKey = <?php echo $_code === 'svea_info' ? 'true' : 'false' ?>;
+        window._svea.formKey = <?php echo $_code === 'svea_info' ? "'$_code'" : 'null' ?>;
+        window._svea.lockRequiredFields = <?php echo $this->shouldLockRequiredFields() ? 'true': 'false' ?>;
+
+        // Create svea controller if the controller doesn't exist
+        if (!window._svea.controller) {
+            var config = {};
+            config.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+            config.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
+            window._svea.controller = new _SveaController(config);
+        }
+
+    });
 </script>

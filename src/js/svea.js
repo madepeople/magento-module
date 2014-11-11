@@ -1,22 +1,19 @@
-/*global Class $ $$ payment currentCountry $F $H Ajax */
+/*global window Class $ $$ payment $F $H Ajax */
 /** Svea magento module javascript part
  *
  * This module takes care of retrieving addresses from svea and modifying the gui
  * so that inputs are hidden/shown enabled or disabled depending on payment
  * method and billing country.
  *
+ * The window._svea object is setup in ssn.phtml.
+ *
  * TODO: Lock everything in 'the box' until the getAddress request returns, otherwise one can change customertype during the request >:/
  *
  */
 
-
 /** SVEA Private customer type denominator for the select element
  */
 var _sveaCustomerTypePrivateIntegerValue = 0;
-
-/** SVEA Private customer type denominator in a customerIdentity
- */
-var _sveaCustomerTypePrivateStringValue = 'Business';
 
 /** SVEA Company customer type denominator for the select element
  */
@@ -49,12 +46,13 @@ var _sveaCompanyReadOnlyElements = [
 
 /** Check if a specific form key should be used
  *
- * If a specific form key should be used it will be stored in `window.sveaFormKey`.
+ * If a specific form key should be used it will be stored in
+ * `window._svea.formKey`.
  *
  * @returns bool
  */
 function _sveaUseFormKey() {
-    return window.sveaUseFormKey;
+    return window._svea.useFormKey;
 }
 
 /** Get the form key that svea uses for it's inputs
@@ -65,15 +63,16 @@ function _sveaUseFormKey() {
  *   vs
  * name=payment[svea_paymentplan][svea_customerType]
  *
- * If window.sveaUseFormKey is set a single set of inputs are used for all svea
- * payment methods and the formKey should be stored in `window.sveaFormKey`.
+ * If window._svea.useFormKey is set a single set of inputs are used for all
+ * svea payment methods and the formKey should be stored in
+ * `window._svea.formKey`.
  * If not the current payment method will be used as form key. This means that
  * the formKey returned here can be non-svea payment method code.
  *
  * @returns string
  */
 function _sveaGetFormKey() {
-    return _sveaUseFormKey() ? window.sveaFormKey : _sveaGetPaymentMethodCode();
+    return _sveaUseFormKey() ? window._svea.formKey : _sveaGetPaymentMethodCode();
 }
 
 /* Get nationalIdNumber container
@@ -147,7 +146,7 @@ function _sveaGetPaymentMethodCode() {
 
 /** Get country code for selected billing country
  *
- * `currentCountry` is populated after country is changed so use this to get
+ * `window._svea` is populated after country is changed so use this to get
  * the current selected billing country code from the billing country select
  * directly.
  *
@@ -571,7 +570,15 @@ var _SveaController = Class.create({
         'SE',
         'DK'
     ],
-    initialize: function() {
+    getAddressUrl: null,
+    oneStepCheckoutSetMethodsSeparateUrl: null,
+    initialize: function(config) {
+        /** Create a new Svea controller
+         *
+         */
+
+        this.reconfigure(config);
+
         this.customerStore = new _SveaCustomerStore();
         // Store last state
         this.lastState = this.getCurrentState();
@@ -585,6 +592,24 @@ var _SveaController = Class.create({
             // If we started as SVEA have a blank address
             this.lastStateAddressValues = {};
         }
+
+        // Setup gui
+        this.setupGui();
+
+        // Setup observers
+        this.setupObservers();
+
+    },
+    reconfigure: function(config) {
+        if (!config.getAddressUrl) {
+            throw "config.getAddressUrl not set but required";
+        }
+        // Url for the getAddress request
+        this.getAddressUrl = config.getAddressUrl;
+
+        // The URL OneStepCheckout uses to save payment method and payment
+        // method additional data, optional if OneStepCheckout isn't used.
+        this.oneStepCheckoutSetMethodsSeparateUrl = config.oneStepCheckoutSetMethodsSeparateUrl || null;
     },
     /** Toggle visibility and state of 'ship to different address'-checkbox
      *
@@ -602,6 +627,14 @@ var _SveaController = Class.create({
         if (visible) {
             if (typeof shipping !== 'undefined') {
                 shipping.setSameAsBilling(true);
+            }
+        }
+
+        // Handle onepage billing:use_for_shipping
+        $elem = $('billing:use_for_shipping_yes');
+        if ($elem !== null) {
+            if (!$elem.checked) {
+                $elem.click();
             }
         }
 
@@ -781,7 +814,7 @@ var _SveaController = Class.create({
             // svea-ssn-inputs are required entries
             $$('.svea-ssn-input').invoke('addClassName', 'required-entry');
 
-            this.toggleReadOnlyElements(true);
+            this.toggleReadOnlyElements(window._svea.lockRequiredFields);
             this.toggleShipToDifferentAddress(false);
 
         } else {
@@ -849,7 +882,10 @@ var _SveaController = Class.create({
 
         /*global get_separate_save_methods_function */
         if (typeof get_separate_save_methods_function === 'function') {
-            var url = window.sveaOneStepCheckoutSetMethodsSeparateUrl;
+            var url = this.oneStepCheckoutSetMethodsSeparateUrl;
+            if (!url) {
+                throw "config option 'oneStepCheckoutSetMethodsSeparateUrl' not set but required";
+            }
 
             // Note: There is a setting in OneStepCheckout that disables
             // this but even if you turn it of OneStepCheckout will
@@ -923,64 +959,137 @@ var _SveaController = Class.create({
                                 'change',
                                 changeCb);
             });
+
+        // Listen to svea:customerTypeChanged event
+        $$('body').invoke('observe',
+                          'svea:customerTypeChanged',
+                          this.customerTypeChangedCb.bind(this));
+
+        // Listen to svea:getAddress event
+        $$('body').invoke('observe',
+                          'svea:getAddressFromServer',
+                          this.getAddressFromServer.bind(this));
+
     },
     /** Callback for when something has changed
      */
     changeCb: function() {
         // Called when something changed
         this.setupGui();
+    },
+
+    customerTypeChangedCb: function(event) {
+        /** Callback for svea:customerTypeChanged event on <body>
+         *
+         * The event should be fired with a single value which is the new
+         * customer type with the value "0" or "1".
+         */
+
+        var customerType = event.memo,
+        countryCode = _sveaGetBillingCountryCode();
+
+        if (customerType !== "1" && customerType !== "0") {
+            throw ["Got invalid customer type", customerType];
+        }
+
+        // Set hidden input value
+        $$('input[name="payment[' + _sveaGetFormKey() + '][svea_customerType]"]')[0].value = customerType;
+
+        if (countryCode == 'NL' || countryCode == 'DE') {
+            if (customerType == 1) {
+                $$(".forNLDE").invoke('hide');
+                $$(".forNLDEcompany").invoke('show');
+            } else {
+                $$(".forNLDEcompany").invoke('hide');
+                $$(".forNLDE").invoke('show');
+            }
+        } else {
+            if (customerType == 1) {
+                $$(".label_ssn_customerType_0").invoke('hide');
+                $$(".label_ssn_customerType_1").invoke('show');
+            } else {
+                $$(".label_ssn_customerType_1").invoke('hide');
+                $$(".label_ssn_customerType_0").invoke('show');
+            }
+        }
+
+        // Run setupGui
+        this.setupGui();
+    },
+
+    /** Get and update address from svea with an AJAX request
+     *
+     */
+    getAddressFromServer: function() {
+
+        var ssn = _sveaGetBillingNationalIdNumber(),
+        typeElement = _$('input:checked[name*=customerType]'),
+        countryCode = _sveaGetBillingCountryCode(),
+        customerType = typeElement ? typeElement.value : 0;
+
+        /**
+         * Adds class 'loading' on the getAddressButton
+         */
+        function startLoading() {
+            var getAddressButton = _$('.get-address-btn');
+            if (getAddressButton) {
+                $(getAddressButton).addClassName('loading');
+            }
+        }
+
+        /**
+         * Removed class 'loading' on the getAddressButton
+         */
+        function stopLoading() {
+            var getAddressButton = _$('.get-address-btn');
+            if (getAddressButton) {
+                $(getAddressButton).removeClassName('loading');
+            }
+        }
+
+        /** OnSuccess callback that must be bound to this instance
+         */
+        function onSuccess(transport) {
+            var json = transport.responseText.evalJSON();
+
+            try {
+                this.handleResponse(transport.responseText.evalJSON());
+            } catch (e) {
+                // console.warn('_svea.controller.handleResponse error', e, transport);
+                return;
+            }
+        }
+
+        startLoading();
+        new Ajax.Request(this.getAddressUrl, {
+            parameters: {
+                ssn: ssn,
+                type: customerType,
+                cc: countryCode,
+                method: _sveaGetPaymentMethodCode()
+            },
+            onComplete: function (transport) {
+                stopLoading();
+            },
+            onSuccess: onSuccess.bind(this)
+        });
     }
+
 });
 
-/** _SveaController instance
- */
-var _sveaController = new _SveaController();
-
 /** Get and update address from svea with an AJAX request
+ *
+ * @deprecated This should be replaced with emitting a 'svea:getAddressFromServer'
+ * event on <body> with the new type as argument.
+ *
+ * Example for a radio with the values 0 or 1:
+ *     onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
  *
  */
 function sveaGetAddress()
 {
-    var ssn = _sveaGetBillingNationalIdNumber(),
-        typeElement = _$('input:checked[name*=customerType]'),
-        countryCode = currentCountry,
-        customerType = typeElement ? typeElement.value : 0;
-
-    function startLoading()
-    {
-        var getAddressButton = _$('.get-address-btn');
-        if (getAddressButton) {
-            $(getAddressButton).addClassName('loading');
-        }
-    }
-
-    function stopLoading()
-    {
-        var getAddressButton = _$('.get-address-btn');
-        if (getAddressButton) {
-            $(getAddressButton).removeClassName('loading');
-        }
-    }
-
-    function onSuccess(transport) {
-        var json = transport.responseText.evalJSON();
-
-        try {
-            _sveaController.handleResponse(transport.responseText.evalJSON());
-        } catch (e) {
-            // console.warn('_sveaController.handleResponse error', e, transport);
-            return;
-        }
-    }
-
-    startLoading();
-    new Ajax.Request(window.getAddressUrl, {
-        parameters: {ssn: ssn, type: customerType, cc: countryCode, method: _sveaGetPaymentMethodCode()},
-        onComplete: function (transport) {
-            stopLoading();
-        },
-        onSuccess: onSuccess
-    });
+    console.warn("This method is deprecated. See comments");
+    $$('body')[0].fire('svea:getAddressFromServer');
 }
 
 /** This is called from the template when customer type is changed
@@ -988,35 +1097,18 @@ function sveaGetAddress()
  * This needs to be bound to the input in question because the current value is
  * read from $(this).value.
  *
+ * @deprecated This should be replaced with emitting a 'svea:customerTypeChanged'
+ * event on <body> with the new type as argument.
+ *
+ * Example for a radio with the values 0 or 1:
+ *     onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
+ *
  * @returns undefined
  */
 function setCustomerTypeRadioThing()
 {
-    var customerType = $(this).value;
-
-    // Set hidden input value
-    $$('input[name="payment[' + _sveaGetFormKey() + '][svea_customerType]"]')[0].value = customerType;
-
-    if (currentCountry == 'NL' || currentCountry == 'DE') {
-        if (customerType == 1) {
-            $$(".forNLDE").invoke('hide');
-            $$(".forNLDEcompany").invoke('show');
-        } else {
-            $$(".forNLDEcompany").invoke('hide');
-            $$(".forNLDE").invoke('show');
-        }
-    } else {
-        if (customerType == 1) {
-            $$(".label_ssn_customerType_0").invoke('hide');
-            $$(".label_ssn_customerType_1").invoke('show');
-        } else {
-            $$(".label_ssn_customerType_1").invoke('hide');
-            $$(".label_ssn_customerType_0").invoke('show');
-        }
-    }
-
-    // Forward to _sveaController
-    _sveaController.setupGui();
+    console.warn("This method is deprecated, see comments.");
+    $$('body')[0].fire('svea:customerTypeChanged', $(this).value);
 }
 
 /** Callback for when an address is selected
@@ -1026,13 +1118,13 @@ function setCustomerTypeRadioThing()
 function sveaAddressSelectChanged()
 {
     // Update the selected address id on the current address
-    _sveaController.customerStore.getCurrent().setSelectedAddressId($F(this));
+    window._svea.controller.customerStore.getCurrent().setSelectedAddressId($F(this));
 
     // The database needs to find out about the newly selected address
-    _sveaController.setupGui();
+    window._svea.controller.setupGui();
 }
 
-$(document).observe('dom:loaded', function () {
+$(document).observe('dom:loaded', function() {
 
     /** Patch methods that are used to change payment method
      *
@@ -1052,7 +1144,7 @@ $(document).observe('dom:loaded', function () {
             _oldPaymentSwitchMethod = Payment.prototype.switchMethod;
 
             Payment.prototype.switchMethod = function(method) {
-                _sveaController.changeCb();
+                window._svea.controller.changeCb();
                 return _oldPaymentSwitchMethod.call(this, method);
             };
         }
@@ -1062,12 +1154,10 @@ $(document).observe('dom:loaded', function () {
             _oldStreamcheckoutSwitchMethod = Streamcheckout.prototype.switchPaymentBlock;
 
             Streamcheckout.prototype.switchPaymentBlock = function(method) {
-                _sveaController.changeCb();
+                window._svea.controller.changeCb();
                 return _oldStreamcheckoutSwitchMethod.call(this, method);
             };
         }
     })();
 
-    _sveaController.setupObservers();
-    _sveaController.setupGui();
 });

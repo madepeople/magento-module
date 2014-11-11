@@ -1,15 +1,19 @@
 <?php
+
 $_code = $this->getMethodCode();
-$_infoBlock = trim(Mage::getStoreConfig("payment/$_code/paymentplan_info"));
+
+$_infoHtml = $this->getInfoHtml();
 $_ssnHtml = $this->getSsnHtml();
+
 ?>
 
 <ul class="form-list" id="payment_form_<?php echo $_code ?>"
     style="display:none;">
-    <?php if (!empty($_infoBlock)): ?>
-    <li>
-        <?php echo(nl2br($_infoBlock)); ?>
-    </li>
+
+    <?php if (!empty($_infoHtml)): ?>
+        <li>
+            <?php echo($_infoHtml); ?>
+        </li>
     <?php endif ?>
 
     <?php if (!empty($_ssnHtml)): ?>
@@ -17,4 +21,5 @@ $_ssnHtml = $this->getSsnHtml();
             <?php echo $_ssnHtml ?>
         </li>
     <?php endif ?>
+
 </ul>
