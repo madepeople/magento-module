@@ -21,6 +21,7 @@
 "month","måned"
 "initial_fee","Indledende gebyr vil blive tilføjet"
 "no_orderid","No order is placed at Svea. Svea order id is required"
+"Your monthly cost","Din månedlige omkostning"
 
 "Error_20000","Svea error %s : Ordre lukket"
 "Error_20001","Svea error %s : Ordre nægtet"

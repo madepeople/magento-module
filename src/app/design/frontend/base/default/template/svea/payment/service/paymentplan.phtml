@@ -14,11 +14,13 @@ if ($_useUnifiedGui) {
     $_formKey = $_method->getCode();
 }
 
+$_helper = Mage::helper('svea_webpay');
+
 $_currency = Mage::app()->getStore()->getCurrentCurrencyCode();
 $_code = $this->getMethodCode();
 
 $_infoHtml = $this->getInfoHtml();
-$_resultParams = Mage::helper('svea_webpay')->getPaymentPlanParams();
+$_resultParams = $_helper->getPaymentPlanParams();
 $_ssnHtml = $this->getSsnHtml();
 
 ?>
@@ -63,7 +65,7 @@ $_ssnHtml = $this->getSsnHtml();
             <br>
 
             <p id="paymentplan_cost_text" style="display:none">
-                Din månadskostnad: <span class="cost"><span id="paymentplan_cost"></span> <?php echo $_currency . "/" . Mage::helper('svea_webpay')->__('month') ?></span>
+                <?php echo $_helper->__('Your monthly cost') ?>: <span class="cost"><span id="paymentplan_cost"></span> <?php echo $_currency . "/" . $_helper->__('month') ?></span>
             </p>
         </div>
     </li>
