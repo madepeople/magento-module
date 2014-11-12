@@ -200,26 +200,21 @@ $_country = Mage::getSingleton('checkout/session')
 </div>
 
 <script>
+    // This html is loaded by ajax some times, so only overwrite window._svea if it
+    // isn't set
+    if (!window._svea) {
+        window._svea = {};
+    }
 
-    $(document).observe('dom:loaded', function() {
+    window._svea.useFormKey = <?php echo $_code === 'svea_info' ? 'true' : 'false' ?>;
+    window._svea.formKey = <?php echo $_code === 'svea_info' ? "'$_code'" : 'null' ?>;
+    window._svea.lockRequiredFields = <?php echo $this->shouldLockRequiredFields() ? 'true': 'false' ?>;
 
-        // This html is loaded by ajax some times, so only overwrite window._svea if it
-        // isn't set
-        if (!window._svea) {
-            window._svea = {};
-        }
-
-        window._svea.useFormKey = <?php echo $_code === 'svea_info' ? 'true' : 'false' ?>;
-        window._svea.formKey = <?php echo $_code === 'svea_info' ? "'$_code'" : 'null' ?>;
-        window._svea.lockRequiredFields = <?php echo $this->shouldLockRequiredFields() ? 'true': 'false' ?>;
-
-        // Create svea controller if the controller doesn't exist
-        if (!window._svea.controller) {
-            var config = {};
-            config.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
-            config.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
-            window._svea.controller = new _SveaController(config);
-        }
-
-    });
+    // Create svea controller if the controller doesn't exist
+    if (!window._svea.controller) {
+        var config = {};
+        config.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+        config.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
+        window._svea.controller = new _SveaController(config);
+    }
 </script>

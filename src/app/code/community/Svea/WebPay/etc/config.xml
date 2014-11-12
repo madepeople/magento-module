@@ -267,6 +267,10 @@
             </totals_sort>
         </sales>
         <payment>
+            <svea_general>
+                <display_ssn_selector_with_payment_method>1</display_ssn_selector_with_payment_method>
+                <lock_required_fields>0</lock_required_fields>
+            </svea_general>
             <svea_cardpayment>
                 <active>0</active>
                 <model>svea_webpay/hosted_card</model>
