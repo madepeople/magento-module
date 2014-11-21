@@ -82,7 +82,7 @@
   display: none;
 }
 /* line 78, ../sass/checkout.scss */
-.form-list #paymentplan_cost_text, .form-list #paymentplan_notification_fee_text {
+.form-list #paymentplan_cost_text, .form-list #paymentplan_initial_fee_text {
   background-color: #297ab7;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -96,7 +96,7 @@
   font-weight: bold;
 }
 /* line 90, ../sass/checkout.scss */
-.form-list #paymentplan_cost_text .cost, .form-list #paymentplan_notification_fee_text .cost {
+.form-list #paymentplan_cost_text .cost, .form-list #paymentplan_initial_fee_text .cost {
   font-weight: bold;
 }
 

@@ -20,7 +20,7 @@ $_currency = Mage::app()->getStore()->getCurrentCurrencyCode();
 $_code = $this->getMethodCode();
 
 $_infoHtml = $this->getInfoHtml();
-$_resultParams = $this->getPaymentPlans(); // $this->getPaymentPlanParams();
+$_resultParams = $this->getPaymentPlans();
 $_ssnHtml = $this->getSsnHtml();
 
 ?>
@@ -57,8 +57,10 @@ $_ssnHtml = $this->getSsnHtml();
                         'code' => $_campaign['campaignCode'],
                         'amount' => $_campaign['pricePerMonth'],
                         'notification_fee' => $_campaign['notificationFee'],
-                        'is_campaign' => $_campaign['isCampaign']
+                        'is_campaign' => $_campaign['isCampaign'],
+                        'initial_fee' => $_campaign['initialFee'],
                     );
+
                 endforeach;
                 ?>
             </select>
@@ -68,8 +70,8 @@ $_ssnHtml = $this->getSsnHtml();
                 <?php echo $_helper->__('Your monthly cost') ?>: <span class="cost"><span id="paymentplan_cost"></span> <?php echo $_currency . "/" . $_helper->__('month') ?></span>
             </p>
 
-            <p id="paymentplan_notification_fee_text" style="display:none">
-                <?php echo Mage::helper('svea_webpay')->__('Notification fee') ?>: <span class="cost"><span id="paymentplan_notification_fee"></span> <?php echo $_currency ?></span>
+            <p id="paymentplan_initial_fee_text" style="display:none">
+                <?php echo Mage::helper('svea_webpay')->__('initial_fee') ?>
             </p>
 
         </div>
@@ -97,11 +99,12 @@ $_ssnHtml = $this->getSsnHtml();
                     $('paymentplan_cost_text').show();
                     $('paymentplan_cost').update(available_campaigns[i].amount);
                 }
-                if (available_campaigns[i].notification_fee) {
-                    $('paymentplan_notification_fee_text').show();
-                    $('paymentplan_notification_fee').update(available_campaigns[i].notification_fee);
+                // Convert to int here to check if there is an initial fee.
+                // If 0 < initial_fee < 0.49 this is a bug.
+                if (parseFloat(available_campaigns[i].initial_fee) !== 0) {
+                    $('paymentplan_initial_fee_text').show();
                 } else {
-                    $('paymentplan_notification_fee_text').hide();
+                    $('paymentplan_initial_fee_text').hide();
                 }
             }
         }

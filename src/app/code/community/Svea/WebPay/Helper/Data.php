@@ -62,11 +62,13 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      *
      * The arrays in the result has the following keys:
      *
-     * - pricePerMonth: int
+     * - pricePerMonth: Price per month including notificationFee
      * - campaignCode: The campaign code
      * - isCampaign: If this is a campaign
      * - description: Translated free text description
      * - paymentPlan: Svea_Model_PaymentPlan
+     * - notificationFee: Notification fee
+     * - initialFee: Initial fee
      *
      * @param $quote The quote
      *
@@ -97,6 +99,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
             $validCampaign['paymentPlan'] = $paymentPlan;
             $validCampaign['notificationFee'] = $paymentPlan->notificationfee;
+            $validCampaign['initialFee'] = $paymentPlan->initialfee;
+
             // XXX: This rounding was present in previous code, however, I don't
             // know _how_ it should be rounded(UP, DOWN etc).
             $validCampaign['pricePerMonth'] = round($validCampaign['pricePerMonth']);
