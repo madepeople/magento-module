@@ -480,6 +480,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      * Are we using a quick checkout module, such as onestepcheckout or
      * stream checkout?
      *
+     * @deprecated
+     *
      * @return bool
      */
     public function usingQuickCheckout()
@@ -488,4 +490,28 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             // || anotherCriteria() ...
             ;
     }
+
+    /**
+     * Check if the SSN selector should be displayed together with the payment method
+     *
+     * This is based on a setting in admin, it may be disabled for checkouts that
+     * inlines the SSN selector together with the address fields.
+     *
+     * @return bool
+     */
+    public function showSsnSelectorInPaymentMethod()
+    {
+        return Mage::getStoreConfigFlag('payment/svea_general/display_ssn_selector_with_payment_method');
+    }
+
+    /**
+     * Check if required address fields should be locked
+     *
+     * @return bool
+     */
+    public function lockRequiredFields()
+    {
+        return Mage::getStoreConfigFlag('payment/svea_general/lock_required_fields');
+    }
+
 }

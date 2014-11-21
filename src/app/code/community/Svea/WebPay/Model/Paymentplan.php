@@ -22,6 +22,9 @@ class Svea_WebPay_Model_Paymentplan extends Mage_Core_Model_Abstract
 
     /**
      * Get params from Svea API
+     *
+     * @throws Mage_Core_Exception If 'client_country' paymentplan config option isn't set
+     *
      * @return type response or error
      */
     public function getPaymentPlanParams($id = null, $scope = null)
@@ -39,10 +42,14 @@ class Svea_WebPay_Model_Paymentplan extends Mage_Core_Model_Abstract
                 break;
         }
 
+        if (!array_key_exists('client_country', $paymentMethodConfig)) {
+            throw new Mage_Core_Exception("Error: Client Country not set.");
+        }
+
         $conf = new SveaMageConfigProvider($paymentMethodConfig);
         $sveaObject = WebPay::getPaymentPlanParams($conf);
-        $response = $sveaObject->setCountryCode('SE')
-                ->doRequest();
+        $response = $sveaObject->setCountryCode($paymentMethodConfig['client_country'])
+                               ->doRequest();
 
         if ($response->accepted == 1) {
             return $this->formatResponse($response);

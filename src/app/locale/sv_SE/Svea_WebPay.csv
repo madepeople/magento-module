@@ -20,8 +20,10 @@
 "delivered","Order är levererad"
 "month","månad"
 "initial_fee","Uppläggningsavgift tillkommer"
+"Your monthly cost","Din månadskostnad"
 
 "no_orderid","Ingen order hittas hos Svea. Det krävs ett Svea orderid."
+"Your monthly cost","Din månadskostnad"
 
 "Error_20000","Svea error %s : Ordern är stängd"
 "Error_20001","Svea error %s : Ordern nekades"
