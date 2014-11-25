@@ -1,0 +1,11 @@
+{
+  "name": "svea-webpay",
+  "description": "SVEA webpay",
+  "version": "0.1.0",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-cli": "^0.1.13",
+    "grunt-contrib-jasmine": "^0.8.1",
+    "matchdep": "^0.3.0"
+  }
+}
