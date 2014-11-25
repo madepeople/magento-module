@@ -1,0 +1,23 @@
+<script>
+    /** Emulates init that is done inline in magento */
+
+    // Checkout element init
+    $$('#checkout-payment-method-load dt input').invoke('observe', 'click', function(e) {
+        var element = e.element();
+        var name = 'payment_form_' + element.getValue();
+
+        /* Hide all other forms */
+        $$('dd.payment-method').invoke('hide');
+
+        if (element.checked) {
+            var form = $(name);
+            var container = $('container_payment_method_' + element.getValue());
+
+            if (element !== null && container !== null) {
+                container.show();
+                $(name).show();
+            }
+        }
+
+    });
+</script>

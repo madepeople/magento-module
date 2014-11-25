@@ -1,0 +1,87 @@
+<!-- Shipping address fixture -->
+<div id="shipping_address" style="display: none">
+    <ul>
+        <li class="shipping-address-title">Leveransadress</li>
+        <li id="shipping_address_list" >
+            <div id="">
+                <ul>
+                    <li>
+                        <div class="input-box input-firstname">
+                            <label for="shipping:firstname">Förnamn <span class="required">*</span></label><br />
+                            <input class="required-entry input-text" type="text" name="shipping[firstname]" id="shipping:firstname" value="" />
+                        </div>
+                        <div class="input-box input-lastname">
+                            <label for="shipping:lastname">Efternamn <span class="required">*</span></label><br />
+                            <input class="required-entry input-text" type="text" name="shipping[lastname]" id="shipping:lastname" value="" />
+                        </div>
+                    </li>
+                    <li>
+                        <div class="input-box input-telephone">
+                            <label for="shipping:telephone">Telefon <span class="required">*</span></label><br/>
+                            <input type="text" name="shipping[telephone]" value="" title="Telefon" class="required-entry input-text" id="shipping:telephone" />
+                        </div>
+                    </li>
+                    <li>
+                        <div class="input-box input-address">
+                            <label for="shipping:street1">Adress <span class="required">*</span></label><br />
+                            <input type="text" title="Street Address 1" name="shipping[street][]" id="shipping:street1" value="" class="required-entry input-text" /><br/><input type="text" title="Street Address 2" name="shipping[street][]" id="shipping:street2" value="" class="input-text" />
+                        </div>
+                    </li>
+                    <li>
+                        <div class="input-box input-country">
+                            <label for="shipping:country_id">Land <span class="required">*</span></label><br />
+                            <select name="shipping[country_id]" id="shipping:country_id" class="validate-select" title="Land" onchange="shipping.setSameAsBilling(false);">
+                                <option value="" > </option>
+                                <option value="DK" >Danmark</option>
+                                <option value="FI" >Finland</option>
+                                <option value="NL" >Nederländerna</option>
+                                <option value="NO" >Norge</option>
+                                <option value="SE" selected="selected" >Sverige</option>
+                                <option value="DE" >Tyskland</option>
+                                <option value="US" >USA</option>
+                            </select>
+
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="input-box input-city">
+                            <label for="shipping:city">Stad <span class="required">*</span></label><br/>
+                            <input type="text" name="shipping[city]" value="" title="Stad" class="required-entry input-text" id="shipping:city" />
+                        </div>
+                    </li>
+
+                    <li>
+                        <div class="input-box input-postcode" >
+                            <label for="shipping:postcode">Postnummer <span class="required">*</span></label><br />
+                            <input type="text" title="Postnummer" name="shipping[postcode]" id="shipping:postcode" value="" class="validate-zip-international required-entry input-text" />
+                        </div>
+                        <div class="input-box input-region">
+                            <label for="shipping:region">Län <span class="required">*</span></label><br/>
+                            <select id="shipping:region_id" name="shipping[region_id]" title="Län" class="validate-select" style="display:none">
+                                <option value="">Please select region, state or province</option>
+                            </select>
+                            <input type="text" id="shipping:region" name="shipping[region]" value=""  title="Län" class="required-entry input-text" style="display:none" />
+                        </div>
+                    </li>
+                    <li>
+                        <div class="input-box input-company">
+                            <label for="shipping:company">Företag</label><br/>
+                            <input type="text" name="shipping[company]" value="" title="Företag" class="input-text" id="shipping:company" />
+                        </div>
+                        <div class="input-box input-fax">
+                            <label for="shipping:fax">Fax</label><br/>
+                            <input type="text" name="shipping[fax]" value="" title="Fax" class="input-text" id="shipping:fax" />
+                        </div>
+                    </li>
+                    <li class="no-display">
+                        <input type="hidden" name="shipping[save_in_address_book]" value="1" />
+                    </li>
+                </ul>
+                <input type="hidden" name="shipping[address_id]" value="66" id="shipping:address_id" />
+                <!-- END LIST OF SHIPPING FIELDS -->
+            </div>
+        </li>
+    </ul>
+</div>
+
