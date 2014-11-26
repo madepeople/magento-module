@@ -30,3 +30,19 @@ var initBasicCheckout = function() {
         ].join("\n"));
     jQuery('#p_method_dummy').trigger('click');
 };
+
+/** Init Svea object with default parameters
+ *
+ * This should in general only be done once/test.
+ *
+ * @param checkoutType Checkout type, default 'onepage'
+ *
+ * @returns The new svea object
+ */
+var initSvea = function(checkoutType) {
+    /*global Svea */
+    return new Svea({
+        baseUrl: "http://svea-webpay.testing.se/",
+        checkoutType: checkoutType || "onepage"
+    });
+};

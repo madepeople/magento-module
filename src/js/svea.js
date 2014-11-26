@@ -65,7 +65,7 @@
         }
 
         /**
-         * Hide these form fields that we fetch using getAddress, but only if
+         * Disable these form fields that we fetch using getAddress, but only if
          * getAddress is supposed to be used (actually meaning visible in the
          * template). Also, show them if the conditions change back
          *
@@ -118,9 +118,9 @@
         if (this.config.checkoutType !== 'onepage') {
             var method = this.getCurrentMethod();
             if (getAddressVisible && method && method.match(/^svea_(invoice|paymentplan)/)) {
-                toggleFields.call(this, Element.hide);
+                toggleFields.call(this, Element.disable || function(elem) { elem.writeAttribute('disabled', true); });
             } else {
-                toggleFields.call(this, Element.show);
+                toggleFields.call(this, Element.enable || function(elem) { elem.writeAttribute('disabled', false); });
             }
         }
     },
