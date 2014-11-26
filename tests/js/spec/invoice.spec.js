@@ -58,8 +58,10 @@ describe('Svea Invoice with onepage checkout', function() {
         var firstNameInput = jQuery('#billing\\:firstname');
 
         expect(firstNameInput).not.toBeDisabled();
+
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
+
         expect(firstNameInput).not.toBeDisabled();
     });
 
@@ -67,8 +69,10 @@ describe('Svea Invoice with onepage checkout', function() {
         var firstNameInput = jQuery('#billing\\:lastname');
 
         expect(firstNameInput).not.toBeDisabled();
+
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
+
         expect(firstNameInput).not.toBeDisabled();
     });
 
@@ -87,16 +91,21 @@ describe('Svea Invoice with checkout other than onepage', function() {
         var firstNameInput = jQuery('#billing\\:firstname');
 
         expect(firstNameInput).not.toBeDisabled();
+
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
+
         expect(firstNameInput).toBeDisabled();
     });
 
     it('disables billing:lastname', function() {
         var firstNameInput = jQuery('#billing\\:lastname');
+
         expect(firstNameInput).not.toBeDisabled();
+
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
+
         expect(firstNameInput).toBeDisabled();
     });
 
