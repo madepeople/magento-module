@@ -87,7 +87,7 @@ describe('Svea Invoice with checkout other than onepage', function() {
         svea = initSvea('thirdparty');
     });
 
-    it('disables billing:firstname', function() {
+    it('disables billing:firstname when svea_invoice and SE is selected', function() {
         var firstNameInput = jQuery('#billing\\:firstname');
 
         expect(firstNameInput).not.toBeDisabled();
@@ -98,7 +98,7 @@ describe('Svea Invoice with checkout other than onepage', function() {
         expect(firstNameInput).toBeDisabled();
     });
 
-    it('disables billing:lastname', function() {
+    it('disables billing:lastname if svea_invoice and SE is selected', function() {
         var firstNameInput = jQuery('#billing\\:lastname');
 
         expect(firstNameInput).not.toBeDisabled();
