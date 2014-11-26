@@ -66,56 +66,28 @@ abstract class Svea_WebPay_Block_Payment_Abstract
     }
 
     /**
-     * Loads the svea.js file and instantiates the svea payment object
+     * Get URL to svea.js
      *
      * @return string
      */
-    protected function _toHtml()
+    public function getScriptUrl()
     {
-        $scriptUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS,
-                true) . 'svea.js';
-        $scriptUrl = Mage::helper('core')->jsonEncode($scriptUrl);
+        return Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS, true) . 'svea.js';
+    }
 
-        $parameters = Mage::helper('core')->jsonEncode(array(
+    /**
+     * Get parameters for the javascript Svea class
+     *
+     * @return array
+     */
+    public function getSveaJsParameters()
+    {
+        return array(
             'baseUrl' => Mage::getUrl('', array(
-                    '_secure' => true
-                )),
+                '_secure' => true
+            )),
             'checkoutType' => $this->_getCheckoutType(),
-        ));
-
-        $html = parent::_toHtml();
-        $html .= <<<EOF
-<script type="text/javascript">
-var svea;
-window.svea = svea;
-(function () {
-    if (!window.svea) {
-        // Set this in the beginning because, well, concurrency and stuff
-        window.svea = true;
-
-        var head = document.getElementsByTagName('head')[0];
-        var script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = $scriptUrl;
-
-        var callback = function () {
-            window.svea = new Svea($parameters);
-        }
-
-        // Then bind the event to the callback function.
-        // There are several events for cross browser compatibility.
-        script.onreadystatechange = callback;
-        script.onload = callback;
-
-        // Fire the loading
-        head.appendChild(script);
-    } else {
-        window.svea.displayCountrySpecificFields();
+        );
     }
-})();
-</script>
-EOF;
 
-        return $html;
-    }
 }
