@@ -23,6 +23,41 @@ class Svea_WebPay_Model_Payment_Service_Invoice
     protected $_formBlockType = 'svea_webpay/payment_service_invoice';
 
     /**
+     * Check if this method is valid for a specific country
+     *
+     * This makes sure that only countries that are valid according
+     * to the current store configuration can be used for a specific country.
+     *
+     * @see Mage_Payment_Model_Method_Abstract::canUseForCountry()
+     *
+     * @return bool
+     */
+    public function canUseForCountry($country)
+    {
+        $country = strtolower($country);
+
+        // Required configuration options for an invoice method
+        // It seems like the 'active' configuration option is checked somewhere
+        // else, so there is no need to check it here
+        $requiredConfigOptions = array(
+            "{$country}/client_number",
+            "{$country}/username",
+            "{$country}/password",
+        );
+
+        foreach ($requiredConfigOptions as $requiredConfigOption) {
+            $configValue = $this->getConfigData($requiredConfigOption);
+
+            if ($configValue === null || $configValue === '') {
+                return false;
+            }
+
+        }
+
+        return parent::canUseForCountry($country);
+    }
+
+    /**
      * Authorize payment for later capture
      *
      * @param Varien_Object $payment
