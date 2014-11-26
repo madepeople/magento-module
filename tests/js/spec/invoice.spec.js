@@ -24,7 +24,7 @@ describe('Svea Invoice with onepage checkout', function() {
 
     it('does not disable billing:lastname', function() {
         var firstNameInput = jQuery('#billing\\:lastname');
-        initSvea("onepage");
+
         expect(firstNameInput).not.toBeDisabled();
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
