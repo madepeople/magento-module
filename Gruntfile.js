@@ -5,9 +5,21 @@ module.exports = function(grunt) {
 
     // load all grunt tasks
     require('matchdep').filterDev('grunt-*').forEach(grunt.loadNpmTasks);
+    // load uglify
+    grunt.loadNpmTasks('grunt-contrib-uglify');
 
     // Project configuration.
     grunt.initConfig({
+        uglify: {
+            options: {
+                mangle: true
+            },
+            svea: {
+                files: {
+                    'build/js/svea.min.js': ['src/js/svea.js']
+                }
+            }
+        },
         jasmine : {
             // Project's source files
             test: {
