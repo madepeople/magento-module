@@ -1,6 +1,6 @@
 "use strict";
 /*global describe it expect jasmine loadFixtures jQuery beforeEach */
-/*global initBasicCheckout setBillingCountry getBillingCountry getPaymentMethod setPaymentMethod */
+/*global initOnepageCheckout setBillingCountry getBillingCountry getPaymentMethod setPaymentMethod */
 
 jasmine.getFixtures().fixturesPath = 'tests/js/fixtures';
 
@@ -8,7 +8,7 @@ describe("Test-setup", function() {
 
     /** Load fixture and select dummy payment method */
     beforeEach(function() {
-        initBasicCheckout();
+        initOnepageCheckout();
     });
 
     it("has payment method 'dummy' selected", function() {

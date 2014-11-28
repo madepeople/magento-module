@@ -1,18 +1,16 @@
 "use strict";
 /** Test for invoice */
 /*global beforeEach describe it expect jQuery jasmine */
-/*global initBasicCheckout initSvea setBillingCountry getBillingCountry getPaymentMethod setPaymentMethod setInvoiceCustomerType getInvoiceCustomerType */
+/*global initCustomCheckout initOnepageCheckout initOnestepCheckout initSvea setBillingCountry getBillingCountry getPaymentMethod setPaymentMethod setInvoiceCustomerType getInvoiceCustomerType */
 
 jasmine.getFixtures().fixturesPath = 'tests/js/fixtures';
 
 describe('Svea Invoice customerType radios', function() {
-    var svea,
-        individualDiv,
+    var individualDiv,
         companyDiv;
 
     beforeEach(function() {
-        initBasicCheckout();
-        svea = initSvea('onepage');
+        initOnepageCheckout();
 
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
@@ -47,11 +45,9 @@ describe('Svea Invoice customerType radios', function() {
 });
 
 describe('Svea Invoice with onepage checkout', function() {
-    var svea;
 
     beforeEach(function() {
-        initBasicCheckout();
-        svea = initSvea('onepage');
+        initOnepageCheckout();
     });
 
     it('does not disable billing:firstname', function() {
@@ -79,12 +75,10 @@ describe('Svea Invoice with onepage checkout', function() {
 });
 
 describe('Svea Invoice with checkout other than onepage', function() {
-    var svea;
 
     /** Load fixture and select dummy payment method */
     beforeEach(function() {
-        initBasicCheckout();
-        svea = initSvea('thirdparty');
+        initCustomCheckout({checkoutType: 'thirdparty'});
     });
 
     it('disables billing:firstname when svea_invoice and SE is selected', function() {
@@ -109,4 +103,28 @@ describe('Svea Invoice with checkout other than onepage', function() {
         expect(firstNameInput).toBeDisabled();
     });
 
+});
+
+describe('Svea Invoice with onepagecheckout', function() {
+
+    beforeEach(function() {
+        initOnestepCheckout();
+    });
+
+    it('checks and disables use_for_shipping when svea_invoice and SE is selected', function() {
+        var useForShipping = jQuery('#billing\\:use_for_shipping_yes');
+
+        expect(useForShipping).toBeChecked();
+        expect(useForShipping).not.toBeDisabled();
+
+        useForShipping.trigger('click');
+        expect(useForShipping).not.toBeChecked();
+
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('SE');
+
+        expect(useForShipping).toBeChecked();
+        expect(useForShipping).toBeDisabled();
+
+    });
 });
