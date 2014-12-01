@@ -50,26 +50,24 @@ describe('Svea Invoice with onepage checkout', function() {
         initOnepageCheckout();
     });
 
-    it('does not disable billing:firstname', function() {
-        var firstNameInput = jQuery('#billing\\:firstname');
-
-        expect(firstNameInput).not.toBeDisabled();
+    /** Test that checks that an input isn't disabled after svea_invoice + 'SE' is selected
+     * @param input Input 'name', like 'firstname'
+     */
+    function _testDoesNotDisableInput(input) {
+        var inputElement = jQuery('#billing\\:' + input);
 
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
 
-        expect(firstNameInput).not.toBeDisabled();
+        expect(inputElement).not.toBeDisabled();
+    }
+
+    it('does not disable billing:firstname', function() {
+        _testDoesNotDisableInput('firstname');
     });
 
     it('does not disable billing:lastname', function() {
-        var firstNameInput = jQuery('#billing\\:lastname');
-
-        expect(firstNameInput).not.toBeDisabled();
-
-        setPaymentMethod('svea_invoice');
-        setBillingCountry('SE');
-
-        expect(firstNameInput).not.toBeDisabled();
+        _testDoesNotDisableInput('lastname');
     });
 
 });
@@ -81,26 +79,26 @@ describe('Svea Invoice with checkout other than onepage', function() {
         initCustomCheckout({checkoutType: 'thirdparty'});
     });
 
-    it('disables billing:firstname when svea_invoice and SE is selected', function() {
-        var firstNameInput = jQuery('#billing\\:firstname');
+    /** Test that checks that an input is disabled after svea_invoice + 'SE' is selected
+     * @param input Input 'name', like 'firstname'
+     */
+    function _testDisablesInput(input) {
+        var inputElement = jQuery('#billing\\:' + input);
 
-        expect(firstNameInput).not.toBeDisabled();
+        expect(inputElement).not.toBeDisabled();
 
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
 
-        expect(firstNameInput).toBeDisabled();
+        expect(inputElement).toBeDisabled();
+    }
+
+    it('disables billing:firstname when svea_invoice and SE is selected', function() {
+        _testDisablesInput('firstname');
     });
 
     it('disables billing:lastname if svea_invoice and SE is selected', function() {
-        var firstNameInput = jQuery('#billing\\:lastname');
-
-        expect(firstNameInput).not.toBeDisabled();
-
-        setPaymentMethod('svea_invoice');
-        setBillingCountry('SE');
-
-        expect(firstNameInput).toBeDisabled();
+        _testDisablesInput('lastname');
     });
 
 });
