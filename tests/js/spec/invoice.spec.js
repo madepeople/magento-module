@@ -111,11 +111,10 @@ describe('Svea Invoice with onepagecheckout', function() {
         initOnestepCheckout();
     });
 
-    it('checks and disables use_for_shipping when svea_invoice and SE is selected', function() {
+    it('checks use_for_shipping when svea_invoice and SE is selected', function() {
         var useForShipping = jQuery('#billing\\:use_for_shipping_yes');
 
         expect(useForShipping).toBeChecked();
-        expect(useForShipping).not.toBeDisabled();
 
         useForShipping.trigger('click');
         expect(useForShipping).not.toBeChecked();
@@ -124,7 +123,18 @@ describe('Svea Invoice with onepagecheckout', function() {
         setBillingCountry('SE');
 
         expect(useForShipping).toBeChecked();
-        expect(useForShipping).toBeDisabled();
+
+    });
+
+    it('makes use_for_shipping readonly when svea_invoice and SE is selected', function() {
+        var useForShipping = jQuery('#billing\\:use_for_shipping_yes');
+
+        expect(useForShipping).not.toHaveAttr('readonly');
+
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('SE');
+
+        expect(useForShipping).toHaveAttr('readonly');
 
     });
 });
