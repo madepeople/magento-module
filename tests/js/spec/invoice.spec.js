@@ -45,9 +45,10 @@ describe('Svea Invoice customerType radios', function() {
 });
 
 describe('Svea Invoice with onepage checkout', function() {
+    var svea;
 
     beforeEach(function() {
-        initOnepageCheckout();
+        svea = initOnepageCheckout();
     });
 
     /** Test that checks that an input isn't set to readonly after svea_invoice + 'SE' is selected
@@ -70,29 +71,31 @@ describe('Svea Invoice with onepage checkout', function() {
         _testDoesNotSetInputToReadonly('lastname');
     });
 
-    it('displays #svea-invoice-payment-invalid-country when selecting US', function() {
-        var div = jQuery('#payment-svea-invoice-invalid-country');
+    it('displays #svea-invoice-payment-not-available when selecting US', function() {
+        var div = jQuery('#svea-invoice-payment-not-available');
 
         setPaymentMethod('svea_invoice');
+
         setBillingCountry('SE');
 
         expect(div).toBeHidden();
 
         setBillingCountry('US');
+
         expect(div).not.toBeHidden();
 
     });
 
-    it('hides #payment-svea-invoice-invalid-country when going from US to SE', function() {
-        var div = jQuery('#payment-svea-invoice-invalid-country');
+    it('hides #svea-invoice-payment-not-available when going from US to SE', function() {
+        var div = jQuery('#svea-invoice-payment-not-available');
 
         setPaymentMethod('svea_invoice');
         setBillingCountry('US');
 
-        expect(div).toBeHidden();
+        expect(div).not.toBeHidden();
 
         setBillingCountry('SE');
-        expect(div).not.toBeHidden();
+        expect(div).toBeHidden();
 
     });
 
@@ -120,6 +123,13 @@ describe('Svea Invoice with onepage checkout', function() {
         setBillingCountry('SE');
         expect(div).not.toBeHidden();
 
+    });
+
+    it('reads correct billing country code', function() {
+        setBillingCountry('US');
+        expect(svea.getBillingCountry()).toEqual('US');
+        setBillingCountry('SE');
+        expect(svea.getBillingCountry()).toEqual('SE');
     });
 
 });

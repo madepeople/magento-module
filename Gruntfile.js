@@ -46,6 +46,8 @@ module.exports = function(grunt) {
                         "tests/js/dependencies/js/mage/translate.js",
                         "tests/js/dependencies/js/mage/cookies.js",
 
+                        "tests/js/dependencies/js/event.simulate.js",
+
                         'src/js/svea.js', // svea library
                     ],
                     specs: 'tests/js/spec/**/*.spec.js',

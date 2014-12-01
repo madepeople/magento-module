@@ -11,6 +11,9 @@
 <?php $_typeCompany = Svea_WebPay_Helper_Data::TYPE_COMPANY ?>
 <?php $_quote = $this->getMethod()->getInfoInstance()->getQuote() ?>
 <div id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
+    <div id="svea-invoice-payment-not-available" style="display:none;">
+        <?php echo Mage::helper('svea_webpay')->__('This payment method cannot be used.'); ?>
+    </div>
     <div id="svea-invoice-payment-information" class="svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-payment-nl svea-payment-de">
         <!-- This input needs to be populated and transmitted to the backend,
              because we validate it against the items fetched from getAddress

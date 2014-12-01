@@ -42,11 +42,50 @@
         }
     },
 
+    /**
+     * Callback that is called each time customer_type, country_id or payment_method changes
+     *
+     */
     initializeFields: function()
     {
         this.toggleIndividualAndCompany();
         this.displayCountrySpecificFields();
         this.fieldConditionsChanged();
+        this.toggleMethodNotAvailable();
+    },
+
+    /**
+     * Toggle between showing the 'method info' div and the 'not available' div
+     *
+     * This is support for checkouts that doesn't reload payment methods when
+     * billing country changes.
+     */
+    toggleMethodNotAvailable: function() {
+        var validCountries = [
+            'SE',
+            'NO',
+            'FI',
+            'NL',
+            'DE'
+        ],
+            notAvailableDiv = $('svea-invoice-payment-not-available'),
+            infoDiv = $('svea-invoice-payment-information').show();
+
+        if (validCountries.indexOf(this.getBillingCountry()) !== -1) {
+            if (infoDiv) {
+                infoDiv.show();
+            }
+            if (notAvailableDiv) {
+                notAvailableDiv.hide();
+            }
+        } else {
+            if (infoDiv) {
+                infoDiv.hide();
+            }
+            if (notAvailableDiv) {
+                notAvailableDiv.show();
+            }
+        }
     },
 
     /**
@@ -252,6 +291,15 @@
     },
 
     /**
+     * Get selected billing country
+     *
+     * @return string country code or null
+     */
+    getBillingCountry: function() {
+        return $$('[name=billing[country_id]]').length ? $$('[name=billing[country_id]]')[0].value : null;
+    },
+
+    /**
      * Some countries such as the netherlands have separated the address with
      * the street. So we need to dynamically insert a street + house number
      * field of our own which we concatenate and fill the real fields with. We
@@ -265,8 +313,7 @@
         if (event) {
             select = event.target;
         } else {
-            select = $$('[name=billing[country_id]]').length
-                ? $$('[name=billing[country_id]]')[0] : null;
+            select = $$('[name=billing[country_id]]').length ? $$('[name=billing[country_id]]')[0] : null;
         }
 
         if (!select) {
