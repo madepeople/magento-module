@@ -70,6 +70,58 @@ describe('Svea Invoice with onepage checkout', function() {
         _testDoesNotSetInputToReadonly('lastname');
     });
 
+    it('displays #svea-invoice-payment-invalid-country when selecting US', function() {
+        var div = jQuery('#payment-svea-invoice-invalid-country');
+
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('SE');
+
+        expect(div).toBeHidden();
+
+        setBillingCountry('US');
+        expect(div).not.toBeHidden();
+
+    });
+
+    it('hides #payment-svea-invoice-invalid-country when going from US to SE', function() {
+        var div = jQuery('#payment-svea-invoice-invalid-country');
+
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('US');
+
+        expect(div).toBeHidden();
+
+        setBillingCountry('SE');
+        expect(div).not.toBeHidden();
+
+    });
+
+    it('hides #svea-invoice-payment-information when selecting US', function() {
+        var div = jQuery('#svea-invoice-payment-information');
+
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('SE');
+
+        expect(div).not.toBeHidden();
+
+        setBillingCountry('US');
+        expect(div).toBeHidden();
+
+    });
+
+    it('displays #svea-invoice-payment-information when going from US to SE', function() {
+        var div = jQuery('#svea-invoice-payment-information');
+
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('US');
+
+        expect(div).toBeHidden();
+
+        setBillingCountry('SE');
+        expect(div).not.toBeHidden();
+
+    });
+
 });
 
 describe('Svea Invoice with checkout other than onepage', function() {
@@ -135,4 +187,5 @@ describe('Svea Invoice with onepagecheckout', function() {
         expect(useForShipping).toHaveAttr('readonly');
 
     });
+
 });
