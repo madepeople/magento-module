@@ -30,7 +30,7 @@
         // Our initializers both need to set the first state as well as listen
         // for state changes
         var body = $$('body')[0];
-        $(body).on('click', '[name*=customer_type]',
+        $(body).on('change', '[name*=customer_type]',
             this.initializeFields.bindAsEventListener(this));
         $(body).on('change', '[name*=country_id]',
             this.initializeFields.bindAsEventListener(this));
@@ -108,38 +108,68 @@
          * getAddress is supposed to be used (actually meaning visible in the
          * template). Also, show them if the conditions change back
          *
-         * @param action callable
+         * @param lock Boolean, if true the input-fields will be locked to readonly
          */
-        function toggleFields(action)
+        function toggleAddressInputFields(lock)
         {
-            var addressFields = ['firstname', 'lastname', 'street', 'city',
-                'postcode'];
+            var allAddressFields = {
+                common: [
+                    'street',
+                    'city',
+                    'postcode'
+                ],
+                individual: [
+                    'firstname',
+                    'lastname',
+                ],
+                company: [
+                    'company',
+                ]
+            },
+                addressFields,
+                customerType,
+                cb,
+                lockFields = [],
+                unlockFields = [];
 
-            $(addressFields).each(function (field) {
+            if (lock) {
+                customerType = this.getCustomerType();
+                lockFields = allAddressFields.common.slice(0);
+
+                if (allAddressFields.hasOwnProperty(customerType)) {
+                    lockFields = lockFields.concat(allAddressFields[customerType].slice(0));
+                    if (customerType === 'individual') {
+                        unlockFields = allAddressFields.company.slice(0);
+                    } else {
+                        unlockFields = allAddressFields.individual.slice(0);
+                    }
+                }
+
+
+            } else {
+                // Unlock all fields that might have been locked by svea
+                unlockFields = allAddressFields.common.slice(0).concat(allAddressFields.individual).concat(allAddressFields.company);
+
+            }
+
+            $(unlockFields).each(function (field) {
                 var elements = $$('[name*="billing[' + field + '"]');
                 if (!elements.length) {
                     return;
+                } else {
+                    $(elements).each(function(elem) { elem.writeAttribute('readonly', false); });
                 }
-
-                $(elements).each(function (element) {
-                    action(element);
-                    var id = $(element).readAttribute('id');
-                    var label = $$('label[for=' + id + ']').length
-                        ? $$('label[for=' + id + ']')[0] : null;
-
-                    if (label) {
-                        action(label);
-                    }
-
-                    // See if there is a container that we recognize. This one is
-                    // debatable, "field" is a general class name, but magento
-                    // core actually uses it for this specific purpose
-                    var container = $(element).up('.field');
-                    if (container) {
-                        action(container);
-                    }
-                });
             });
+
+            $(lockFields).each(function (field) {
+                var elements = $$('[name*="billing[' + field + '"]');
+                if (!elements.length) {
+                    return;
+                } else {
+                    $(elements).each(function(elem) { elem.writeAttribute('readonly', true); });
+                }
+            });
+
         }
 
         /** Toggles the possibility use a separate shipping address
@@ -225,16 +255,12 @@
             var method = this.getCurrentMethod();
             if (getAddressVisible && method && method.match(/^svea_(invoice|paymentplan)/)) {
                 if (!this.config.allowSeparateShippingAddress) {
-                    toggleFields.call(this, function(elem) {
-                        elem.writeAttribute('readonly', true);
-                    });
+                    toggleAddressInputFields.call(this, true);
 
                     toggleSeparateShippingAddress(false);
                 }
             } else {
-                toggleFields.call(this, function(elem) {
-                    elem.writeAttribute('readonly', false);
-                });
+                toggleAddressInputFields.call(this, false);
 
                 toggleSeparateShippingAddress(true);
             }
@@ -264,6 +290,20 @@
         }
 
         return undefined;
+    },
+
+    /**
+     * Get selected customer type
+     *
+     * @return string or null
+     */
+    getCustomerType: function() {
+        var elem = $$('input:checked[name*=customer_type]');
+        if (elem.length) {
+            return elem[0].value;
+        } else {
+            return null;
+        }
     },
 
     /**

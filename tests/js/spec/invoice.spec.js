@@ -1,7 +1,7 @@
 "use strict";
 /** Test for invoice */
 /*global beforeEach describe it expect jQuery jasmine */
-/*global initCustomCheckout initOnepageCheckout initOnestepCheckout initSvea setBillingCountry getBillingCountry getPaymentMethod setPaymentMethod setInvoiceCustomerType getInvoiceCustomerType */
+/*global initCustomCheckout initOnepageCheckout initOnestepCheckout initSvea setBillingCountry getBillingCountry getPaymentMethod setPaymentMethod setInvoiceCustomerType getInvoiceCustomerType $$ */
 
 jasmine.getFixtures().fixturesPath = 'tests/js/fixtures';
 
@@ -132,13 +132,21 @@ describe('Svea Invoice with onepage checkout', function() {
         expect(svea.getBillingCountry()).toEqual('SE');
     });
 
+    it('reads correct customer type', function() {
+        setInvoiceCustomerType('individual');
+        expect(svea.getCustomerType()).toEqual('individual');
+        setInvoiceCustomerType('company');
+        expect(svea.getCustomerType()).toEqual('company');
+    });
+
 });
 
 describe('Svea Invoice with checkout other than onepage', function() {
+    var svea;
 
     /** Load fixture and select dummy payment method */
     beforeEach(function() {
-        initCustomCheckout({checkoutType: 'thirdparty'});
+        svea = initCustomCheckout({checkoutType: 'thirdparty'});
     });
 
     /** Test that checks that an input is set to readonly after svea_invoice + 'SE' is selected
@@ -161,6 +169,37 @@ describe('Svea Invoice with checkout other than onepage', function() {
 
     it('sets billing:lastname to readonly when svea_invoice and SE is selected', function() {
         _testSetsInputToReadonly('lastname');
+    });
+
+    it('removes readonly from billing:firstname for companies', function() {
+        var inputElement = jQuery('#billing\\:firstname');
+
+
+        setInvoiceCustomerType('individual');
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('SE');
+        expect(inputElement).toHaveAttr('readonly');
+
+        setInvoiceCustomerType('company');
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('SE');
+
+        expect(inputElement).not.toHaveAttr('readonly');
+
+    });
+
+    it('removes readonly from billing:lastname for companies', function() {
+        var inputElement = jQuery('#billing\\:lastname');
+
+        setInvoiceCustomerType('individual');
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('SE');
+        expect(inputElement).toHaveAttr('readonly');
+
+        setInvoiceCustomerType('company');
+        setPaymentMethod('svea_invoice');
+        setBillingCountry('SE');
+        expect(inputElement).not.toHaveAttr('readonly');
     });
 
 });
