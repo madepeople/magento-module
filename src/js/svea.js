@@ -76,10 +76,6 @@
             var addressFields = ['firstname', 'lastname', 'street', 'city',
                 'postcode'];
 
-            if (!this.config['allowSeparateShippingAddress']) {
-                addressFields.push('use_for_shipping');
-            }
-
             $(addressFields).each(function (field) {
                 var elements = $$('[name*="billing[' + field + '"]');
                 if (!elements.length) {
@@ -107,6 +103,77 @@
             });
         }
 
+        /** Toggles the possibility use a separate shipping address
+         *
+         * The elements will get the class 'svea-hidden' if they should be hidden.
+         * They will not be made readonly since that may create problems when
+         * removing the readonly attribute(in case something else wants to keep
+         * it readonly).
+         *
+         * @param caUse Boolean, if true it will be possible to use a separate shipping address
+         */
+        function toggleSeparateShippingAddress(canUse) {
+            var $elem;
+
+            if (!canUse) {
+                // call shipping.setSameAsBilling just in case
+                /*global shipping */
+                if (typeof shipping !== 'undefined') {
+                    shipping.setSameAsBilling(true);
+                }
+            }
+
+            // Handle onepage billing:use_for_shipping
+            $elem = $('billing:use_for_shipping_yes');
+            if ($elem !== null) {
+                if (!canUse) {
+                    if (!$elem.checked) {
+                        $elem.click();
+                    }
+                    $elem.addClassName('svea-hidden');
+                } else {
+                    $elem.removeClassName('svea-hidden');
+                }
+            }
+
+            // Handle streamcheckout checkbox, should not be checked
+            $elem = $$('.ship-to-different-address');
+            if ($elem.length === 1) {
+                if (!canUse) {
+                    $elem = $($elem[0].down('input'));
+                    if ($elem.checked) {
+                        $elem.click();
+                    }
+                    $elem[0].addClassName('svea-hidden');
+                } else {
+                    $elem[0].removeClassName('svea-hidden');
+                }
+            }
+
+            // Handle onestepcheckout checkbox, should be checked
+            $elem = $$('.input-different-shipping');
+            if ($elem.length === 1) {
+                if (!canUse) {
+                    $elem[0].addClassName('svea-hidden');
+
+                    $elem = $($elem[0].down('input'));
+                    if (!$elem.checked) {
+                        $elem.click();
+                    }
+
+                } else {
+                    $elem[0].removeClassName('svea-hidden');
+                }
+            }
+
+            // Hide actual #shipping_address element because magento doesn't handle
+            // it correctly in all cases.
+            if (!canUse) {
+                ($$('#shipping_address')[0] || { hide: function () {}}).hide();
+            }
+
+        }
+
         // If getAddress is hidden we should show the fields
         var getAddressVisible = false;
         $$('.svea-get-address').each(function (element) {
@@ -118,15 +185,22 @@
         if (this.config.checkoutType !== 'onepage') {
             var method = this.getCurrentMethod();
             if (getAddressVisible && method && method.match(/^svea_(invoice|paymentplan)/)) {
-                toggleFields.call(this, function(elem) {
-                    elem.writeAttribute('readonly', true);
-                });
+                if (!this.config.allowSeparateShippingAddress) {
+                    toggleFields.call(this, function(elem) {
+                        elem.writeAttribute('readonly', true);
+                    });
+
+                    toggleSeparateShippingAddress(false);
+                }
             } else {
                 toggleFields.call(this, function(elem) {
                     elem.writeAttribute('readonly', false);
                 });
+
+                toggleSeparateShippingAddress(true);
             }
         }
+
     },
 
     /**

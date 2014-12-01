@@ -176,15 +176,15 @@ describe('Svea Invoice with onepagecheckout', function() {
 
     });
 
-    it('makes use_for_shipping readonly when svea_invoice and SE is selected', function() {
+    it('adds class svea-hidden to use_for_shipping_yes when svea_invoice and SE is selected', function() {
         var useForShipping = jQuery('#billing\\:use_for_shipping_yes');
 
-        expect(useForShipping).not.toHaveAttr('readonly');
+        expect(useForShipping).not.toHaveClass('svea-hidden');
 
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
 
-        expect(useForShipping).toHaveAttr('readonly');
+        expect(useForShipping).toHaveClass('svea-hidden');
 
     });
 
