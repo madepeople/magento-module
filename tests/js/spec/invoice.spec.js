@@ -50,24 +50,24 @@ describe('Svea Invoice with onepage checkout', function() {
         initOnepageCheckout();
     });
 
-    /** Test that checks that an input isn't disabled after svea_invoice + 'SE' is selected
+    /** Test that checks that an input isn't set to readonly after svea_invoice + 'SE' is selected
      * @param input Input 'name', like 'firstname'
      */
-    function _testDoesNotDisableInput(input) {
+    function _testDoesNotSetInputToReadonly(input) {
         var inputElement = jQuery('#billing\\:' + input);
 
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
 
-        expect(inputElement).not.toBeDisabled();
+        expect(inputElement).not.toHaveAttr('readonly');
     }
 
-    it('does not disable billing:firstname', function() {
-        _testDoesNotDisableInput('firstname');
+    it('does not set billing:firstname to readonly', function() {
+        _testDoesNotSetInputToReadonly('firstname');
     });
 
-    it('does not disable billing:lastname', function() {
-        _testDoesNotDisableInput('lastname');
+    it('does not set billing:lastname to readonly', function() {
+        _testDoesNotSetInputToReadonly('lastname');
     });
 
 });
@@ -79,26 +79,26 @@ describe('Svea Invoice with checkout other than onepage', function() {
         initCustomCheckout({checkoutType: 'thirdparty'});
     });
 
-    /** Test that checks that an input is disabled after svea_invoice + 'SE' is selected
+    /** Test that checks that an input is set to readonly after svea_invoice + 'SE' is selected
      * @param input Input 'name', like 'firstname'
      */
-    function _testDisablesInput(input) {
+    function _testSetsInputToReadonly(input) {
         var inputElement = jQuery('#billing\\:' + input);
 
-        expect(inputElement).not.toBeDisabled();
+        expect(inputElement).not.toHaveAttr('readonly');
 
         setPaymentMethod('svea_invoice');
         setBillingCountry('SE');
 
-        expect(inputElement).toBeDisabled();
+        expect(inputElement).toHaveAttr('readonly');
     }
 
-    it('disables billing:firstname when svea_invoice and SE is selected', function() {
-        _testDisablesInput('firstname');
+    it('sets billing:firstname to readonly when svea_invoice and SE is selected', function() {
+        _testSetsInputToReadonly('firstname');
     });
 
-    it('disables billing:lastname if svea_invoice and SE is selected', function() {
-        _testDisablesInput('lastname');
+    it('sets billing:lastname to readonly when svea_invoice and SE is selected', function() {
+        _testSetsInputToReadonly('lastname');
     });
 
 });
