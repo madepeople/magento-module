@@ -118,9 +118,13 @@
         if (this.config.checkoutType !== 'onepage') {
             var method = this.getCurrentMethod();
             if (getAddressVisible && method && method.match(/^svea_(invoice|paymentplan)/)) {
-                toggleFields.call(this, Element.disable || function(elem) { elem.writeAttribute('disabled', true); });
+                toggleFields.call(this, function(elem) {
+                    elem.writeAttribute('readonly', true);
+                });
             } else {
-                toggleFields.call(this, Element.enable || function(elem) { elem.writeAttribute('disabled', false); });
+                toggleFields.call(this, function(elem) {
+                    elem.writeAttribute('readonly', false);
+                });
             }
         }
     },
