@@ -170,7 +170,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($order->getBillingAddress()->getPostcode())
                     ->setLocality($order->getBillingAddress()->getCity())
-                    ->setIpAddress($_SERVER['SERVER_ADDR'])
+                    ->setIpAddress(Mage::helper('core/http')->getRemoteAddr(false))
                     ->setPhoneNumber($order->getBillingAddress()->getTelephone());
 
             if ($countryCode == "DE" || $countryCode == "NL") {
@@ -188,7 +188,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($order->getBillingAddress()->getPostcode())
                     ->setLocality($order->getBillingAddress()->getCity())
-                    ->setIpAddress($_SERVER['SERVER_ADDR']) // This doesn't cut it for reverse proxies
+                    ->setIpAddress(Mage::helper('core/http')->getRemoteAddr(false))
                     ->setPhoneNumber($order->getBillingAddress()->getTelephone());
 
             if ($countryCode == "DE" || $countryCode == "NL") {
