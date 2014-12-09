@@ -75,7 +75,8 @@
         }
     }
     // Part payment cost calculations
-    #paymentplan_cost_text, #paymentplan_notification_fee_text {
+    #paymentplan_cost_text {
+        margin: 0;
         background-color: #297ab7;
         -webkit-border-radius: 3px;
         -moz-border-radius: 3px;
@@ -85,19 +86,27 @@
         color: white;
         display: inline-block;
         padding: 1px 6px;
-        margin-top: 10px;
         font-weight: bold;
         .cost {
             font-weight: bold;
+        }
+    }
+
+    .paymentplan_info {
+        margin-top: 10px;
+
+        #paymentplan_initial_fee_text {
+            margin: 2px 0 0 0;
+            background: none;
+            color: #909090;
+            font-weight: normal;
+            font-size: 11px;
         }
     }
 }
 .sp-methods .svea-payment-logos {
     margin-left:18px;
 }
-
-
-
 
 // Include partials for third party checkout modules
 @import "partials/streamcheckout";
