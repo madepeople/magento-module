@@ -9,22 +9,20 @@
   background: #e3e3e3 !important;
 }
 
-/* line 14, ../sass/checkout.scss */
+/* line 13, ../sass/checkout.scss */
 .form-list#payment_form_svea_paymentplan, .form-list#payment_form_svea_invoice {
   margin-top: 10px;
   border: 1px solid #ccc;
   padding: 10px;
   background: white;
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   -moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
-  -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
-  -ms-border-radius: 3px;
-  -o-border-radius: 3px;
+  -webkit-border-radius: 3px;
   border-radius: 3px;
-  -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
   max-width: 260px;
   margin-left: 18px;
@@ -50,8 +48,8 @@
 /* line 38, ../sass/checkout.scss */
 .form-list .svea-ssn-container .field .input-box input.input-text {
   max-width: 100%;
-  -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
   box-sizing: border-box;
 }
 /* line 44, ../sass/checkout.scss */
@@ -84,7 +82,7 @@
   display: none;
 }
 /* line 78, ../sass/checkout.scss */
-.form-list #paymentplan_cost_text {
+.form-list #paymentplan_cost_text, .form-list #paymentplan_initial_fee_text {
   background-color: #297ab7;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -98,7 +96,7 @@
   font-weight: bold;
 }
 /* line 90, ../sass/checkout.scss */
-.form-list #paymentplan_cost_text .cost {
+.form-list #paymentplan_cost_text .cost, .form-list #paymentplan_initial_fee_text .cost {
   font-weight: bold;
 }
 
@@ -107,11 +105,11 @@
   margin-left: 18px;
 }
 
-/* line 6, ../sass/partials/_streamcheckout.scss */
+/* line 5, ../sass/partials/_streamcheckout.scss */
 #streamcheckout .form-list#payment_form_svea_paymentplan, #streamcheckout .form-list#payment_form_svea_invoice {
   background: none;
-  -webkit-box-shadow: none;
   -moz-box-shadow: none;
+  -webkit-box-shadow: none;
   box-shadow: none;
   padding: 0;
   max-width: auto;
@@ -170,12 +168,12 @@
   float: left !important;
 }
 
-/* line 3, ../sass/partials/_onestepcheckout.scss */
+/* line 2, ../sass/partials/_onestepcheckout.scss */
 .onestepcheckout-index-index #container_payment_method_svea_invoice,
 .onestepcheckout-index-index #container_payment_method_svea_paymentplan {
   padding-left: 0 !important;
 }
-/* line 7, ../sass/partials/_onestepcheckout.scss */
+/* line 6, ../sass/partials/_onestepcheckout.scss */
 .onestepcheckout-index-index #container_payment_method_svea_invoice #payment_form_svea_invoice,
 .onestepcheckout-index-index #container_payment_method_svea_invoice #payment_form_svea_paymentplan,
 .onestepcheckout-index-index #container_payment_method_svea_paymentplan #payment_form_svea_invoice,
