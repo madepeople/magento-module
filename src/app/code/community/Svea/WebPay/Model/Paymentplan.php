@@ -90,7 +90,44 @@ class Svea_WebPay_Model_Paymentplan extends Mage_Core_Model_Abstract
     }
 
     /**
+     * Get an object which is similar to a Svea Response
+     *
+     * This can be used instead of a proper svea response since we don't store
+     * them in the database. Do not assume that the result will contain _all_
+     * information that a real Svea Response has, test your code when using this
+     * result.
+     *
+     * @returns stdClass An object with attributes set as a PaymentPlanResponse
+     */
+    public function asSveaResponse()
+    {
+        $rc = new stdClass();
+
+        $map = array(
+            "campaincode" => 'campaignCode',
+            "description" => 'description',
+            "paymentplantype" => 'paymentPlanType',
+            "contractlength" => 'contractLength',
+            "monthlyannuityfactor" => 'monthlyAnnuityFactor',
+            "initialfee" => 'initialFee',
+            "notificationfee" => 'notificationFee',
+            "interestratepercentage" => 'interestRatePercent',
+            "interestfreemonths" => 'numberOfInterestFreeMonths',
+            "paymentfreemonths" => 'numberOfPaymentFreeMonths',
+            "fromamount" => 'fromAmount',
+            "toamount" => 'toAmount',
+        );
+
+        foreach ($map as $myKey => $responseKey) {
+            $rc->$responseKey = $this->getData($myKey);
+        }
+
+        return $rc;
+    }
+
+    /**
      * Format Svea response to Array
+     *
      * @param type $response
      * @return array
      */
