@@ -66,14 +66,15 @@ $_ssnHtml = $this->getSsnHtml();
             </select>
             <br>
 
-            <p id="paymentplan_cost_text" style="display:none">
-                <?php echo $_helper->__('Your monthly cost') ?>: <span class="cost"><span id="paymentplan_cost"></span> <?php echo $_currency . "/" . $_helper->__('month') ?></span>
-            </p>
+            <div class="paymentplan_info" id="paymentplan_info" style="display:none">
+                <p id="paymentplan_cost_text" style="display:none">
+                    <?php echo $_helper->__('Your monthly cost') ?>: <span class="cost"><span id="paymentplan_cost"></span> <?php echo $_currency . "/" . $_helper->__('month') ?></span>
+                </p>
 
-            <p id="paymentplan_initial_fee_text" style="display:none">
-                <?php echo Mage::helper('svea_webpay')->__('initial_fee') ?>
-            </p>
-
+                <p id="paymentplan_initial_fee_text" style="display:none">
+                    <?php echo Mage::helper('svea_webpay')->__('initial_fee') ?>
+                </p>
+            </div>
         </div>
     </li>
 
@@ -105,6 +106,13 @@ $_ssnHtml = $this->getSsnHtml();
                     $('paymentplan_initial_fee_text').show();
                 } else {
                     $('paymentplan_initial_fee_text').hide();
+                }
+
+                if ($('paymentplan_cost_text').visible()
+                    && $('paymentplan_initial_fee_text').visible()) {
+                    $('paymentplan_info').show();
+                } else {
+                    $('paymentplan_info').hide();
                 }
             }
         }

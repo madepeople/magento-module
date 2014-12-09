@@ -82,7 +82,8 @@
   display: none;
 }
 /* line 78, ../sass/checkout.scss */
-.form-list #paymentplan_cost_text, .form-list #paymentplan_initial_fee_text {
+.form-list #paymentplan_cost_text {
+  margin: 0;
   background-color: #297ab7;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
@@ -92,15 +93,26 @@
   color: white;
   display: inline-block;
   padding: 1px 6px;
-  margin-top: 10px;
   font-weight: bold;
 }
 /* line 90, ../sass/checkout.scss */
-.form-list #paymentplan_cost_text .cost, .form-list #paymentplan_initial_fee_text .cost {
+.form-list #paymentplan_cost_text .cost {
   font-weight: bold;
 }
-
 /* line 95, ../sass/checkout.scss */
+.form-list .paymentplan_info {
+  margin-top: 10px;
+}
+/* line 98, ../sass/checkout.scss */
+.form-list .paymentplan_info #paymentplan_initial_fee_text {
+  margin: 2px 0 0 0;
+  background: none;
+  color: #909090;
+  font-weight: normal;
+  font-size: 11px;
+}
+
+/* line 107, ../sass/checkout.scss */
 .sp-methods .svea-payment-logos {
   margin-left: 18px;
 }
