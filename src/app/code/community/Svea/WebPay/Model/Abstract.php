@@ -196,9 +196,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                 ->setOrderDate(date("Y-m-d"))
                 ->setCurrency($order->getOrderCurrencyCode());
 
-        if ($order instanceof Mage_Sales_Model_Order) {
-//            die;
-        }
         return $svea;
     }
 
