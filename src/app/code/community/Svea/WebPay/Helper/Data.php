@@ -256,10 +256,19 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Possible discount
-        if (abs($invoice->getDiscountAmount())) {
+        $discount = abs($invoice->getDiscountAmount());
+        if ($discount) {
+            if ($taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
+                $orderTax = Mage::getModel('sales/order_tax')
+                    ->load($order->getId(), 'order_id');
+                $rate = $orderTax->getPercent();
+                $discount *= 1+($rate/100);
+            }
+
             $discountRow = Item::fixedDiscount()
-                    ->setAmountIncVat(abs($invoice->getDiscountAmount()))
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'));
+                ->setAmountIncVat($discount)
+                ->setName(Mage::helper('svea_webpay')->__('discount'))
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'));
 
             $sveaObject->addDiscount($discountRow);
         }
@@ -399,9 +408,18 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Discount
-        if (abs($creditMemo->getDiscountAmount()) > 0) {
+        $discount = abs($creditMemo->getDiscountAmount());
+        if ($discount > 0) {
+            if ($taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
+                $orderTax = Mage::getModel('sales/order_tax')
+                    ->load($order->getId(), 'order_id');
+                $rate = $orderTax->getPercent();
+                $discount *= 1+($rate/100);
+            }
+
             $discountRow = Item::fixedDiscount()
-                ->setAmountIncVat(abs($creditMemo->getDiscountAmount()))
+                ->setAmountIncVat($discount)
+                ->setName(Mage::helper('svea_webpay')->__('discount'))
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'));
 
             $sveaObject->addDiscount($discountRow);

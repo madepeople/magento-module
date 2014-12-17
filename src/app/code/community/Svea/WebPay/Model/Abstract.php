@@ -67,7 +67,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         $taxConfig = Mage::getSingleton('tax/config');
 
         // Build the rows for request
-        $totalDiscount = 0;
         foreach ($order->getAllItems() as $item) {
             if ($item->getProductType() === Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE) {
                 continue;
@@ -100,6 +99,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             }
 
             $qty = get_class($item) == 'Mage_Sales_Model_Quote_Item' ? $item->getQty() : $item->getQtyOrdered();
+
             $orderRow = Item::orderRow()
                     ->setArticleNumber($item->getSku())
                     ->setQuantity((int)$qty)
@@ -143,10 +143,19 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         }
 
         // Discount
-        if (abs($order->getDiscountAmount()) > 0) {
+        $discount = abs($order->getDiscountAmount());
+        if ($discount > 0) {
+            if ($taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
+                $appliedTaxes = $order->getAppliedTaxes();
+                $orderTax = array_shift($appliedTaxes);
+                $rate = $orderTax['percent'];
+                $discount *= 1+($rate/100);
+            }
+
             $discountRow = Item::fixedDiscount()
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setAmountIncVat(abs($order->getDiscountAmount()));
+                ->setName(Mage::helper('svea_webpay')->__('discount'))
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setAmountIncVat($discount);
 
             $svea->addDiscount($discountRow);
         }
@@ -162,16 +171,22 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         }
 
         // Invoice fee
-        $paymentFee = $order->getSveaPaymentFeeInclTax();
-
-        if ($paymentFee > 0) {
+        $paymentFeeInclTax = $order->getSveaPaymentFeeInclTax();
+        if ($paymentFeeInclTax > 0) {
+            $paymentFeeIncludesTax = $this->getConfigData('handling_fee_includes_tax');
             $paymentFeeTaxClass = $this->getConfigData('handling_fee_tax_class');
             $rate = $taxCalculationModel->getRate($request->setProductClassId($paymentFeeTaxClass));
             $invoiceFeeRow = Item::invoiceFee()
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                     ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-                    ->setVatPercent((int)$rate)
-                    ->setAmountIncVat((float)$paymentFee);
+                    ->setVatPercent((int)$rate);
+
+            if ($paymentFeeIncludesTax) {
+                $invoiceFeeRow->setAmountIncVat((float)$paymentFeeInclTax);
+            } else {
+                $paymentFeeExclTax = $order->getSveaPaymentFeeAmount();
+                $invoiceFeeRow->setAmountExVat((float)$paymentFeeExclTax);
+            }
 
             $svea->addFee($invoiceFeeRow);
         }
@@ -181,6 +196,9 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                 ->setOrderDate(date("Y-m-d"))
                 ->setCurrency($order->getOrderCurrencyCode());
 
+        if ($order instanceof Mage_Sales_Model_Order) {
+//            die;
+        }
         return $svea;
     }
 
