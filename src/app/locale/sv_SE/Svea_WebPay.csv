@@ -15,6 +15,7 @@
 "text_vat_no","Organisationsnummer"
 "text_initials","Initialer"
 "invoice_address","Fakturaadress"
+"discount","Rabatt"
 "get_address","Hämta adress"
 "invoice_fee","Svea fakturaavgift"
 "delivered","Order är levererad"

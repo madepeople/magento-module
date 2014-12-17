@@ -41,8 +41,18 @@ class Svea_WebPay_Model_Quote_Total_Tax
         $rate = $taxCalculationModel->getRate($request->setProductClassId($taxClassId));
 
         if ($rate) {
-            $paymentFeeTax = $taxCalculationModel->calcTaxAmount($address->getSveaPaymentFeeAmount(), $rate, true, false);
-            $basePaymentFeeTax = $taxCalculationModel->calcTaxAmount($address->getBaseSveaPaymentFeeAmount(), $rate, true, false);
+            $method = $address->getQuote()
+                ->getPayment()
+                ->getMethodInstance();
+
+            if ($method->getConfigData('handling_fee_includes_tax')) {
+                $priceIncludesTax = true;
+            } else {
+                $priceIncludesTax = false;
+            }
+
+            $paymentFeeTax = $taxCalculationModel->calcTaxAmount($address->getSveaPaymentFeeAmount(), $rate, $priceIncludesTax, false);
+            $basePaymentFeeTax = $taxCalculationModel->calcTaxAmount($address->getBaseSveaPaymentFeeAmount(), $rate, $priceIncludesTax, false);
         }
 
         $paymentFee = $address->getSveaPaymentFeeAmount();

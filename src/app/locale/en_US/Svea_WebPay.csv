@@ -15,6 +15,7 @@
 "text_vat_no","VAT Number"
 "text_initials","Initials"
 "invoice_address","Invoice Address"
+"discount","Discount"
 "get_address","Get Address"
 "invoice_fee","Svea Invoice Fee"
 "delivered","Order is Delivered"
