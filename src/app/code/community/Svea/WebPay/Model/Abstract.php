@@ -173,7 +173,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         // Invoice fee
         $paymentFeeInclTax = $order->getSveaPaymentFeeInclTax();
         if ($paymentFeeInclTax > 0) {
-            $paymentFeeIncludesTax = $this->getConfigData('handling_fee_includes_tax');
             $paymentFeeTaxClass = $this->getConfigData('handling_fee_tax_class');
             $rate = $taxCalculationModel->getRate($request->setProductClassId($paymentFeeTaxClass));
             $invoiceFeeRow = Item::invoiceFee()
@@ -181,13 +180,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                     ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
                     ->setVatPercent((int)$rate);
 
-            if ($paymentFeeIncludesTax) {
-                $invoiceFeeRow->setAmountIncVat((float)$paymentFeeInclTax);
-            } else {
-                $paymentFeeExclTax = $order->getSveaPaymentFeeAmount();
-                $invoiceFeeRow->setAmountExVat((float)$paymentFeeExclTax);
-            }
-
+            $invoiceFeeRow->setAmountIncVat((float)$paymentFeeInclTax);
             $svea->addFee($invoiceFeeRow);
         }
 
