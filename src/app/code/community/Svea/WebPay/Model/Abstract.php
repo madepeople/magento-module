@@ -100,7 +100,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
 
             $qty = get_class($item) == 'Mage_Sales_Model_Quote_Item' ? $item->getQty() : $item->getQtyOrdered();
 
-            $orderRow = Item::orderRow()
+            $orderRow = WebPayItem::orderRow()
                 ->setArticleNumber($item->getSku())
                 ->setQuantity((int)$qty)
                 ->setName($name)
@@ -119,7 +119,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
 
         // Shipping
         if ($order->getShippingAmount() > 0) {
-            $shippingFee = Item::shippingFee()
+            $shippingFee = WebPayItem::shippingFee()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setName($order->getShippingDescription());
 
@@ -138,10 +138,13 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                 $appliedTaxes = $order->getAppliedTaxes();
                 $orderTax = array_shift($appliedTaxes);
                 $rate = $orderTax['percent'];
+                // Round this to two decimals using magento rounding functions
                 $discount *= 1+($rate/100);
+                $calculator = Mage::getModel('core/calculator', $order->getStore());
+                $discount = $calculator->deltaRound($discount, true);
             }
 
-            $discountRow = Item::fixedDiscount()
+            $discountRow = WebPayItem::fixedDiscount()
                 ->setName(Mage::helper('svea_webpay')->__('discount'))
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setAmountIncVat($discount);
@@ -151,7 +154,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
 
         // Gift cards
         if (abs($order->getGiftCardsAmount()) > 0) {
-            $giftCardRow = Item::fixedDiscount()
+            $giftCardRow = WebPayItem::fixedDiscount()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setAmountIncVat(abs($order->getGiftCardsAmount()))
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'));
@@ -164,7 +167,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         if ($paymentFeeInclTax > 0) {
             $paymentFeeTaxClass = $this->getConfigData('handling_fee_tax_class');
             $rate = $taxCalculationModel->getRate($request->setProductClassId($paymentFeeTaxClass));
-            $invoiceFeeRow = Item::invoiceFee()
+            $invoiceFeeRow = WebPayItem::invoiceFee()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
                 ->setVatPercent((int)$rate);
