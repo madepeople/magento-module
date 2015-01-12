@@ -15,11 +15,11 @@ class Svea_WebPay_Model_Source_Delivermethod
         return array(
             array(
                 'label' => 'Post',
-                'value' => DistributionType::POST'POST'
+                'value' => DistributionType::POST
             ),
             array(
                 'label' => 'Email',
-                'value' => DistributionType::EMAIL'EMAIL',
+                'value' => DistributionType::EMAIL,
             )
         );
     }
