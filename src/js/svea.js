@@ -30,7 +30,7 @@
         // Our initializers both need to set the first state as well as listen
         // for state changes
         var body = $$('body')[0];
-        $(body).on('click', '[name*=customer_type]',
+        $(body).on('change', '[name*=customer_type]',
             this.initializeFields.bindAsEventListener(this));
         $(body).on('change', '[name*=country_id]',
             this.initializeFields.bindAsEventListener(this));
@@ -42,11 +42,50 @@
         }
     },
 
+    /**
+     * Callback that is called each time customer_type, country_id or payment_method changes
+     *
+     */
     initializeFields: function()
     {
         this.toggleIndividualAndCompany();
         this.displayCountrySpecificFields();
         this.fieldConditionsChanged();
+        this.toggleMethodNotAvailable();
+    },
+
+    /**
+     * Toggle between showing the 'method info' div and the 'not available' div
+     *
+     * This is support for checkouts that doesn't reload payment methods when
+     * billing country changes.
+     */
+    toggleMethodNotAvailable: function() {
+        var validCountries = [
+            'SE',
+            'NO',
+            'FI',
+            'NL',
+            'DE'
+        ],
+            notAvailableDiv = $('svea-invoice-payment-not-available'),
+            infoDiv = $('svea-invoice-payment-information').show();
+
+        if (validCountries.indexOf(this.getBillingCountry()) !== -1) {
+            if (infoDiv) {
+                infoDiv.show();
+            }
+            if (notAvailableDiv) {
+                notAvailableDiv.hide();
+            }
+        } else {
+            if (infoDiv) {
+                infoDiv.hide();
+            }
+            if (notAvailableDiv) {
+                notAvailableDiv.show();
+            }
+        }
     },
 
     /**
@@ -65,46 +104,143 @@
         }
 
         /**
-         * Hide these form fields that we fetch using getAddress, but only if
+         * Disable these form fields that we fetch using getAddress, but only if
          * getAddress is supposed to be used (actually meaning visible in the
          * template). Also, show them if the conditions change back
          *
-         * @param action callable
+         * @param lock Boolean, if true the input-fields will be locked to readonly
          */
-        function toggleFields(action)
+        function toggleAddressInputFields(lock)
         {
-            var addressFields = ['firstname', 'lastname', 'street', 'city',
-                'postcode'];
+            var allAddressFields = {
+                common: [
+                    'street',
+                    'city',
+                    'postcode'
+                ],
+                individual: [
+                    'firstname',
+                    'lastname',
+                ],
+                company: [
+                    'company',
+                ]
+            },
+                addressFields,
+                customerType,
+                cb,
+                lockFields = [],
+                unlockFields = [];
 
-            if (!this.config['allowSeparateShippingAddress']) {
-                addressFields.push('use_for_shipping');
+            if (lock) {
+                customerType = this.getCustomerType();
+                lockFields = allAddressFields.common.slice(0);
+
+                if (allAddressFields.hasOwnProperty(customerType)) {
+                    lockFields = lockFields.concat(allAddressFields[customerType].slice(0));
+                    if (customerType === 'individual') {
+                        unlockFields = allAddressFields.company.slice(0);
+                    } else {
+                        unlockFields = allAddressFields.individual.slice(0);
+                    }
+                }
+
+
+            } else {
+                // Unlock all fields that might have been locked by svea
+                unlockFields = allAddressFields.common.slice(0).concat(allAddressFields.individual).concat(allAddressFields.company);
+
             }
 
-            $(addressFields).each(function (field) {
+            $(unlockFields).each(function (field) {
                 var elements = $$('[name*="billing[' + field + '"]');
                 if (!elements.length) {
                     return;
+                } else {
+                    $(elements).each(function(elem) { elem.writeAttribute('readonly', false); });
                 }
-
-                $(elements).each(function (element) {
-                    action(element);
-                    var id = $(element).readAttribute('id');
-                    var label = $$('label[for=' + id + ']').length
-                        ? $$('label[for=' + id + ']')[0] : null;
-
-                    if (label) {
-                        action(label);
-                    }
-
-                    // See if there is a container that we recognize. This one is
-                    // debatable, "field" is a general class name, but magento
-                    // core actually uses it for this specific purpose
-                    var container = $(element).up('.field');
-                    if (container) {
-                        action(container);
-                    }
-                });
             });
+
+            $(lockFields).each(function (field) {
+                var elements = $$('[name*="billing[' + field + '"]');
+                if (!elements.length) {
+                    return;
+                } else {
+                    $(elements).each(function(elem) { elem.writeAttribute('readonly', true); });
+                }
+            });
+
+        }
+
+        /** Toggles the possibility use a separate shipping address
+         *
+         * The elements will get the class 'svea-hidden' if they should be hidden.
+         * They will not be made readonly since that may create problems when
+         * removing the readonly attribute(in case something else wants to keep
+         * it readonly).
+         *
+         * @param caUse Boolean, if true it will be possible to use a separate shipping address
+         */
+        function toggleSeparateShippingAddress(canUse) {
+            var $elem;
+
+            if (!canUse) {
+                // call shipping.setSameAsBilling just in case
+                /*global shipping */
+                if (typeof shipping !== 'undefined') {
+                    shipping.setSameAsBilling(true);
+                }
+            }
+
+            // Handle onepage billing:use_for_shipping
+            $elem = $('billing:use_for_shipping_yes');
+            if ($elem !== null) {
+                if (!canUse) {
+                    if (!$elem.checked) {
+                        $elem.click();
+                    }
+                    $elem.addClassName('svea-hidden');
+                } else {
+                    $elem.removeClassName('svea-hidden');
+                }
+            }
+
+            // Handle streamcheckout checkbox, should not be checked
+            $elem = $$('.ship-to-different-address');
+            if ($elem.length === 1) {
+                if (!canUse) {
+                    $elem = $($elem[0].down('input'));
+                    if ($elem.checked) {
+                        $elem.click();
+                    }
+                    $elem[0].addClassName('svea-hidden');
+                } else {
+                    $elem[0].removeClassName('svea-hidden');
+                }
+            }
+
+            // Handle onestepcheckout checkbox, should be checked
+            $elem = $$('.input-different-shipping');
+            if ($elem.length === 1) {
+                if (!canUse) {
+                    $elem[0].addClassName('svea-hidden');
+
+                    $elem = $($elem[0].down('input'));
+                    if (!$elem.checked) {
+                        $elem.click();
+                    }
+
+                } else {
+                    $elem[0].removeClassName('svea-hidden');
+                }
+            }
+
+            // Hide actual #shipping_address element because magento doesn't handle
+            // it correctly in all cases.
+            if (!canUse) {
+                ($$('#shipping_address')[0] || { hide: function () {}}).hide();
+            }
+
         }
 
         // If getAddress is hidden we should show the fields
@@ -118,11 +254,18 @@
         if (this.config.checkoutType !== 'onepage') {
             var method = this.getCurrentMethod();
             if (getAddressVisible && method && method.match(/^svea_(invoice|paymentplan)/)) {
-                toggleFields.call(this, Element.hide);
+                if (!this.config.allowSeparateShippingAddress) {
+                    toggleAddressInputFields.call(this, true);
+
+                    toggleSeparateShippingAddress(false);
+                }
             } else {
-                toggleFields.call(this, Element.show);
+                toggleAddressInputFields.call(this, false);
+
+                toggleSeparateShippingAddress(true);
             }
         }
+
     },
 
     /**
@@ -150,6 +293,20 @@
     },
 
     /**
+     * Get selected customer type
+     *
+     * @return string or null
+     */
+    getCustomerType: function() {
+        var elem = $$('input:checked[name*=customer_type]');
+        if (elem.length) {
+            return elem[0].value;
+        } else {
+            return null;
+        }
+    },
+
+    /**
      * Toggle the blocks specific to private individuals/companies
      *
      * @param event
@@ -174,6 +331,15 @@
     },
 
     /**
+     * Get selected billing country
+     *
+     * @return string country code or null
+     */
+    getBillingCountry: function() {
+        return $$('[name=billing[country_id]]').length ? $$('[name=billing[country_id]]')[0].value : null;
+    },
+
+    /**
      * Some countries such as the netherlands have separated the address with
      * the street. So we need to dynamically insert a street + house number
      * field of our own which we concatenate and fill the real fields with. We
@@ -187,8 +353,7 @@
         if (event) {
             select = event.target;
         } else {
-            select = $$('[name=billing[country_id]]').length
-                ? $$('[name=billing[country_id]]')[0] : null;
+            select = $$('[name=billing[country_id]]').length ? $$('[name=billing[country_id]]')[0] : null;
         }
 
         if (!select) {

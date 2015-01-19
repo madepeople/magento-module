@@ -1,0 +1,84 @@
+<!-- Billing address fixture -->
+<div id="billing_address">
+    <ul>
+        <li>Fakturaadress</li>
+        <li>
+            <!-- Billing address -->
+            <ul id="billing_address_list">
+                <li>
+                    <div class="input-box input-firstname">
+                        <label for="billing:firstname">Förnamn <span class="required">*</span></label><br />
+                        <input class="required-entry input-text" type="text" name="billing[firstname]" id="billing:firstname" value="" />
+                    </div>
+                    <div class="input-box input-lastname">
+                        <label for="billing:lastname">Efternamn <span class="required">*</span></label><br />
+                        <input class="required-entry input-text" type="text" name="billing[lastname]" id="billing:lastname" value="" />
+                    </div>
+                </li>
+                <li>
+                    <div class="input-box input-email">
+                        <label for="billing:email">E-post <span class="required">*</span></label><br />
+                        <input type="text" name="billing[email]" id="billing:email" value="" title="E-post" class="validate-email required-entry input-text" />
+                    </div>
+                    <div class="input-box input-telephone">
+                        <label for="billing:telephone">Telefon <span class="required">*</span></label><br/>
+                        <input type="text" name="billing[telephone]" value="" title="Telefon" class="required-entry input-text" id="billing:telephone" />
+                    </div>
+                </li>
+                <li>
+                    <div class="input-box input-address">
+                        <label for="billing:street1">Adress <span class="required">*</span></label><br />
+                        <input type="text" title="Street Address 1" name="billing[street][]" id="billing:street1" value="" class="required-entry input-text" /><br/><input type="text" title="Street Address 2" name="billing[street][]" id="billing:street2" value="" class="input-text" />
+                    </div>
+                </li>
+                <li>
+                    <div class="input-box input-country">
+                        <label for="billing:country_id">Land <span class="required">*</span></label><br />
+                        <select name="billing[country_id]" id="billing:country_id" class="validate-select" title="Land">
+                            <option value=""> </option>
+                            <option value="DK" >Danmark</option>
+                            <option value="FI" >Finland</option>
+                            <option value="NL" >Nederländerna</option>
+                            <option value="NO" >Norge</option>
+                            <option value="SE" selected="selected" >Sverige</option>
+                            <option value="DE" >Tyskland</option>
+                            <option value="US" >USA</option>
+                        </select>
+                    </div>
+                </li>
+                <li>
+                    <div class="input-box input-city">
+                        <label for="billing:city">Stad <span class="required">*</span></label><br/>
+                        <input type="text" name="billing[city]" value="" title="Stad" class="required-entry input-text" id="billing:city" />
+                    </div>
+                </li>
+                <li>
+                    <div class="input-box input-postcode" >
+                        <label for="billing:postcode">Postnummer <span class="required">*</span></label><br />
+                        <input type="text" title="Postnummer" name="billing[postcode]" id="billing:postcode" value="" class="validate-zip-international required-entry input-text" />
+                    </div>
+                    <div class="input-box input-region">
+                        <label for="billing:region">Län <span class="required">*</span></label><br/>
+                        <select id="billing:region_id" name="billing[region_id]" title="Län" class="validate-select" style="display:none">
+                            <option value="">Please select region, state or province</option>
+                        </select>
+                        <input type="text" id="billing:region" name="billing[region]" value=""  title="Län" class="required-entry input-text" style="display:none" />
+                    </div>
+                </li>
+                <li>
+                    <div class="input-box input-company">
+                        <label for="billing:company">Företag</label><br/>
+                        <input type="text" name="billing[company]" value="" title="Företag" class="input-text" id="billing:company" />
+                    </div>
+                    <div class="input-box input-fax">
+                        <label for="billing:fax">Fax</label><br/>
+                        <input type="text" name="billing[fax]" value="" title="Fax" class="input-text" id="billing:fax" />
+                    </div>
+                </li>
+
+                <li class="no-display"><input type="hidden" name="billing[save_in_address_book]" value="1" /></li>
+
+            </ul>
+        </li>
+    </ul>
+</div>

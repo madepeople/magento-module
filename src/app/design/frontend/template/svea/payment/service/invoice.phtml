@@ -11,6 +11,9 @@
 <?php $_typeCompany = Svea_WebPay_Helper_Data::TYPE_COMPANY ?>
 <?php $_quote = $this->getMethod()->getInfoInstance()->getQuote() ?>
 <div id="payment_form_<?php echo $this->getMethodCode() ?>" style="display:none;">
+    <div id="svea-invoice-payment-not-available" style="display:none;">
+        <?php echo Mage::helper('svea_webpay')->__('This payment method cannot be used.'); ?>
+    </div>
     <div id="svea-invoice-payment-information" class="svea-payment-se svea-payment-dk svea-payment-no svea-payment-fi svea-payment-nl svea-payment-de">
         <!-- This input needs to be populated and transmitted to the backend,
              because we validate it against the items fetched from getAddress
@@ -167,3 +170,33 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+var svea;
+window.svea = svea;
+(function () {
+    if (!window.svea) {
+        // Set this in the beginning because, well, concurrency and stuff
+        window.svea = true;
+
+        var head = document.getElementsByTagName('head')[0];
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = <?php echo Mage::helper('core')->jsonEncode($this->getScriptUrl()) ?>;
+
+        var callback = function () {
+            window.svea = new Svea(<?php echo Mage::helper('core')->jsonEncode($this->getSveaJsParameters()) ?>);
+        }
+
+        // Then bind the event to the callback function.
+        // There are several events for cross browser compatibility.
+        script.onreadystatechange = callback;
+        script.onload = callback;
+
+        // Fire the loading
+        head.appendChild(script);
+    } else {
+        window.svea.displayCountrySpecificFields();
+    }
+})();
+</script>
