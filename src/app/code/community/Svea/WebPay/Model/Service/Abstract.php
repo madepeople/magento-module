@@ -211,7 +211,23 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
      */
     public function authorize(Varien_Object $payment, $amount)
     {
+
         $order = $payment->getOrder();
+
+        // For Finland the ssn should be collected but no authorization should be
+        // performed.
+        if ($order->getBillingAddress()->getCountryId() == 'FI') {
+            // return;
+            $sveaInfo = @$_POST['payment']['svea_invoice'];
+            if (!is_array($sveaInfo)) {
+                throw new Mage_Exception("Error when saving order: Svea invoice information not set in _POST");
+            } else {
+                $paymentInfo = $this->getInfoInstance();
+                $paymentInfo->setAdditionalInformation($sveaInfo);
+                return;
+            }
+        }
+
         // Object created in validate()
         $sveaObject = $order->getData('svea_payment_request');
         $sveaObject = $this->_choosePayment($sveaObject);

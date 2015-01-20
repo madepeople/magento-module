@@ -1,4 +1,4 @@
-/*global window Class $ $$ payment $F $H Ajax */
+/*global window Class $ $$ payment $F $H Ajax Validation */
 /** Svea magento module javascript part
  *
  * This module takes care of retrieving addresses from svea and modifying the gui
@@ -42,6 +42,31 @@ var _sveaPrivateReadOnlyElements = [
 var _sveaCompanyReadOnlyElements = [
     'company'
 ];
+
+/**
+ * SSN validator for svea
+ *
+ * This validator will only validate the ssn/orgnr if the current method is
+ * 'svea_invoice' and the country is Finland and the only validation that
+ * currently is done is to check if it's empty or not.
+ */
+Validation.add(
+    'validate-svea-invoice-ssn',
+    'This is a required field.',
+    function(value) {
+        var countryCode = _sveaGetBillingCountryCode(),
+            paymentMethodCode = _sveaGetPaymentMethodCode();
+
+        if (paymentMethodCode === 'svea_invoice' && countryCode === 'FI') {
+            if (Validation.get('IsEmpty').test(value)) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return true;
+        }
+});
 
 
 /** Check if a specific form key should be used
@@ -729,16 +754,19 @@ var _SveaController = Class.create({
 
         return this.validPaymentMethods.indexOf(paymentMethod) !== -1 && this.validCountries.indexOf(countryCode) !== -1;
     },
-    /** Check if svea getAddress may be used
+    /** Check if the container with its content should be displayed
      *
      * This is not the same as it _must_ be used even though it currently returns
      * the same value. When this returns `false` the svea ssn container should be
      * hidden, when true it should be visible.
      *
+     * For Finland('FI') the container should be displayed but the getaddress
+     * button will be hidden by the template.
+     *
      * @returns Boolean
      */
-    canUseSveaGetAddress: function() {
-        return this.sveaAddressIsRequired();
+    showContainer: function() {
+        return this.sveaAddressIsRequired() || _sveaGetBillingCountryCode() === 'FI';
     },
     /** Toggle visibility of ssn container
      *
@@ -829,7 +857,7 @@ var _SveaController = Class.create({
 
         }
 
-        if (this.canUseSveaGetAddress()) {
+        if (this.showContainer()) {
             // Show ssn-container
             this.toggleSsnContainer(true);
         } else {

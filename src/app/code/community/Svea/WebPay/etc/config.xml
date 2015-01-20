@@ -168,6 +168,15 @@
                     </add_payment_fee_total_to_block>
                 </observers>
             </core_block_abstract_to_html_before>
+            <payment_info_block_prepare_specific_information>
+                <observers>
+                    <add_svea_payment_info>
+                        <type>singleton</type>
+                        <class>svea_webpay/observer</class>
+                        <method>addSveaPaymentInfo</method>
+                    </add_svea_payment_info>
+                </observers>
+            </payment_info_block_prepare_specific_information>
         </events>
     </global>
 
