@@ -164,7 +164,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         }
 
         if ($company == "1") {
-            $item = Item::companyCustomer();
+            $item = WebPayItem::companyCustomer();
             $item = $item->setEmail($order->getBillingAddress()->getEmail())
                     ->setCompanyName($order->getBillingAddress()->getCompany())
                     ->setStreetAddress($addressArray[1], $addressArray[2])
@@ -181,7 +181,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             }
             $svea = $svea->addCustomerDetails($item);
         } else {
-            $item = Item::individualCustomer();
+            $item = WebPayItem::individualCustomer();
             $item = $item->setNationalIdNumber($additionalInfo['svea_ssn'])
                     ->setEmail($order->getBillingAddress()->getEmail())
                     ->setName($order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
