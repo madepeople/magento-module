@@ -147,8 +147,13 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         if ($discount > 0) {
             if ($taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
                 $appliedTaxes = $order->getAppliedTaxes();
-                $orderTax = array_shift($appliedTaxes);
-                $rate = $orderTax['percent'];
+                if (null === $appliedTaxes) {
+                    $tax = Mage::getModel('sales/order_tax')->load($order->getId(), 'order_id');
+                    $rate = $tax->getPercent();
+                } else {
+                    $orderTax = array_shift($appliedTaxes);
+                    $rate = $orderTax['percent'];
+                }
                 $discount *= 1+($rate/100);
             }
 
