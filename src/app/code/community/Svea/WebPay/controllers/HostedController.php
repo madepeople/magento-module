@@ -146,14 +146,10 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
             $redirectUrl = 'checkout/onepage/failure';
             $comment = 'CAUTION! This order could have been paid, please inspect the Svea administration panel. Error when returning from gateway: ' . $e->getMessage();
             $message = $e->getMessage();
-            $response = $this->_getSveaResponseXml();
+            $response = $this->_getSveaResponseObject();
             if (!empty($response)) {
-                // We handle statuses here, but it would actually be better if
-                // they could be translated and managed in a more generic way.
-                // Svea\HostedPaymentResponse has defined error codes, but
-                // they are a mess to extract without using the object in
-                // question, which has a chicken-egg problem in Magento
-                $status = (string)$response->statuscode;
+                $responseXml = $this->_getSveaResponseXml();
+                $status = (string)$responseXml->statuscode;
                 switch ($status) {
                     case '108':
                         // Transaction cancelled at the gateway by customer
@@ -161,12 +157,17 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
                         $comment = 'Customer cancelled the order at the gateway.';
                         $message = null;
                         break;
+                    default:
+                        $comment = $response->response->errormessage
+                            . ' - ' . $response->response->resultcode
+                            . ' - Transaction ID: ' . $response->response->transactionId;
+                        $message = $response->response->errormessage;
+                        break;
                 }
             }
             if (null !== $message) {
                 Mage::getSingleton('core/session')->addError($message);
             }
-            Mage::logException($e);
             $order->addStatusHistoryComment($comment);
             $order->cancel()
                 ->save();
@@ -247,6 +248,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
 
             $write->commit();
         } catch (Exception $e) {
+            Mage::logException($e);
             $write->rollback();
             throw $e;
         }
