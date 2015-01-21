@@ -12,7 +12,7 @@ require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Inclu
  * @copyright (c) 2013, SveaWebPay (Svea Ekonomi AB)
  *
  */
-class Svea_WebPay_Block_Payment_Hosted_Redirect_Card extends Mage_Core_Block_Template
+class Svea_WebPay_Block_Payment_Hosted_Redirect extends Mage_Core_Block_Template
 {
 
     protected $_template = 'svea/payment/hosted/redirect.phtml';

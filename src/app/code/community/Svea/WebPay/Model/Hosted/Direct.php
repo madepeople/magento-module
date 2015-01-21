@@ -14,7 +14,7 @@ class Svea_WebPay_Model_Hosted_Direct extends Svea_WebPay_Model_Hosted_Abstract
 {
 
     protected $_code = 'svea_directpayment';
-    protected $_sveaUrl = 'svea_webpay/hosted/redirectdirect';
+    protected $_sveaUrl = 'svea_webpay/hosted/redirect';
     protected $_formBlockType = 'svea_webpay/payment_hosted_direct';
 
     /**
@@ -25,9 +25,10 @@ class Svea_WebPay_Model_Hosted_Direct extends Svea_WebPay_Model_Hosted_Abstract
     protected function _choosePayment($sveaObject, $addressSelector = NULL)
     {
         $paymentFormPrep = $sveaObject->usePayPageDirectBankOnly()
-                ->setPayPageLanguage(Mage::helper('svea_webpay')->__('lang_code'))
-                ->setReturnUrl(Mage::getUrl('svea_webpay/hosted/responseDirectPayment'))
-                ->setCancelUrl(Mage::getUrl('checkout/cart/'));
+            ->setPayPageLanguage(Mage::helper('svea_webpay')->__('lang_code'))
+            ->setCallbackUrl(Mage::getUrl('svea_webpay/hosted/callback'))
+            ->setReturnUrl(Mage::getUrl('svea_webpay/hosted/return'))
+            ->setCancelUrl(Mage::getUrl('svea_webpay/hosted/cancel'));
 
         return $paymentFormPrep;
     }

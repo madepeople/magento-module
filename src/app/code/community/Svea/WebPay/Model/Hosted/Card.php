@@ -16,7 +16,7 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
 {
 
     protected $_code = 'svea_cardpayment';
-    protected $_sveaUrl = 'svea_webpay/hosted/redirectcard';
+    protected $_sveaUrl = 'svea_webpay/hosted/redirect';
     protected $_formBlockType = 'svea_webpay/payment_hosted_card';
 
     /**
@@ -27,17 +27,18 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
      */
     protected function _choosePayment($sveaObject, $addressSelector = NULL)
     {
-        // In Denmark it might be other card choices. May not be neccesary
-        // in future updates in Svea's systems
+        // In Denmark there might be other card choices. May not be necessary
+        // in future updates to Svea's systems
         if (!isset($sveaObject->countryCode) || $sveaObject->countryCode == "DK") {
             $sveaObject = $sveaObject->usePayPageCardOnly()
-                    ->setPayPageLanguage(Mage::helper('svea_webpay')->__('lang_code'));
+                ->setPayPageLanguage(Mage::helper('svea_webpay')->__('lang_code'));
         } else {
             $sveaObject = $sveaObject->usePaymentMethod(PaymentMethod::KORTCERT);
         }
 
-        $paymentFormPrep = $sveaObject->setReturnUrl(Mage::getUrl("svea_webpay/hosted/responseCard"))
-                ->setCancelUrl(Mage::getUrl("checkout/cart/"));
+        $paymentFormPrep = $sveaObject->setReturnUrl(Mage::getUrl("svea_webpay/hosted/return"))
+            ->setCallbackUrl(Mage::getUrl('svea_webpay/hosted/callback'))
+            ->setCancelUrl(Mage::getUrl("svea_webpay/hosted/cancel"));
 
         return $paymentFormPrep;
     }

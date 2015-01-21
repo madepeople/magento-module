@@ -4,149 +4,252 @@ require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Inclu
 class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
 {
 
-    public function redirectCardAction()
+    protected $_order;
+    protected $_xmlResponse;
+    protected $_sveaResponseObject;
+
+    /**
+     * Parse the Svea response XML
+     *
+     * @return mixed|SimpleXMLElement|string
+     */
+    protected function _getSveaResponseXml()
     {
-        $orderId = Mage::getSingleton('checkout/session')->getLastOrderId();
-        $order = Mage::getModel('sales/order')->load($orderId);
-
-        if (!$orderId) {
-            return $this->_redirect('');
+        if (!$this->_xmlResponse) {
+            $response = $this->getRequest()
+                ->getPost('response');
+            $response = @base64_decode($response);
+            $response = @simplexml_load_string($response);
+            $this->_xmlResponse = $response;
         }
-
-        if (!$order->getId()) {
-            return $this->_redirect('');
-        }
-
-        if (!($order->getPayment()->getMethodInstance() instanceof Svea_WebPay_Model_Hosted_Abstract)) {
-            return $this->_redirect('');
-        }
-
-        $this->loadLayout();
-        $this->renderLayout();
+        return $this->_xmlResponse;
     }
 
-    public function redirectDirectAction()
+    /**
+     * Retrieve the Svea response object for the current request, so we can do
+     * some admin magic
+     *
+     * @param $order
+     * @return SimpleXMLElement
+     */
+    protected function _getSveaResponseObject()
     {
+        if (!$this->_sveaResponseObject) {
+            $order = $this->_initOrder();
+            $methodInstance = $order->getPayment()
+                ->getMethodInstance();
 
-        $orderId = Mage::getSingleton('checkout/session')->getLastOrderId();
-        $order = Mage::getModel('sales/order')->load($orderId);
-
-        if (!$orderId) {
-            return $this->_redirect('');
+            $paymentMethodConfig = $methodInstance->getSveaStoreConfClass();
+            $config = new SveaMageConfigProvider($paymentMethodConfig);
+            $request = $this->getRequest();
+            $responseObject = new SveaResponse(array(
+                'response' => $request->getPost('response'),
+                'mac' => $request->getPost('mac'),
+            ), null, $config);
+            $this->_sveaResponseObject = $responseObject;
         }
-
-        if (!$order->getId()) {
-            return $this->_redirect('');
-        }
-
-        if (!($order->getPayment()->getMethodInstance() instanceof Svea_WebPay_Model_Hosted_Abstract)) {
-            return $this->_redirect('');
-        }
-
-        $this->loadLayout();
-        $this->renderLayout();
+        return $this->_sveaResponseObject;
     }
-
-    public function responseCardAction()
+    /**
+     * Initialize the order object for the current transaction
+     *
+     * @throws Mage_Payment_Exception
+     */
+    protected function _initOrder()
     {
-        if ($this->getRequest()->getParam("response") && $this->getRequest()->getParam("mac")) {
-            $conf = Mage::getStoreConfig('payment/svea_cardpayment');
-            $this->responseAction($_REQUEST, $conf);
-
-            $quote = Mage::getModel('checkout/session')
-                ->getQuote();
-
-            if ($quote && $quote->getId()) {
-                $quote->setIsActive(false)
-                    ->save();
+        if (!$this->_order) {
+            $response = $this->_getSveaResponseXml();
+            $orderId = (string)$response->transaction->customerrefno;
+            if (empty($orderId)) {
+                throw new Mage_Payment_Exception('Required field orderId is missing');
             }
-        }
-    }
 
-    public function responseDirectPaymentAction()
-    {
-        if ($this->getRequest()->getParam("response") && $this->getRequest()->getParam("mac")) {
-            $conf = Mage::getStoreConfig('payment/svea_directpayment');
-            $this->responseAction($_REQUEST, $conf);
-
-            $quote = Mage::getModel('checkout/session')
-                ->getQuote();
-
-            if ($quote && $quote->getId()) {
-                $quote->setIsActive(false)
-                    ->save();
+            // Lock the order row to prevent double processing from the
+            // customer + callback
+            $resource = Mage::getModel('sales/order')->getResource();
+            $resource->getReadConnection()
+                ->select()
+                ->forUpdate()
+                ->from($resource->getTable('sales/order'))
+                ->where('increment_id = ?', $orderId)
+                ->query();
+            $order = Mage::getModel('sales/order')
+                ->loadByIncrementId($orderId);
+            if (!$order->getId()) {
+                throw new Mage_Payment_Exception('Order with ID "' . $orderId . '" could not be found');
             }
+
+            $methodInstance = $order->getPayment()
+                ->getMethodInstance();
+            if (!($methodInstance instanceof Svea_WebPay_Model_Hosted_Abstract)) {
+                throw new Mage_Payment_Exception('Order isn\'t a Svea order');
+            }
+
+            $this->_order = $order;
+        }
+        return $this->_order;
+    }
+
+    /**
+     * When Magento claims the order has been successfully placed
+     *
+     * We save the last_quote_id in a special place to prevent hacky customers
+     * from entering checkout/success when they're only on the gateway,
+     * confusing merchants, tracking (analytics and affiliates) as well as
+     * the hacky customers themselves
+     */
+    public function redirectAction()
+    {
+        $session = Mage::getSingleton('checkout/session');
+        $lastQuoteId = $session->getLastQuoteId();
+        $session->unsLastQuoteId();
+        if (!$lastQuoteId) {
+            // Redirect to the failure page in case of a timeout or hacking
+            return $this->_redirect('checkout/onepage/failure');
+        }
+        $session->setSveaLastQuoteId($lastQuoteId);
+        $redirectBlock = $this->getLayout()
+            ->createBlock('svea_webpay/payment_hosted_redirect');
+        $this->getResponse()->setBody($redirectBlock->toHtml());
+    }
+
+    /**
+     * When a customer cancels payment in the Svea gateway
+     */
+    public function cancelAction()
+    {
+        if ($this->_order) {
+            $this->_order->cancel()->save();
+        }
+        $session = Mage::getSingleton('checkout/session');
+        $session->setLastRealOrderId(null);
+        $session->unsLastRealOrderId();
+        $this->_redirect('checkout/cart', array('_secure' => true));
+    }
+
+    /**
+     * We have returned from the Svea gateway and they claim everything is
+     * epic. Since there is a callback functionality and we need to handle
+     * it the same way as this, we just use the callbackAction to process
+     * the order information
+     */
+    public function returnAction()
+    {
+        try {
+            $session = Mage::getSingleton('checkout/session');
+            $session->setLastQuoteId($session->getSveaLastQuoteId());
+            $session->unsSveaLastQuoteId();
+            $this->callbackAction();
+            $this->_redirect('checkout/onepage/success', array('_secure' => true));
+        } catch (Exception $e) {
+            $order = $this->_initOrder();
+            $redirectUrl = 'checkout/onepage/failure';
+            $comment = 'CAUTION! This order could have been paid, please inspect the Svea administration panel. Error when returning from gateway: ' . $e->getMessage();
+            $message = $e->getMessage();
+            $response = $this->_getSveaResponseXml();
+            if (!empty($response)) {
+                // We handle statuses here, but it would actually be better if
+                // they could be translated and managed in a more generic way.
+                // Svea\HostedPaymentResponse has defined error codes, but
+                // they are a mess to extract without using the object in
+                // question, which has a chicken-egg problem in Magento
+                $status = (string)$response->statuscode;
+                switch ($status) {
+                    case '108':
+                        // Transaction cancelled at the gateway by customer
+                        $redirectUrl = 'checkout/cart';
+                        $comment = 'Customer cancelled the order at the gateway.';
+                        $message = null;
+                        break;
+                }
+            }
+            if (null !== $message) {
+                Mage::getSingleton('core/session')->addError($message);
+            }
+            Mage::logException($e);
+            $order->addStatusHistoryComment($comment);
+            $order->cancel()
+                ->save();
+            $this->_redirect($redirectUrl);
         }
     }
 
-    private function responseAction($request, $conf)
+    /**
+     * Handle the callback information from Svea, needs to be synchronous in
+     * case the gateway sends the user to the success page the same time as
+     * the Svea callback calls us.
+     *
+     * We have everything within a transaction with row-locking to prevent
+     * race conditions.
+     *
+     * @return void
+     */
+    public function callbackAction()
     {
-        $sveaConf = new SveaMageConfigProvider($conf);
-        $response = new SveaResponse($request, "", $sveaConf);
+        $write = Mage::getSingleton('core/resource')
+            ->getConnection('core_write');
+        try {
+            $write->beginTransaction();
+            $order = $this->_initOrder();
+            if ($order->getState() !== Mage_Sales_Model_Order::STATE_PENDING_PAYMENT) {
+                // Order is not in pending payment state. It's possible that the payment
+                // has already been registered via the callback.
+                $write->rollback();
+                return;
+            }
 
-        $order = Mage::getModel('sales/order')
-                ->loadByIncrementId($response->response->clientOrderNumber);
+            $response = $this->_getSveaResponseObject();
+            $accepted = $response->response->accepted;
+            if ($accepted === 0) {
+                // Transaction not accepted
+                throw new Exception('Payment failed with code: ' . $response->response->resultcode . '. Please contact Svea for more information.');
+            }
 
-        if (!$order->getId()) {
-            Mage::getSingleton('core/session')  ->addError("Order #" . $response->response->clientOrderNumber . " couldn't be loaded")
-                                                ->addError( Mage::helper('svea_webpay')->responseCodes($response->response->resultcode, $response->response->errormessage));
-            return $this->_redirect("checkout/onepage/failure", array("_secure" => true));
-        }
-
-        if ($order->getTotalDue() == 0) {
-            // The order has already been paid, is somebody messing with us?
-            Mage::getSingleton('core/session')  ->addError("Order #" . $response->response->clientOrderNumber . " has already been paid")
-                                                ->addError( Mage::helper('svea_webpay')->responseCodes($response->response->resultcode, $response->response->errormessage));
-
-            return $this->_redirect("checkout/onepage/failure", array("_secure" => true));
-        }
-
-        if ($response->response->accepted == 1) {
-            $payment = $order->getPayment();
-            $payment->addTransaction(Mage_Payment_Model_Method_Abstract::ACTION_AUTHORIZE_CAPTURE);
-            $payment->setPreparedMessage('Order has been paid at Svea.')
-                    ->setTransactionId($response->response->transactionId)
-                    ->setIsTransactionApproved(true);
 
             $rawDetails = array();
             foreach ($response->response as $key => $val) {
-                if (!is_string($key)) {
+                if (!is_string($key) || is_object($val)) {
                     continue;
                 }
-
                 $rawDetails[$key] = $val;
             }
 
-            $payment->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
+            $payment = $order->getPayment();
+            $payment->setTransactionId($response->response->transactionId)
+                ->setIsTransactionApproved(true)
+                ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
 
-            // Capture the whole amount
-            $payment->capture(null);
+            if (false && empty($captureNow)) {
+                // Implement this somehow, using the new integration library
+                // Leave the transaction open for captures/refunds/etc
+                $payment->setPreparedMessage('Svea - Payment Authorized.');
+                $payment->setIsTransactionClosed(0)
+                    ->registerAuthorizationNotification($order->getGrandTotal());
+            } else {
+                // The order has been fully paid
+                $payment->setPreparedMessage('Svea - Payment Successful.');
+                $payment->registerCaptureNotification($order->getGrandTotal());
+            }
 
-            $newOrderStatus = $order->getPayment()
-                ->getMethodInstance()
-                ->getConfigData('new_order_status');
-
+            $methodInstance = $order->getPayment()
+                ->getMethodInstance();
+            $newOrderStatus = $methodInstance->getConfigData('new_order_status');
             if (!empty($newOrderStatus)) {
                 $order->setStatus($newOrderStatus);
             }
-
             $order->save();
             $order->sendNewOrderEmail();
 
-            $this->_redirect("checkout/onepage/success", array("_secure" => true));
-        } else {
-            $errorMessage = $response->response->errormessage;
-            $statusCode = $response->response->resultcode;
+            // Newer versions of magento needs this when saving the order
+            // inside a transaction, to update the order grid in admin
+            $order->getResource()
+                ->updateGridRecords(array($order->getId()));
 
-            if ($order->canCancel()) {
-                $order->cancel();
-                $order->addStatusToHistory($order->getStatus(), Mage::helper('svea_webpay')->responseCodes($statusCode, $errorMessage), false);
-                $order->save();
-            }
-
-            Mage::getSingleton('core/session')->addError(Mage::helper('svea_webpay')->responseCodes($statusCode, $errorMessage));
-
-            $this->_redirect("checkout/onepage/failure", array("_secure" => true));
+            $write->commit();
+        } catch (Exception $e) {
+            $write->rollback();
+            throw $e;
         }
     }
+
 }
