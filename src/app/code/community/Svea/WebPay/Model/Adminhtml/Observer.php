@@ -1,22 +1,41 @@
 <?php
 
+/**
+ * Observer to check for newer versions when in the Admin Panel
+ *
+ * @author Péter Tóth <peter@madepeople.se>
+ */
 class Svea_WebPay_Model_Adminhtml_Observer extends Mage_Core_Model_Observer
 {
     private $endpoint = 'https://api.github.com/repos/sveawebpay/magento-module/releases';
     private $cacheKey = 'Svea_WebPay_Releases';
 
+    /**
+     * Get JSON of releases from cache
+     *
+     * @return false|mixed
+     */
     private function _getCachedReleases()
     {
         $cache = Mage::app()->getCache();
         return $cache->load($this->cacheKey);
     }
 
-    private function _saveCachedReleases($releases)
+    /**
+     * Save releases to cache
+     *
+     * @param string $releases JSON of the release data
+     * @return bool
+     */
+    private function _saveReleasesToCache($releases)
     {
         $cache = Mage::app()->getCache();
-        return $cache->save($this->cacheKey, $releases, array('CONFIG'));
+        return $cache->save($releases, $this->cacheKey, array('CONFIG'));
     }
 
+    /**
+     * Check if there is a newer version of this module, display admin notice if there is
+     */
     public function checkModuleVersion()
     {
         try {
@@ -29,7 +48,7 @@ class Svea_WebPay_Model_Adminhtml_Observer extends Mage_Core_Model_Observer
                 curl_setopt($ch, CURLOPT_TIMEOUT, 15);
                 $releases = curl_exec($ch);
                 curl_close($ch);
-                $this->_saveCachedReleases($releases);
+                $this->_saveReleasesToCache($releases);
             }
 
             $releases = json_decode($releases);
@@ -42,7 +61,7 @@ class Svea_WebPay_Model_Adminhtml_Observer extends Mage_Core_Model_Observer
                 }
             }
 
-            $currentVersion = Mage::getConfig()->getModuleConfig("Svea_Webpay")->version;
+            $currentVersion = (string)Mage::getConfig()->getModuleConfig("Svea_WebPay")->version;
 
             if (version_compare($currentVersion, $latestVersion, '<')) {
                 Mage::getModel('adminnotification/inbox')->addNotice('New version of Svea WebPay', 'There is a new version of Svea WebPay available for download. Please upgrade!', $tarballUrl);
