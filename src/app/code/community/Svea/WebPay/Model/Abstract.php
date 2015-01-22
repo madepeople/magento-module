@@ -199,7 +199,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
      */
     public function validate()
     {
-
         $paymentInfo = $this->getInfoInstance();
         if ($paymentInfo instanceof Mage_Sales_Model_Order_Payment) {
             $order = $paymentInfo->getOrder();
@@ -208,16 +207,27 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         }
         $paymentMethodConfig = $this->getSveaStoreConfClass();
         Mage::helper('svea_webpay')->getPaymentRequest($order, $paymentMethodConfig);
-        $additionalInformation = $paymentInfo->getAdditionalInformation();
-        if (empty($additionalInformation) || !isset($additionalInformation['svea_customerType'])) {
-            $paymentData = $paymentInfo->getData();
-            $code = isset($paymentData[$this->getCode()])
-                ? $this->getCode() : 'svea_info';
+        // For Finland we must take the additionalInformation from $_POST
+        // since no getAddress call has been made previously
+        $billingCountryId = $order->getBillingAddress()->getCountryId();
+        if ($billingCountryId === 'FI') {
+            $additionalInformation = @$_POST['payment'][@$_POST['payment']['method']];
+            if (!is_array($additionalInformation)) {
+                throw new Mage_Exception("Error when validation order: Svea invoice information not set in _POST");
+            }
+        } else {
+            $additionalInformation = $paymentInfo->getAdditionalInformation();
 
-            if (isset($paymentData[$code])) {
-                $additionalInformation = $paymentData[$this->getCode()];
-            } else {
-                $additionalInformation = array();
+            if (empty($additionalInformation) || !isset($additionalInformation['svea_customerType'])) {
+                $paymentData = $paymentInfo->getData();
+                $code = isset($paymentData[$this->getCode()])
+                    ? $this->getCode() : 'svea_info';
+
+                if (isset($paymentData[$code])) {
+                    $additionalInformation = $paymentData[$this->getCode()];
+                } else {
+                    $additionalInformation = array();
+                }
             }
         }
         $sveaRequest = $this->getSveaPaymentObject($order, $additionalInformation);

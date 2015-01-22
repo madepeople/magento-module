@@ -55,6 +55,11 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         $sveaInformation = $payment->getAdditionalInformation();
 
         $order = $payment->getOrder();
+        // We don't do getAddress() requests for Finland
+        $billingCountryId = $order->getBillingAddress()->getCountryId();
+        if ($billingCountryId === 'FI') {
+            return;
+        }
         if (!empty($sveaInformation) && !empty($sveaInformation['svea_addressSelector'])) {
             // Get address has been used, and we need to override the billing
             // address that the customer has entered, and possibly also the
@@ -122,11 +127,11 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 if ($sveaInformation['svea_customerType'] == 0) {
                     // Don't overwrite the name if a company
                     $orderAddress->setFirstname($address->firstName)
-                        ->setLastname($address->lastName . ' ' . $address->coAddress);
+                                 ->setLastname($address->lastName . ' ' . $address->coAddress);
                 }
                 $orderAddress->setCity($address->locality)
-                    ->setPostcode($address->zipCode)
-                    ->setStreet($address->street);
+                             ->setPostcode($address->zipCode)
+                             ->setStreet($address->street);
             }
         } else if (in_array($order->getBillingAddress()->getCountryId(), array('SE', 'DK'))) {
             $message = Mage::helper('svea_webpay')->__('Please click the "Get Address" button to fetch your address information and proceed.');
@@ -214,17 +219,16 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
 
         $order = $payment->getOrder();
 
-        // For Finland the ssn should be collected but no authorization should be
-        // performed.
+        // For Finland the values in _POST should be used, not
+        // previously stored information because no getAddress() request has been
+        // made.
         if ($order->getBillingAddress()->getCountryId() == 'FI') {
-            // return;
-            $sveaInfo = @$_POST['payment']['svea_invoice'];
+            $sveaInfo = @$_POST['payment'][@$_POST['payment']['method']];
             if (!is_array($sveaInfo)) {
                 throw new Mage_Exception("Error when saving order: Svea invoice information not set in _POST");
             } else {
                 $paymentInfo = $this->getInfoInstance();
                 $paymentInfo->setAdditionalInformation($sveaInfo);
-                return;
             }
         }
 
