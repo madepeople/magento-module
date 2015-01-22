@@ -168,6 +168,15 @@
                     </add_payment_fee_total_to_block>
                 </observers>
             </core_block_abstract_to_html_before>
+            <adminhtml_controller_action_predispatch_start>
+                <observers>
+                    <check_svea_module_version>
+                        <type>singleton</type>
+                        <class>svea_webpay/adminhtml_observer</class>
+                        <method>checkModuleVersion</method>
+                    </check_svea_module_version>
+                </observers>
+            </adminhtml_controller_action_predispatch_start>
         </events>
     </global>
 
