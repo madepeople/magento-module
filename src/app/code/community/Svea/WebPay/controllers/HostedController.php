@@ -142,35 +142,41 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
             $this->callbackAction();
             $this->_redirect('checkout/onepage/success', array('_secure' => true));
         } catch (Exception $e) {
-            $order = $this->_initOrder();
             $redirectUrl = 'checkout/onepage/failure';
             $comment = 'CAUTION! This order could have been paid, please inspect the Svea administration panel. Error when returning from gateway: ' . $e->getMessage();
             $message = $e->getMessage();
-            $response = $this->_getSveaResponseObject();
-            if (!empty($response)) {
-                $responseXml = $this->_getSveaResponseXml();
-                $status = (string)$responseXml->statuscode;
-                switch ($status) {
-                    case '108':
-                        // Transaction cancelled at the gateway by customer
-                        $redirectUrl = 'checkout/cart';
-                        $comment = 'Customer cancelled the order at the gateway.';
-                        $message = null;
-                        break;
-                    default:
-                        $comment = $response->response->errormessage
-                            . ' - ' . $response->response->resultcode
-                            . ' - Transaction ID: ' . $response->response->transactionId;
-                        $message = $response->response->errormessage;
-                        break;
+
+            try {
+                $order = $this->_initOrder();
+                $response = $this->_getSveaResponseObject();
+                if (!empty($response)) {
+                    $responseXml = $this->_getSveaResponseXml();
+                    $status = (string)$responseXml->statuscode;
+                    switch ($status) {
+                        case '108':
+                            // Transaction cancelled at the gateway by customer
+                            $redirectUrl = 'checkout/cart';
+                            $comment = 'Customer cancelled the order at the gateway.';
+                            $message = null;
+                            break;
+                        default:
+                            $comment = $response->response->errormessage
+                                . ' - ' . $response->response->resultcode
+                                . ' - Transaction ID: ' . $response->response->transactionId;
+                            $message = $response->response->errormessage;
+                            break;
+                    }
                 }
+                $order->addStatusHistoryComment($comment);
+                $order->cancel()
+                    ->save();
+            } catch (Exception $e) {
+                // We just don't want to explode in _initOrder
             }
+
             if (null !== $message) {
                 Mage::getSingleton('core/session')->addError($message);
             }
-            $order->addStatusHistoryComment($comment);
-            $order->cancel()
-                ->save();
             $this->_redirect($redirectUrl);
         }
     }
@@ -222,18 +228,23 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
             $methodInstance = $order->getPayment()
                 ->getMethodInstance();
 
-            // This config value should come from the payment object data ideally
-            // since it could have been changed between requests
-            if ($methodInstance->getConfigData('autodeliver')) {
-                // The order should automatically delivered
+            if ($methodInstance instanceof Svea_WebPay_Model_Hosted_Direct) {
                 $payment->setPreparedMessage('Svea - Payment Successful.');
-                $payment->capture(null);
+                $payment->registerCaptureNotification($order->getGrandTotal());
             } else {
-                // Implement this somehow, using the new integration library
-                // Leave the transaction open for captures/refunds/etc
-                $payment->setPreparedMessage('Svea - Payment Authorized.');
-                $payment->setIsTransactionClosed(0)
-                    ->registerAuthorizationNotification($order->getGrandTotal());
+                // This config value should come from the payment object data ideally
+                // since it could have been changed between requests
+                if ($methodInstance->getConfigData('autodeliver')) {
+                    // The order should automatically delivered
+                    $payment->setPreparedMessage('Svea - Payment Successful.');
+                    $payment->capture(null);
+                } else {
+                    // Implement this somehow, using the new integration library
+                    // Leave the transaction open for captures/refunds/etc
+                    $payment->setPreparedMessage('Svea - Payment Authorized.');
+                    $payment->setIsTransactionClosed(0)
+                        ->registerAuthorizationNotification($order->getGrandTotal());
+                }
             }
 
             $newOrderStatus = $methodInstance->getConfigData('new_order_status');
