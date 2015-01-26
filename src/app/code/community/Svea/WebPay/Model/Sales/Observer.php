@@ -13,7 +13,9 @@ class Svea_WebPay_Model_Sales_Observer
     public function autodeliverOrder(Varien_Event_Observer $observer)
     {
         $payment = $observer->getEvent()->getPayment();
-
+        if (!($payment->getMethodInstance() instanceof Svea_WebPay_Model_Service_Abstract)) {
+            return;
+        }
         if ($payment->getMethodInstance()->getConfigData('autodeliver')) {
             $payment->capture(null);
         }

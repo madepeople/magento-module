@@ -1,5 +1,7 @@
 <?php
 
+require_once Mage::getRoot() . '/code/community/Svea/WebPay/integrationLib/Includes.php';
+
 class Svea_WebPay_Model_Source_Delivermethod
 {
 
@@ -13,11 +15,11 @@ class Svea_WebPay_Model_Source_Delivermethod
         return array(
             array(
                 'label' => 'Post',
-                'value' => 'POST'
+                'value' => DistributionType::POST
             ),
             array(
                 'label' => 'Email',
-                'value' => 'EMAIL',
+                'value' => DistributionType::EMAIL,
             )
         );
     }
