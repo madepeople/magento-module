@@ -13,6 +13,16 @@
 class Svea_WebPay_Model_Hosted_Direct extends Svea_WebPay_Model_Hosted_Abstract
 {
 
+    /**
+     * Direct bank orders don't support capture, we consider them captured
+     * once they are placed
+     *
+     * @var bool
+     */
+    protected $_canCapture = false;
+    protected $_canVoid = false;
+    protected $_canRefund = true;
+
     protected $_code = 'svea_directpayment';
     protected $_sveaUrl = 'svea_webpay/hosted/redirect';
     protected $_formBlockType = 'svea_webpay/payment_hosted_direct';
@@ -31,6 +41,27 @@ class Svea_WebPay_Model_Hosted_Direct extends Svea_WebPay_Model_Hosted_Abstract
             ->setCancelUrl(Mage::getUrl('svea_webpay/hosted/cancel'));
 
         return $paymentFormPrep;
+    }
+
+    /**
+     * Fetch transaction info
+     *
+     * @param Mage_Payment_Model_Info $payment
+     * @param string $transactionId
+     * @return array
+     */
+    public function fetchTransactionInfo(Mage_Payment_Model_Info $payment, $transactionId)
+    {
+        if (preg_match('/-/', $transactionId)) {
+            Mage::throwException('Cannot fetch transaction information for child transactions. Please use the parent transaction.');
+        }
+
+        $request = $this->_getQueryOrderRequest($payment, $transactionId);
+        $response = $request->queryDirectBankOrder()
+            ->doRequest();
+
+        $result = $this->_flatten($response);
+        return $result;
     }
 
 }

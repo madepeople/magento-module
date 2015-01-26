@@ -234,4 +234,104 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
     {
         return Mage::getStoreConfig('payment/' . $this->_code, $storeId);
     }
+
+    /**
+     * Returns the deliver order request that we use to capture transactions
+     *
+     * @param Mage_Payment_Model_Info $payment
+     * @param $transactionId
+     * @return mixed
+     */
+    protected function _getDeliverOrderRequest(Mage_Payment_Model_Info $payment, $transactionId)
+    {
+        $order = $payment->getOrder();
+        $paymentMethodConfig = $this->getSveaStoreConfClass($order->getStoreId());
+        $config = new SveaMageConfigProvider($paymentMethodConfig);
+        $countryId = $order->getBillingAddress()->getCountryId();
+
+        $request = WebPayAdmin::deliverOrderRows($config)
+            ->setOrderId($transactionId)
+            ->setCountryCode($countryId)
+        ;
+
+        return $request;
+    }
+
+    /**
+     * Builds the base queryOrder object
+     *
+     * @param Mage_Payment_Model_Info $payment
+     * @param $transactionId
+     * @return mixed
+     */
+    protected function _getQueryOrderRequest(Mage_Payment_Model_Info $payment, $transactionId)
+    {
+        $order = $payment->getOrder();
+        $paymentMethodConfig = $this->getSveaStoreConfClass($order->getStoreId());
+        $config = new SveaMageConfigProvider($paymentMethodConfig);
+        $countryId = $order->getBillingAddress()->getCountryId();
+
+        $request = WebPayAdmin::queryOrder($config)
+            ->setOrderId($transactionId)
+            ->setCountryCode($countryId)
+        ;
+
+        return $request;
+    }
+
+    /**
+     * Builds the base queryOrder object
+     *
+     * @param Mage_Payment_Model_Info $payment
+     * @param $transactionId
+     * @return mixed
+     */
+    protected function _getCancelOrderRequest(Mage_Payment_Model_Info $payment, $transactionId)
+    {
+        $order = $payment->getOrder();
+        $paymentMethodConfig = $this->getSveaStoreConfClass($order->getStoreId());
+        $config = new SveaMageConfigProvider($paymentMethodConfig);
+        $countryId = $order->getBillingAddress()->getCountryId();
+
+        $request = WebPayAdmin::cancelOrder($config)
+            ->setOrderId($transactionId)
+            ->setCountryCode($countryId)
+        ;
+
+        return $request;
+    }
+
+    /**
+     * Flattens an array
+     *
+     * @param $array
+     */
+    protected function _flattenArray($array, $prefix = '')
+    {
+        $result = array();
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $result = array_merge($result, $this->_flattenArray($value, $prefix.$key.'.'));
+            } else {
+                $result[$prefix.$key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * Flattens an array or object into an array
+     *
+     * @param $object  array|StdClass
+     */
+    protected function _flatten($object)
+    {
+        $array = Mage::helper('core')->jsonDecode(
+            Mage::helper('core')->jsonEncode($object),
+            Zend_Json::TYPE_ARRAY);
+
+        $flattenedArray = $this->_flattenArray($array);
+        return $flattenedArray;
+    }
+
 }

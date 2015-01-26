@@ -206,7 +206,6 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
                 throw new Exception('Payment failed with code: ' . $response->response->resultcode . '. Please contact Svea for more information.');
             }
 
-
             $rawDetails = array();
             foreach ($response->response as $key => $val) {
                 if (!is_string($key) || is_object($val)) {
@@ -220,20 +219,23 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
                 ->setIsTransactionApproved(true)
                 ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
 
-            if (false && empty($captureNow)) {
+            $methodInstance = $order->getPayment()
+                ->getMethodInstance();
+
+            // This config value should come from the payment object data ideally
+            // since it could have been changed between requests
+            if ($methodInstance->getConfigData('autodeliver')) {
+                // The order should automatically delivered
+                $payment->setPreparedMessage('Svea - Payment Successful.');
+                $payment->capture(null);
+            } else {
                 // Implement this somehow, using the new integration library
                 // Leave the transaction open for captures/refunds/etc
                 $payment->setPreparedMessage('Svea - Payment Authorized.');
                 $payment->setIsTransactionClosed(0)
                     ->registerAuthorizationNotification($order->getGrandTotal());
-            } else {
-                // The order has been fully paid
-                $payment->setPreparedMessage('Svea - Payment Successful.');
-                $payment->registerCaptureNotification($order->getGrandTotal());
             }
 
-            $methodInstance = $order->getPayment()
-                ->getMethodInstance();
             $newOrderStatus = $methodInstance->getConfigData('new_order_status');
             if (!empty($newOrderStatus)) {
                 $order->setStatus($newOrderStatus);
