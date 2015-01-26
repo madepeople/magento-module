@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Svea_WebPay>
-            <version>4.0.29</version>
+            <version>4.0.30</version>
         </Svea_WebPay>
     </modules>
     <global>
@@ -276,6 +276,7 @@
                 <model>svea_webpay/hosted_card</model>
                 <order_status>pending</order_status>
                 <title>Svea Card Payment</title>
+                <autodeliver>0</autodeliver>
                 <test>1</test>
                 <payment_action>order</payment_action>
                 <clear_cart_on_fulfillment>1</clear_cart_on_fulfillment>

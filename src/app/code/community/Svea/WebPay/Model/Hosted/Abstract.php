@@ -13,8 +13,11 @@
 abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstract
 {
 
+    protected $_canRefund = true;
+    protected $_canRefundInvoicePartial = false;
     protected $_isGateway = true;
     protected $_isInitializeNeeded = true;
+    protected $_canFetchTransactionInfo = true;
 
     /**
      * Instantiate state and set it to state object
@@ -64,7 +67,50 @@ abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstr
     }
 
     /**
-     * Validate thru Svea integrationLib only if this is an order
+     * Refund (fully) both the card and direct bank payments. Payments need
+     * to be captured fully before they can be refunded. Otherwise you will
+     * get "Illegal transaction status (105)".
+     *
+     * @param Varien_Object $payment
+     * @param float $amount
+     * @return $this
+     * @throws Mage_Core_Exception
+     */
+    public function refund(Varien_Object $payment, $amount)
+    {
+        list($sveaOrderId,) = explode('-', $payment->getParentTransactionId());
+        $order = $payment->getOrder();
+        $paymentMethodConfig = $this->getSveaStoreConfClass($order->getStoreId());
+        $config = new SveaMageConfigProvider($paymentMethodConfig);
+
+        $countryId = $order->getBillingAddress()->getCountryId();
+        $creditAmount = $amount * 100;
+
+        $creditTransaction = new Svea\HostedService\CreditTransaction($config);
+        $creditTransaction->transactionId = $sveaOrderId;
+        $creditTransaction->creditAmount = $creditAmount;
+        $creditTransaction->countryCode = $countryId;
+        $response = $creditTransaction->doRequest();
+
+        if ($response->accepted === 0) {
+            $message = 'CreditTransaction failed for transaction ' . $sveaOrderId . ': ' . $response->errormessage . ' (' . $response->resultcode . ')';
+            Mage::throwException($message);
+        }
+
+        $result = $this->_flatten($response);
+        $transactionString = $sveaOrderId . '-refund-' . ((int)microtime(true));
+
+        $payment->setTransactionId($transactionString)
+            ->setIsTransactionClosed(true)
+            ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS,
+                $result);
+
+        return $this;
+    }
+
+    /**
+     * Validate through Svea integrationLib only if this is an order
+     *
      * @return boolean
      */
     public function validate()

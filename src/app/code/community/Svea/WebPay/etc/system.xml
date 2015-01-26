@@ -104,15 +104,16 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </secretword_prod>
-                        <redirect_info translate="label">
-                            <label>Info Text</label>
-                            <frontend_type>textarea</frontend_type>
+                        <autodeliver translate="label">
+                            <label>Autodeliver Transaction</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
                             <sort_order>8</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Text to show when payment is selected in checkout to inform that the customer will be redirected. Optional.</comment>
-                        </redirect_info>
+                            <comment>Will automatically invoice and capture the order. If No is chosen, you will manually have to invoice the order.</comment>
+                        </autodeliver>
                         <clear_cart_on_fulfillment>
                             <label>Clear Cart on Order Fulfillment</label>
                             <comment>When set to 'Yes', the cart won't be emptied until a user returns from a successful payment from the gateway.</comment>
@@ -352,7 +353,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Will automatically Invoice the order. If No is choosen, you will manually have to invoice the order.</comment>
+                            <comment>Will automatically Invoice the order. If No is chosen, you will manually have to invoice the order.</comment>
                         </autodeliver>
                         <invoiced_order_status translate="label">
                             <label>Invoiced order status</label>
@@ -507,7 +508,7 @@
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
-                            <comment>Will automatically Invoice the order. If No is choosen, you will manually have to invoice the order.</comment>
+                            <comment>Will automatically Invoice the order. If No is chosen, you will manually have to invoice the order.</comment>
                         </autodeliver>
                         <invoiced_order_status translate="label">
                             <label>Invoiced order status</label>
