@@ -140,6 +140,14 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
             $session->setLastQuoteId($session->getSveaLastQuoteId());
             $session->unsSveaLastQuoteId();
             $this->callbackAction();
+
+            $quote = Mage::getModel('sales/quote')->load($session->getLastQuoteId());
+            if ($quote->getId()) {
+                // Make sure the quote is disabled, typically for logged in customers
+                $quote->setIsActive(false)
+                    ->save();
+            }
+
             $this->_redirect('checkout/onepage/success', array('_secure' => true));
         } catch (Exception $e) {
             $redirectUrl = 'checkout/onepage/failure';
