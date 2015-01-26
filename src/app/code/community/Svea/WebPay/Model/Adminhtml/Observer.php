@@ -77,7 +77,7 @@ class Svea_WebPay_Model_Adminhtml_Observer extends Mage_Core_Model_Observer
                     )));
             }
         } catch (Exception $e) {
-            Mage::log($e);
+            Mage::logException($e);
             Mage::getSingleton('adminhtml/session')->addWarning('Svea WebPay was not able to check for updates. Please read the error log for more information.');
         }
     }
