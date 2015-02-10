@@ -36,6 +36,25 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
     }
 
     /**
+     * Returns the main tax percentage of the order
+     *
+     * @param $order
+     * @return int
+     */
+    protected function _getOrderMainTaxRate($order)
+    {
+        $appliedTaxes = $order->getAppliedTaxes();
+        if (null === $appliedTaxes) {
+            $tax = Mage::getModel('sales/order_tax')->load($order->getId(), 'order_id');
+            $rate = $tax->getPercent();
+        } else {
+            $orderTax = array_shift($appliedTaxes);
+            $rate = $orderTax['percent'];
+        }
+        return (int)$rate;
+    }
+
+    /**
      * Add values and rows to Svea CreateOrder object
      *
      * Configurable products:
@@ -133,15 +152,9 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         // Discount
         $discount = abs($order->getDiscountAmount());
         if ($discount > 0) {
-            if ($taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
-                $appliedTaxes = $order->getAppliedTaxes();
-                if (null === $appliedTaxes) {
-                    $tax = Mage::getModel('sales/order_tax')->load($order->getId(), 'order_id');
-                    $rate = $tax->getPercent();
-                } else {
-                    $orderTax = array_shift($appliedTaxes);
-                    $rate = $orderTax['percent'];
-                }
+            if (!$taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
+                $rate = $this->_getOrderMainTaxRate($order);
+
                 // Round this to two decimals using magento rounding functions
                 $discount *= 1+($rate/100);
                 $calculator = Mage::getModel('core/calculator', $order->getStore());
@@ -160,8 +173,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         if (abs($order->getGiftCardsAmount()) > 0) {
             $giftCardRow = WebPayItem::fixedDiscount()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                ->setAmountIncVat(abs($order->getGiftCardsAmount()))
-                ->setUnit(Mage::helper('svea_webpay')->__('unit'));
+                ->setAmountIncVat(abs($order->getGiftCardsAmount()));
 
             $svea->addDiscount($giftCardRow);
         }
@@ -184,12 +196,11 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             ->setClientOrderNumber($order->getIncrementId())
             ->setOrderDate(date("Y-m-d"))
             ->setCurrency($order->getOrderCurrencyCode());
-
         return $svea;
     }
 
     /**
-     * Use Svea IntegrationLib validaton to get Exceptions
+     * Use Svea IntegrationLib validation to get Exceptions
      *
      * @return type
      */
