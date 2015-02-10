@@ -73,18 +73,6 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
             // If there is no previous authorization
             $sveaOrderId = $payment->getTransactionId();
         }
-        $information = $this->fetchTransactionInfo($payment, $sveaOrderId);
-
-        if ($information['status'] !== 'AUTHORIZED') {
-            $message = 'Payment cannot be captured: ';
-            if (!empty($information['errorMessage'])) {
-                $message .= $information['errorMessage'] . ' (' . $information['resultcode'] . ')';
-            } else {
-                $message .= $information['status'];
-            }
-            $message .= '.';
-            throw new Mage_Payment_Exception($message);
-        }
 
         $order = $payment->getOrder();
         $paymentMethodConfig = $this->getSveaStoreConfClass($order->getStoreId());
