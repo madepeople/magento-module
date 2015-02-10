@@ -288,6 +288,7 @@
             <svea_general>
                 <display_ssn_selector_with_payment_method>1</display_ssn_selector_with_payment_method>
                 <lock_required_fields>0</lock_required_fields>
+                <check_for_new_updates>1</check_for_new_updates>
             </svea_general>
             <svea_cardpayment>
                 <active>0</active>
