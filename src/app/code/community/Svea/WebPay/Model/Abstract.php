@@ -87,7 +87,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             if ($parentItem) {
                 switch ($parentItem->getProductType()) {
                     case Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE:
-                        $price = $parentItem->getPrice();
                         $priceInclTax = $parentItem->getPriceInclTax();
                         $taxPercent = $parentItem->getTaxPercent();
                         break;
