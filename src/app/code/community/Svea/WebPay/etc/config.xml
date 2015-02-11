@@ -70,6 +70,10 @@
                         <after>svea_payment_fee,tax_shipping,discount,msrp,tax</after>
                         <before>grand_total</before>
                     </svea_payment_fee_tax>
+                    <svea_equalisation>
+                        <class>svea_webpay/quote_total_equalisation</class>
+                        <after>grand_total</after>
+                    </svea_equalisation>
                 </totals>
             </quote>
 

@@ -151,12 +151,12 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
     public function getSveaPaymentObject($order, $additionalInfo = null)
     {
         $svea = parent::getSveaPaymentObject($order, $additionalInfo);
-        //Add more customer info
+
         $countryCode = $order->getBillingAddress()->getCountryId();
         $company = $additionalInfo['svea_customerType'];
         $address = $order->getBillingAddress()->getStreetFull();
 
-        //Seperates the street from the housenumber according to testcases
+        // Separates the street from the house number according to test cases
         $pattern = "/^(?:\s)*([0-9]*[A-ZÄÅÆÖØÜßäåæöøüa-z]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]+)(?:\s*)([0-9]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]*[^\s])?(?:\s)*$/";
         preg_match($pattern, $address, $addressArray);
         if (empty($addressArray)) {

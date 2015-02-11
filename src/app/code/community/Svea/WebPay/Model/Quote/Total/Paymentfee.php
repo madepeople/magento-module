@@ -1,6 +1,7 @@
 <?php
 
-class Svea_WebPay_Model_Quote_Total_Paymentfee extends Mage_Sales_Model_Quote_Address_Total_Abstract
+class Svea_WebPay_Model_Quote_Total_Paymentfee
+    extends Mage_Sales_Model_Quote_Address_Total_Abstract
 {
     public function __construct()
     {

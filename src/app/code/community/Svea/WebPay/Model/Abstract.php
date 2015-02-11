@@ -43,13 +43,22 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
      */
     protected function _getOrderMainTaxRate($order)
     {
-        $appliedTaxes = $order->getAppliedTaxes();
-        if (null === $appliedTaxes) {
-            $tax = Mage::getModel('sales/order_tax')->load($order->getId(), 'order_id');
-            $rate = $tax->getPercent();
+        if ($order instanceof Mage_Sales_Model_Quote) {
+            // We need to sort out the terminology in the future version
+            $quote = $order;
+            $totals = $quote->getTotals();
+            $tax = $totals['tax']->getFullInfo();
+            $quoteTax = array_shift($tax);
+            $rate = $quoteTax['percent'];
         } else {
-            $orderTax = array_shift($appliedTaxes);
-            $rate = $orderTax['percent'];
+            $appliedTaxes = $order->getAppliedTaxes();
+            if (null === $appliedTaxes) {
+                $tax = Mage::getModel('sales/order_tax')->load($order->getId(), 'order_id');
+                $rate = $tax->getPercent();
+            } else {
+                $orderTax = array_shift($appliedTaxes);
+                $rate = $orderTax['percent'];
+            }
         }
         return (int)$rate;
     }
@@ -135,8 +144,22 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             null,
             $store);
 
+        if ($order instanceof Mage_Sales_Model_Quote) {
+            $quote = $order;
+            $totals = $quote->getTotals();
+            $discount = abs($totals['discount']->getValue());
+            $shipping = abs($totals['shipping']->getValue());
+            $paymentFeeInclTax = 0;
+            $giftCardAmount = 0;
+        } else {
+            $discount = abs($order->getDiscountAmount());
+            $shipping = abs($order->getShippingInclTax());
+            $paymentFeeInclTax = abs($order->getSveaPaymentFeeInclTax());
+            $giftCardAmount = abs($order->getGiftCardsAmount());
+        }
+
         // Shipping
-        if ($order->getShippingAmount() > 0) {
+        if ($shipping > 0) {
             $shippingFee = WebPayItem::shippingFee()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setName($order->getShippingDescription());
@@ -145,12 +168,11 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
             $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
             $shippingFee->setVatPercent((int)$rate);
-            $shippingFee->setAmountIncVat($order->getShippingInclTax());
+            $shippingFee->setAmountIncVat($shipping);
             $svea->addFee($shippingFee);
         }
 
         // Discount
-        $discount = abs($order->getDiscountAmount());
         if ($discount > 0) {
             if (!$taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
                 $rate = $this->_getOrderMainTaxRate($order);
@@ -170,7 +192,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         }
 
         // Gift cards
-        if (abs($order->getGiftCardsAmount()) > 0) {
+        if ($giftCardAmount > 0) {
             $giftCardRow = WebPayItem::fixedDiscount()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setAmountIncVat(abs($order->getGiftCardsAmount()));
@@ -179,7 +201,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         }
 
         // Invoice fee
-        $paymentFeeInclTax = $order->getSveaPaymentFeeInclTax();
         if ($paymentFeeInclTax > 0) {
             $paymentFeeTaxClass = $this->getConfigData('handling_fee_tax_class');
             $rate = $taxCalculationModel->getRate($request->setProductClassId($paymentFeeTaxClass));
@@ -191,6 +212,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             $invoiceFeeRow->setAmountIncVat((float)$paymentFeeInclTax);
             $svea->addFee($invoiceFeeRow);
         }
+
 
         $svea->setCountryCode($billingAddress->getCountryId())
             ->setClientOrderNumber($order->getIncrementId())
