@@ -152,7 +152,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         // Discount
         $discount = abs($order->getDiscountAmount());
         if ($discount > 0) {
-            if ($taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
+            if (!$taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
                 $rate = $this->_getOrderMainTaxRate($order);
 
                 // Round this to two decimals using magento rounding functions
