@@ -63,11 +63,10 @@ class ConfirmTransactionIntegrationTest extends \PHPUnit_Framework_TestCase {
         $captureDate = "2014-03-21";
 
         $request = new ConfirmTransaction( Svea\SveaConfig::getDefaultConfig() );
-        $response = $request
-            ->setTransactionId( $transactionId )
-            ->setCaptureDate( $captureDate )
-            ->setCountryCode( "SE" )
-            ->doRequest();
+        $request->transactionId = $transactionId;
+        $request->captureDate = $captureDate;
+        $request->countryCode = "SE";
+        $response = $request->doRequest();
 
         $this->assertInstanceOf( "Svea\HostedService\ConfirmTransactionResponse", $response );
         
@@ -90,25 +89,22 @@ class ConfirmTransactionIntegrationTest extends \PHPUnit_Framework_TestCase {
         );
         
         // Set the below to match the transaction, then run the test.
-        $customerrefno = "clientOrderNumber:2014-06-09T14:02:33 02:00";
-        $transactionId = 583151;
-        $captureDate = "2014-06-09";
-
+        $clientOrderNumber = "798";
+        $transactionId = 587950;
+        $captureDate = date('c');
                 
         $request = new ConfirmTransaction( Svea\SveaConfig::getDefaultConfig() );
-        $response = $request
-            ->setTransactionId( $transactionId )
-            ->setCaptureDate( $captureDate )
-            ->setCountryCode( "SE" )
-            ->doRequest();        
+        $request->transactionId = $transactionId;
+        $request->captureDate = $captureDate;
+        $request->countryCode = "SE";
+        $response = $request->doRequest();     
         
-        print_r( $response );
-        $this->assertInstanceOf( "Svea\HostedService\ConfirmTransactionResponse", $response );
-     
-        // if we receive an error from the service, the integration test passes
+        //print_r( $response );
+        $this->assertInstanceOf( "Svea\HostedService\ConfirmTransactionResponse", $response );     
         $this->assertEquals( 1, $response->accepted );        
-        $this->assertEquals( $customerrefno, $response->customerrefno );  
-
+        $this->assertStringMatchesFormat( "%d", $response->transactionId);   // %d => an unsigned integer value
+        
+        $this->assertEquals( $clientOrderNumber, $response->clientOrderNumber );  
     }    
 }
 ?>

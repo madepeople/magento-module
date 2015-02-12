@@ -69,7 +69,7 @@ class CardPaymentTest extends \PHPUnit_Framework_TestCase {
         $this->assertEquals('-12500', $xmlMessage->orderrows->row[2]->amount);
     }
 
-        public function testCardPaymentForEngCustomer() {
+    public function testCardPaymentForEngCustomer() {
         $config = SveaConfig::getDefaultConfig();
         $rowFactory = new \TestUtil();
         $form = \WebPay::createOrder($config)
@@ -449,7 +449,7 @@ class CardPaymentTest extends \PHPUnit_Framework_TestCase {
      * test that <subscriptiontype> is included in payment request xml
      */
     public function test_cardPayment_request_xml_includes_subscriptiontype() {
-        $cardPayment = new CardPayment(\TestUtil::createOrder());
+        $cardPayment = new CardPayment(\TestUtil::createOrder()->setClientOrderNumber("33"));
         $cardPayment
             ->setSubscriptionType(CardPayment::RECURRINGCAPTURE)
             ->setCallbackUrl("http://myurl.se")
@@ -460,7 +460,7 @@ class CardPaymentTest extends \PHPUnit_Framework_TestCase {
         $subscriptiontype = "<subscriptiontype>RECURRINGCAPTURE<\/subscriptiontype>"; // remember to escape <_/_subscriptiontype>
         //$this->assertRegExp("/[a-zA-Z0-9<>]*".$subscriptiontype."[a-zA-Z0-9<>]*/","foo<subscriptiontype>RECURRINGCAPTURE</subscriptiontype>bar");
         
-        //print_r($paymentForm->xmlMessage);        
+        ////print_r($paymentForm->xmlMessage);        
         $this->assertRegExp("/[a-zA-Z0-9<>]*".$subscriptiontype."[a-zA-Z0-9<>]*/", $paymentForm->xmlMessage );
     }    
 }

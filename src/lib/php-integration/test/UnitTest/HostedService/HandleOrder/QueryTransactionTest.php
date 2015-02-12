@@ -26,24 +26,18 @@ class QueryTransactionTest extends PHPUnit_Framework_TestCase {
     
     function test_setCountryCode(){
         $countryCode = "SE";       
-        $this->queryObject->setCountryCode( $countryCode ); 
+        $this->queryObject->countryCode = $countryCode; 
         $this->assertEquals( $countryCode, PHPUnit_Framework_Assert::readAttribute($this->queryObject, 'countryCode') );
-    }
-    
-    function test_setTransactionId( ){
-        $transactionId = 987654;       
-        $this->queryObject->setTransactionId( $transactionId );
-        $this->assertEquals( $transactionId, PHPUnit_Framework_Assert::readAttribute($this->queryObject, 'transactionId') );
     }
               
     function test_prepareRequest_array_contains_mac_merchantid_message() {
 
         // set up annulTransaction object & get request form
         $transactionId = 987654;       
-        $this->queryObject->setTransactionId( $transactionId );
+        $this->queryObject->transactionId = $transactionId;
 
         $countryCode = "SE";
-        $this->queryObject->setCountryCode($countryCode);
+        $this->queryObject->countryCode = $countryCode; 
                 
         $form = $this->queryObject->prepareRequest();
 
@@ -57,10 +51,10 @@ class QueryTransactionTest extends PHPUnit_Framework_TestCase {
 
         // set up creditTransaction object & get request form
         $transactionId = 987654;       
-        $this->queryObject->setTransactionId( $transactionId );
+        $this->queryObject->transactionId = $transactionId;
 
         $countryCode = "SE";
-        $this->queryObject->setCountryCode($countryCode);
+        $this->queryObject->countryCode = $countryCode; 
                 
         $form = $this->queryObject->prepareRequest();
         
@@ -89,7 +83,7 @@ class QueryTransactionTest extends PHPUnit_Framework_TestCase {
         );        
         
         $countryCode = "SE";
-        $this->queryObject->setCountryCode($countryCode);
+        $this->queryObject->countryCode = $countryCode; 
                 
         $form = $this->queryObject->prepareRequest();     
     }

@@ -15,7 +15,7 @@ require_once SVEA_REQUEST_DIR . '/Includes.php';
  * order request.
  * 
  * Use updateOrderRow() or updateOrderRows() to specify the order row(s) to update in the order. 
- * The supplied order row row numbers must match order rows in the original createOrder request. 
+ * The supplied order row numbers must match order rows from the original createOrder request.
  * 
  * Then use either updateInvoiceOrderRows() or updatePaymentPlanOrderRows(), 
  * which ever matches the payment method used in the original order request.
@@ -52,7 +52,7 @@ class UpdateOrderRowsBuilder {
     
     /**
      * Required. Use same countryCode as in createOrder request.
-     * @param string $countryCode
+     * @param string $countryCodeAsString
      * @return $this
      */
     public function setCountryCode($countryCodeAsString) {
@@ -62,15 +62,6 @@ class UpdateOrderRowsBuilder {
     /** @var string $countryCode */
     public $countryCode;
 
-    /**
-     * Required.
-     * @param string $orderType -- one of ConfigurationProvider::INVOICE_TYPE, ::PAYMENTPLAN_TYPE
-     * @return $this
-     */
-    public function setOrderType($orderTypeAsConst) {
-        $this->orderType = $orderTypeAsConst;
-        return $this;
-    }
     /** @var string $orderType -- one of ConfigurationProvider::INVOICE_TYPE, ::PAYMENTPLAN_TYPE */
     public $orderType;    
 
@@ -99,7 +90,7 @@ class UpdateOrderRowsBuilder {
      * @return UpdateOrderRowsRequest 
      */
     public function updateInvoiceOrderRows() {
-        $this->setOrderType(\ConfigurationProvider::INVOICE_TYPE );
+        $this->orderType = \ConfigurationProvider::INVOICE_TYPE;
         return new AdminService\UpdateOrderRowsRequest($this);
     }
     
@@ -108,7 +99,7 @@ class UpdateOrderRowsBuilder {
      * @return UpdateOrderRowsRequest 
      */
     public function updatePaymentPlanOrderRows() {
-        $this->setOrderType(\ConfigurationProvider::PAYMENTPLAN_TYPE );
+        $this->orderType = \ConfigurationProvider::PAYMENTPLAN_TYPE;
         return new AdminService\UpdateOrderRowsRequest($this);
     }
 }

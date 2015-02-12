@@ -26,44 +26,29 @@ require_once 'WebServiceResponse.php';
  * @author anne-hal, Kristian Grossman-Madsen
  */
 class GetAddressesResponse extends WebServiceResponse{
-
-    /** @var string $resultcode */
-    public $resultcode;
     
-    /** @var GetAddressIdentity [] array of GetAddressIdentity */
+    /** @var GetAddressIdentity  array of GetAddressIdentity */
     public $customerIdentity = array();
     
-    /**
-     *  formatObject sets the following attributes:
-     * 
-     *  $response->accepted                 // true iff request was accepted by the service 
-     *  $response->errormessage             // may be set if accepted above is false
-     *
-     *  $response->resultcode               // one of {Error, Accepted, NoSuchEntity}
-     * 
-     *  $response->$customerIdentity[0..n] // array of Svea\GetAddressIdentity
-     */
-    protected function formatObject($message) {
+    public function __construct($response) {
         
         // was request accepted?
-        if( $message->GetAddressesResult->RejectionCode == "Error" ) {
+        if( $response->GetAddressesResult->RejectionCode == "Error" ) {
             $this->accepted = 0;
         }
         else {
-            $this->accepted = $message->GetAddressesResult->Accepted;
+            $this->accepted = $response->GetAddressesResult->Accepted;
         }
-        $this->errormessage = isset($message->GetAddressesResult->ErrorMessage) ? $message->GetAddressesResult->ErrorMessage : "";        
-
-        // set response resultcode
-        $this->resultcode = $message->GetAddressesResult->RejectionCode;
+        $this->resultcode = $response->GetAddressesResult->RejectionCode;
+        $this->errormessage = isset($response->GetAddressesResult->ErrorMessage) ? $response->GetAddressesResult->ErrorMessage : "";        
 
         // set response attributes
-        if (property_exists($message->GetAddressesResult, "Addresses") && $this->accepted == 1) {
-            $this->formatCustomerIdentity($message->GetAddressesResult->Addresses);
+        if (property_exists($response->GetAddressesResult, "Addresses") && $this->accepted == 1) {
+            $this->formatCustomerIdentity($response->GetAddressesResult->Addresses);
         }
     }
 
-    public function formatCustomerIdentity($customers) {
+    private function formatCustomerIdentity($customers) {
 
         is_array($customers->CustomerAddress) ? $loopValue = $customers->CustomerAddress : $loopValue = $customers;
         
@@ -74,3 +59,17 @@ class GetAddressesResponse extends WebServiceResponse{
         }
     }
 }
+
+//    $response->accepted                 // boolean, true iff Svea accepted request
+//    $response->resultcode               // may contain an error code
+//    $response->customerIdentity         // if accepted, may define a GetAddressIdentity object:
+//        ->customerType;       // not guaranteed to be defined
+//        ->nationalIdNumber;   // not guaranteed to be defined
+//        ->phoneNumber;        // not guaranteed to be defined
+//        ->firstName;          // not guaranteed to be defined
+//        ->lastName;           // not guaranteed to be defined
+//        ->fullName;           // not guaranteed to be defined
+//        ->street;             // not guaranteed to be defined
+//        ->coAddress;          // not guaranteed to be defined
+//        ->zipCode;            // not guaranteed to be defined
+//        ->locality;           // not guaranteed to be defined

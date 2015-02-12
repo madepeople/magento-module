@@ -23,11 +23,10 @@ class CreditTransactionIntegrationTest extends \PHPUnit_Framework_TestCase {
         $amount = 100;
                 
         $request = new CreditTransaction( Svea\SveaConfig::getDefaultConfig() );
-        $response = $request
-            ->setTransactionId( $transactionId )
-            ->setCreditAmount( $amount )
-            ->setCountryCode( "SE" )
-            ->doRequest();
+        $request->transactionId = $transactionId;
+        $request->creditAmount = $amount;
+        $request->countryCode = "SE";
+        $response = $request->doRequest();
 
         $this->assertInstanceOf( "Svea\HostedService\CreditTransactionResponse", $response );
         
@@ -49,22 +48,22 @@ class CreditTransactionIntegrationTest extends \PHPUnit_Framework_TestCase {
         );
         
         // Set the below to match the transaction, then run the test.
-        //$customerrefno = 312;
-        $transactionId = 583151;
+        $clientOrderNumber = "796";
+        $transactionId = 587949;
         $amount = 100;
                 
         $request = new CreditTransaction( Svea\SveaConfig::getDefaultConfig() );
-        $response = $request
-            ->setTransactionId( $transactionId )
-            ->setCreditAmount( $amount )
-            ->setCountryCode( "SE" )
-            ->doRequest();        
-        
+        $request->transactionId = $transactionId;
+        $request->creditAmount = $amount;
+        $request->countryCode = "SE";
+        $response = $request->doRequest();       
+                
+        //print_r( $response );
         $this->assertInstanceOf( "Svea\HostedService\CreditTransactionResponse", $response );
-        
-        print_r( $response );
         $this->assertEquals( 1, $response->accepted );        
-        //$this->assertEquals( $customerrefno, $response->customerrefno );  
+        $this->assertStringMatchesFormat( "%d", $response->transactionId);   // %d => an unsigned integer value
+              
+        $this->assertEquals( $clientOrderNumber, $response->clientOrderNumber );  
     }    
 }
 ?>

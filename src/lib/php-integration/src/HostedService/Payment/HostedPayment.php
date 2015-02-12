@@ -15,7 +15,7 @@ require_once SVEA_REQUEST_DIR . '/Includes.php';
  * hosted payment request, a response xml message is returned to the specified
  * return url, where it can be parsed using i.e. the SveaResponse class.
  * 
- * Alternatively, you can use the getPaymentURL() to get a response with
+ * Alternatively, you can use the getPaymentUrl() to get a response with
  * an URL that the customer can visit later to complete the payment at a later
  * time.
  * 
@@ -183,7 +183,7 @@ class HostedPayment {
      * @return HostedPaymentResponse
      * @throws ValidationException
      */
-    public function getPaymentURL() {
+    public function getPaymentUrl() {
         
         // follow the procedure set out in getPaymentForm, then 
         // 
@@ -254,7 +254,7 @@ class HostedPayment {
         $responseXML = curl_exec($ch);
         curl_close($ch);
         
-        // create SveaResponse to handle annul response
+        // create SveaResponse to handle response
         $responseObj = new \SimpleXMLElement($responseXML);        
         $sveaResponse = new \SveaResponse($responseObj, $this->countryCode, $this->config);
 
@@ -371,7 +371,7 @@ class HostedPayment {
      * @return RecurTransactionResponse
      */
     public function doRecur() {
-        
+                
         // calculate amount from order rows   
         $formatter = new HostedRowFormatter();
         $this->request['rows'] = $formatter->formatRows($this->order);
@@ -379,14 +379,13 @@ class HostedPayment {
         $this->request['totalVat'] = $formatter->formatTotalVat( $this->request['rows']);        
                             
         $request = new RecurTransaction( $this->order->conf );
-        $response = $request                
-            ->setCurrency( $this->order->currency )
-            ->setAmount( $this->request['amount'] ) // incl. vat       
-            ->setCustomerRefNo( $this->order->clientOrderNumber )   // CustomerRefNo in Hosted service equals ClientOrderNumber in order objects
-            ->setCountryCode( $this->order->countryCode )
-            ->setSubscriptionId( $this->subscriptionId )                
-            ->doRequest()
-        ;         
+        $request->currency = $this->order->currency;
+        $request->amount = $this->request['amount'];       
+        $request->customerRefNo = $this->order->clientOrderNumber;
+        $request->countryCode = $this->order->countryCode;
+        $request->subscriptionId = $this->subscriptionId;
+        $response = $request->doRequest();   
+            
         return $response;
     }
 }

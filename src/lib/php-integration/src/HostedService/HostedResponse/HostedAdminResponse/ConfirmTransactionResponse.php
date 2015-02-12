@@ -11,8 +11,14 @@ require_once SVEA_REQUEST_DIR . '/Includes.php';
  */
 class ConfirmTransactionResponse extends HostedAdminResponse{
 
-    /** @var string $customerrefno */
-    public $customerrefno;
+    /** @var string $transactionId  transaction id that uniquely identifies the order at Svea */
+    public $transactionId;          
+  
+    /** @var string $clientOrderNumber */
+    public $clientOrderNumber;
+    
+    /** @var string $orderType  -- set to \ConfigurationProvider::HOSTED_TYPE for all hosted confirm order requests (currently only confirm card orders) */
+    public $orderType;    
     
     function __construct($message,$countryCode,$config) {
         parent::__construct($message,$countryCode,$config);
@@ -35,7 +41,9 @@ class ConfirmTransactionResponse extends HostedAdminResponse{
             $this->accepted = 0;
             $this->setErrorParams( (string)$hostedAdminResponse->statuscode ); 
         }
-
-        $this->customerrefno = (string)$hostedAdminResponse->transaction->customerrefno;
+        $this->transactionId = (string)$hostedAdminResponse->transaction['id'];
+        
+        $this->clientOrderNumber = (string)$hostedAdminResponse->transaction->customerrefno;
+        $this->orderType = \ConfigurationProvider::HOSTED_TYPE; // c.f. corresponding attribute in DeliverOrderResult
     }
 }

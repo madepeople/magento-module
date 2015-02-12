@@ -24,54 +24,47 @@ class RecurTransactionTest extends PHPUnit_Framework_TestCase {
         $this->assertEquals( "recur", PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'method') );        
     }
     
-    function test_setCountryCode(){
-        $countryCode = "SE";       
-        $this->recurTransactionObject->setCountryCode( $countryCode ); 
-        $this->assertEquals( $countryCode, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'countryCode') );
-    }
-    
-    function test_setCurrency() {
-        $currency = "SEK";
-        $this->recurTransactionObject->setCurrency( $currency );
-        $this->assertEquals( $currency, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'currency') );
-    }    
-    
-    function test_setAmount() {
-        $amount = 100;
-        $this->recurTransactionObject->setAmount( $amount );
-        $this->assertEquals( $amount, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'amount') );
-    }
-
-    function test_setCustomerRefNo( ){
-        $customerRefNo = "myCustomerRefNo";       
-        $this->recurTransactionObject->setCustomerRefNo( $customerRefNo );
-        $this->assertEquals( $customerRefNo, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'customerRefNo') );
-    }
-    
-    function test_setSubscriptionId( ){
-        $subscriptionId = 987654;       
-        $this->recurTransactionObject->setSubscriptionId( $subscriptionId );
-        $this->assertEquals( $subscriptionId, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'subscriptionId') );
-    }
-
-              
+//    function test_setCurrency() {
+//        $currency = "SEK";
+//        $this->recurTransactionObject->setCurrency( $currency );
+//        $this->assertEquals( $currency, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'currency') );
+//    }    
+//    
+//    function test_setAmount() {
+//        $amount = 100;
+//        $this->recurTransactionObject->setAmount( $amount );
+//        $this->assertEquals( $amount, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'amount') );
+//    }
+//
+//    function test_setCustomerRefNo( ){
+//        $customerRefNo = "myCustomerRefNo";       
+//        $this->recurTransactionObject->setCustomerRefNo( $customerRefNo );
+//        $this->assertEquals( $customerRefNo, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'customerRefNo') );
+//    }
+//    
+//    function test_setSubscriptionId( ){
+//        $subscriptionId = 987654;       
+//        $this->recurTransactionObject->setSubscriptionId( $subscriptionId );
+//        $this->assertEquals( $subscriptionId, PHPUnit_Framework_Assert::readAttribute($this->recurTransactionObject, 'subscriptionId') );
+//    }
+             
     function test_prepareRequest_array_contains_mac_merchantid_message() {
 
         // set up recurTransaction object & get request form
         $customerRefNo = "myCustomerRefNo";       
-        $this->recurTransactionObject->setCustomerRefNo( $customerRefNo );
+        $this->recurTransactionObject->customerRefNo = $customerRefNo;
         
         $subscriptionId = 987654;       
-        $this->recurTransactionObject->setSubscriptionId( $subscriptionId );
+        $this->recurTransactionObject->subscriptionId = $subscriptionId;
 
         $currency = "SEK";
-        $this->recurTransactionObject->setCurrency( $currency );
+        $this->recurTransactionObject->currency = $currency;
 
         $amount = 100;
-        $this->recurTransactionObject->setAmount( $amount );
-        
+        $this->recurTransactionObject->amount = $amount;        
+
         $countryCode = "SE";
-        $this->recurTransactionObject->setCountryCode($countryCode);
+        $this->recurTransactionObject->countryCode = $countryCode;
                 
         $form = $this->recurTransactionObject->prepareRequest();
 
@@ -85,19 +78,19 @@ class RecurTransactionTest extends PHPUnit_Framework_TestCase {
 
         // set up recurTransaction object & get request form
         $customerRefNo = "myCustomerRefNo";       
-        $this->recurTransactionObject->setCustomerRefNo( $customerRefNo );
+        $this->recurTransactionObject->customerRefNo = $customerRefNo;
         
         $subscriptionId = 987654;       
-        $this->recurTransactionObject->setSubscriptionId( $subscriptionId );
+        $this->recurTransactionObject->subscriptionId = $subscriptionId;
 
         $currency = "SEK";
-        $this->recurTransactionObject->setCurrency( $currency );
+        $this->recurTransactionObject->currency = $currency;
 
         $amount = 100;
-        $this->recurTransactionObject->setAmount( $amount );
+        $this->recurTransactionObject->amount = $amount;        
         
         $countryCode = "SE";
-        $this->recurTransactionObject->setCountryCode($countryCode);
+        $this->recurTransactionObject->countryCode = $countryCode;
                 
         $form = $this->recurTransactionObject->prepareRequest();
 
@@ -129,16 +122,16 @@ class RecurTransactionTest extends PHPUnit_Framework_TestCase {
         );   
   
         $subscriptionId = 987654;       
-        $this->recurTransactionObject->setSubscriptionId( $subscriptionId );
+        $this->recurTransactionObject->subscriptionId = $subscriptionId;
 
         $currency = "SEK";
-        $this->recurTransactionObject->setCurrency( $currency );
+        $this->recurTransactionObject->currency = $currency;
 
         $amount = 100;
-        $this->recurTransactionObject->setAmount( $amount );
+        $this->recurTransactionObject->amount = $amount;        
         
         $countryCode = "SE";
-        $this->recurTransactionObject->setCountryCode($countryCode);
+        $this->recurTransactionObject->countryCode = $countryCode;
                 
         $form = $this->recurTransactionObject->prepareRequest();   
     }    
@@ -151,16 +144,16 @@ class RecurTransactionTest extends PHPUnit_Framework_TestCase {
         );   
     
         $customerRefNo = "myCustomerRefNo";       
-        $this->recurTransactionObject->setCustomerRefNo( $customerRefNo );
+        $this->recurTransactionObject->customerRefNo = $customerRefNo;
         
         $currency = "SEK";
-        $this->recurTransactionObject->setCurrency( $currency );
+        $this->recurTransactionObject->currency = $currency;
 
         $amount = 100;
-        $this->recurTransactionObject->setAmount( $amount );
+        $this->recurTransactionObject->amount = $amount;        
         
         $countryCode = "SE";
-        $this->recurTransactionObject->setCountryCode($countryCode);
+        $this->recurTransactionObject->countryCode = $countryCode;
                 
         $form = $this->recurTransactionObject->prepareRequest();   
     }   
@@ -174,16 +167,16 @@ class RecurTransactionTest extends PHPUnit_Framework_TestCase {
         );   
     
         $customerRefNo = "myCustomerRefNo";       
-        $this->recurTransactionObject->setCustomerRefNo( $customerRefNo );
+        $this->recurTransactionObject->customerRefNo = $customerRefNo;
         
         $subscriptionId = 987654;       
-        $this->recurTransactionObject->setSubscriptionId( $subscriptionId );
+        $this->recurTransactionObject->subscriptionId = $subscriptionId;
 
         $currency = "SEK";
-        $this->recurTransactionObject->setCurrency( $currency );
+        $this->recurTransactionObject->currency = $currency;
 
         $countryCode = "SE";
-        $this->recurTransactionObject->setCountryCode($countryCode);
+        $this->recurTransactionObject->countryCode = $countryCode;
                 
         $form = $this->recurTransactionObject->prepareRequest();   
     }   
@@ -191,16 +184,16 @@ class RecurTransactionTest extends PHPUnit_Framework_TestCase {
     function test_prepareRequest_missing_currency_does_not_throw_an_exception() {
     
         $customerRefNo = "myCustomerRefNo";       
-        $this->recurTransactionObject->setCustomerRefNo( $customerRefNo );
+        $this->recurTransactionObject->customerRefNo = $customerRefNo;
         
         $subscriptionId = 987654;       
-        $this->recurTransactionObject->setSubscriptionId( $subscriptionId );
+        $this->recurTransactionObject->subscriptionId = $subscriptionId;
 
         $amount = 100;
-        $this->recurTransactionObject->setAmount( $amount );
+        $this->recurTransactionObject->amount = $amount;        
         
         $countryCode = "SE";
-        $this->recurTransactionObject->setCountryCode($countryCode);
+        $this->recurTransactionObject->countryCode = $countryCode;
                 
         $form = $this->recurTransactionObject->prepareRequest();   
     }     

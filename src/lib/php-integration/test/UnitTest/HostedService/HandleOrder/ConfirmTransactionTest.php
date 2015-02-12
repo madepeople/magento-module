@@ -21,36 +21,18 @@ class ConfirmTransactionTest extends PHPUnit_Framework_TestCase {
         $this->assertInstanceOf( "Svea\HostedService\ConfirmTransaction", $this->confirmObject);
         $this->assertEquals( "confirm", PHPUnit_Framework_Assert::readAttribute($this->confirmObject, 'method') );                
     }
-    
-    function test_setCountryCode(){
-        $countryCode = "SE";       
-        $this->confirmObject->setCountryCode( $countryCode );
-        $this->assertEquals( $countryCode, PHPUnit_Framework_Assert::readAttribute($this->confirmObject, 'countryCode') );
-    }
-    
-    function test_setTransactionId( ){
-        $transactionId = 987654;       
-        $this->confirmObject->setTransactionId( $transactionId );
-        $this->assertEquals( $transactionId, PHPUnit_Framework_Assert::readAttribute($this->confirmObject, 'transactionId') );
-    }
-    
-    function test_setCaptureDate( ) {
-        $captureDate = "2014-03-21";
-        $this->confirmObject->setCaptureDate( $captureDate );
-        $this->assertEquals( $captureDate, PHPUnit_Framework_Assert::readAttribute($this->confirmObject, 'captureDate') );
-    }
               
     function test_prepareRequest_array_contains_mac_merchantid_message() {
 
         // set up confirmTransaction object & get request form
         $transactionId = 987654;       
-        $this->confirmObject->setTransactionId( $transactionId );
+        $this->confirmObject->transactionId = $transactionId;
 
         $captureDate = "2014-03-21";
-        $this->confirmObject->setCaptureDate( $captureDate );
+        $this->confirmObject->captureDate = $captureDate;
         
         $countryCode = "SE";
-        $this->confirmObject->setCountryCode($countryCode);
+        $this->confirmObject->countryCode = $countryCode;
                 
         $form = $this->confirmObject->prepareRequest();
 
@@ -64,13 +46,13 @@ class ConfirmTransactionTest extends PHPUnit_Framework_TestCase {
 
         // set up confirmTransaction object & get request form
         $transactionId = 987654;       
-        $this->confirmObject->setTransactionId( $transactionId );
+        $this->confirmObject->transactionId = $transactionId;
 
         $captureDate = "2014-03-21";
-        $this->confirmObject->setCaptureDate( $captureDate );
+        $this->confirmObject->captureDate = $captureDate;
         
         $countryCode = "SE";
-        $this->confirmObject->setCountryCode($countryCode);
+        $this->confirmObject->countryCode = $countryCode;
                 
         $form = $this->confirmObject->prepareRequest();
         
@@ -100,10 +82,10 @@ class ConfirmTransactionTest extends PHPUnit_Framework_TestCase {
         );
         
         $captureDate = "2014-03-21";
-        $this->confirmObject->setCaptureDate( $captureDate );
+        $this->confirmObject->captureDate = $captureDate;
         
         $countryCode = "SE";
-        $this->confirmObject->setCountryCode($countryCode);
+        $this->confirmObject->countryCode = $countryCode;
                 
         $form = $this->confirmObject->prepareRequest();
     }
@@ -116,10 +98,10 @@ class ConfirmTransactionTest extends PHPUnit_Framework_TestCase {
         );
         
         $transactionId = 987654;       
-        $this->confirmObject->setTransactionId( $transactionId );
+        $this->confirmObject->transactionId = $transactionId;
 
         $countryCode = "SE";
-        $this->confirmObject->setCountryCode($countryCode);
+        $this->confirmObject->countryCode = $countryCode;
                 
         $form = $this->confirmObject->prepareRequest();       
     }
@@ -129,15 +111,15 @@ class ConfirmTransactionTest extends PHPUnit_Framework_TestCase {
 
         $this->setExpectedException(
             'Svea\ValidationException', 
-            '-missing value : countryCode is required. Use function setCountryCode().'
+            '-missing value : CountryCode is required. Use function setCountryCode().'
         );
-        
+       
         $transactionId = 987654;       
-        $this->confirmObject->setTransactionId( $transactionId );
+        $this->confirmObject->transactionId = $transactionId;
 
         $captureDate = "2014-03-21";
-        $this->confirmObject->setCaptureDate( $captureDate );
-                
+        $this->confirmObject->captureDate = $captureDate;
+        
         $form = $this->confirmObject->prepareRequest();     
     }    
 }

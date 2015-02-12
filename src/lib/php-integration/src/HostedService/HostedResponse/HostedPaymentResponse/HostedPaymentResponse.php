@@ -8,13 +8,18 @@ require_once SVEA_REQUEST_DIR . '/Includes.php';
  */
 class HostedPaymentResponse extends HostedResponse{
 
-    public $transactionId;
-    public $clientOrderNumber;
-    public $paymentMethod;
+    /** @var string $transactionId  -- the order id at Svea */
+    public $transactionId;         
+    /** @var string $clientOrderNumber -- the customer reference number, i.e. order number */
+    public $clientOrderNumber;    
+    /** @var string $paymentMethod */
+    public $paymentMethod;    
+    /** @var string $merchantId -- the merchant id */
     public $merchantId;
+    /** @var string $amount The total amount including VAT, presented as a decimal number */
     public $amount;
+    /** @var string $currency -- ISO 4217 alphabetic, e.g. SEK */
     public $currency;
-
 
     /**
      * HostedPaymentResponse validates the hosted payment response.
@@ -29,7 +34,7 @@ class HostedPaymentResponse extends HostedResponse{
      * 
      * @param string $response  hosted request response xml message
      * @param string $countryCode  two-letter country code
-     * @param ConfigurationProveder  $config
+     * @param ConfigurationProvider $config
      */
     function __construct($response,$countryCode,$config) {
         if (is_array($response)) {
@@ -82,7 +87,7 @@ class HostedPaymentResponse extends HostedResponse{
         $this->merchantId = (string)$xmlElement->transaction->merchantid;
         $this->clientOrderNumber = (string)$xmlElement->transaction->customerrefno;
         $minorAmount = (int)($xmlElement->transaction->amount);
-        $this->amount = $minorAmount * 0.01;
+        $this->amount = number_format( ($minorAmount * 0.01), 2, ".", "" );
         $this->currency = (string)$xmlElement->transaction->currency;
 
         if (property_exists($xmlElement->transaction, "subscriptionid")) {
@@ -95,9 +100,6 @@ class HostedPaymentResponse extends HostedResponse{
            $this->expiryMonth = (string)$xmlElement->transaction->expirymonth;
            $this->expiryYear = (string)$xmlElement->transaction->expiryyear;
            $this->authCode = (string)$xmlElement->transaction->authcode;
-        }
-        
-        $this->rawHostedPaymentResponse = $xmlElement;
-        
+        }      
     }
 }

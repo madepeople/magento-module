@@ -27,6 +27,12 @@ class CreditOrderRowsBuilderTest extends \PHPUnit_Framework_TestCase {
         $this->creditOrderRowsObject->setOrderId($orderId);
         $this->assertEquals($orderId, $this->creditOrderRowsObject->orderId);        
     }
+
+    public function test_creditOrderRowsBuilder_setTransactionId() {
+        $orderId = "123456";
+        $this->creditOrderRowsObject->setTransactionId($orderId);
+        $this->assertEquals($orderId, $this->creditOrderRowsObject->orderId);        
+    }  
     
     public function test_creditOrderRowsBuilder_setInvoiceId() {
         $orderId = "123456";
@@ -37,12 +43,6 @@ class CreditOrderRowsBuilderTest extends \PHPUnit_Framework_TestCase {
         $country = "SE";
         $this->creditOrderRowsObject->setCountryCode($country);
         $this->assertEquals($country, $this->creditOrderRowsObject->countryCode);        
-    }
-    
-    public function test_creditOrderRowsBuilder_setOrderType() {
-        $orderType = \ConfigurationProvider::INVOICE_TYPE;
-        $this->creditOrderRowsObject->setOrderType($orderType);
-        $this->assertEquals($orderType, $this->creditOrderRowsObject->orderType);        
     }
     
     public function test_creditOrderRowsBuilder_setInvoiceDistributionType() {
@@ -102,6 +102,7 @@ class CreditOrderRowsBuilderTest extends \PHPUnit_Framework_TestCase {
         ;            
         
         $creditOrderRowsObject = $this->creditOrderRowsObject
+                ->setCountryCode("SE")
                 ->setOrderId($orderId)
                 ->addNumberedOrderRow( $mockedNumberedOrderRow )
                 ->setRowToCredit(1)
@@ -123,6 +124,7 @@ class CreditOrderRowsBuilderTest extends \PHPUnit_Framework_TestCase {
         ;            
         
         $creditOrderRowsObject = $this->creditOrderRowsObject
+                ->setCountryCode("SE")
                 ->setOrderId($orderId)
                 ->addNumberedOrderRow( $mockedNumberedOrderRow )
                 ->setRowToCredit(1)
@@ -131,6 +133,5 @@ class CreditOrderRowsBuilderTest extends \PHPUnit_Framework_TestCase {
         $request = $creditOrderRowsObject->creditDirectBankOrderRows();
         
         $this->assertInstanceOf("Svea\HostedService\CreditTransaction", $request);
-    }
-    
+    }   
 }

@@ -22,10 +22,9 @@ class AnnulTransactionIntegrationTest extends \PHPUnit_Framework_TestCase {
         $transactionId = 987654;
 
         $request = new AnnulTransaction( Svea\SveaConfig::getDefaultConfig() );
-        $response = $request
-            ->setTransactionId( $transactionId )
-            ->setCountryCode( "SE" )
-            ->doRequest();
+        $request->transactionId = $transactionId;
+        $request->countryCode = "SE";
+        $response = $request->doRequest();
 
         $this->assertInstanceOf( "Svea\HostedService\AnnulTransactionResponse", $response );
         
@@ -48,21 +47,20 @@ class AnnulTransactionIntegrationTest extends \PHPUnit_Framework_TestCase {
         );
         
         // Set the below to match the transaction, then run the test.
-        $customerrefno = 313;
-        $transactionId = 579929;
+        $customerrefno = "794";
+        $transactionId = 587947;
 
         $request = new AnnulTransaction( Svea\SveaConfig::getDefaultConfig() );
-        $response = $request
-            ->setTransactionId( $transactionId )
-            ->setCountryCode( "SE" );
-    
-        $response = $request->doRequest();        
-         
+        $request->transactionId = $transactionId;
+        $request->countryCode = "SE";
+        $response = $request->doRequest();   
+              
+        //print_r( $response); 
         $this->assertInstanceOf( "Svea\HostedService\AnnulTransactionResponse", $response );
-        
-        print_r( $response); 
         $this->assertEquals( 1, $response->accepted );        
-        $this->assertEquals( $customerrefno, $response->customerrefno );  
+        $this->assertStringMatchesFormat( "%d", $response->transactionId);   // %d => an unsigned integer value
+        
+        $this->assertEquals( $customerrefno, $response->clientOrderNumber );  
     }    
 }
 ?>

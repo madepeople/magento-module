@@ -7,18 +7,7 @@ require_once SVEA_REQUEST_DIR . '/Includes.php';
  * OrderBuilder collects and prepares order data to be sent to Svea. It is the
  * parent of CreateOrderBuilder and DeliverOrderBuilder.
  * 
- * Set all required order attributes in CreateOrderBuilder instance by using the 
- * instance setAttribute() methods. Instance methods can be chained together, as 
- * they return the instance itself in a fluent fashion.
- * 
-$order
-    ->setCountryCode("SE")              // required
-    ->setCurrency("SEK")                // required for card payment, direct payment and PayPage payment.
-    ->setClientOrderNumber("14050626")  // required for card payment, direct payment, PaymentMethod payment and PayPage payments.
-    ->setCustomerReference("att: kgm")  // optional
-    ->setOrderDate("2012-12-12")        // required for invoice and payment plan payments
-;
- *  * @author Kristian Grossman-Madsen, Anneli Halld'n, Daniel Brolund for Svea WebPay
+ * @author Kristian Grossman-Madsen, Anneli Halld'n, Daniel Brolund for Svea WebPay
  */
 class OrderBuilder {
 
@@ -70,6 +59,7 @@ class OrderBuilder {
     
     /**
      * Required for invoice and payment plan orders - add customer information to the order 
+     * Optional for card and direct bank orders
      * 
      * See the customer objects for information on required customer information fields for
      * invoice and payment plan orders.
@@ -179,7 +169,9 @@ class OrderBuilder {
     }
 
     /**
-     * Required for Card, Direct Bank and PayPage orders - set the order currency
+     * Required for card payment, direct bank & PayPage payments. Ignored for invoice and payment plan.
+     *
+     * Ignored for invoice and payment plan orders, which use the selected client id currency, as determined by ConfigurationProvider and setCountryCode.
      * 
      * @param string $currencyAsString in ISO 4217 three-letter format, ex. "SEK", "EUR"
      * @return $this
@@ -192,6 +184,7 @@ class OrderBuilder {
 
     /**
      * Optional - set a client side customer reference, i.e. customer number etc.
+     * Max length 30 characters.
      * 
      * @param string  $customerReferenceAsString needs to be unique to the order for card and direct bank orders
      * @return $this
@@ -202,7 +195,8 @@ class OrderBuilder {
     }
 
     /**
-     * Required for Card, Direct Bank and pay page orders - set a client side order identifier, i.e. the webshop order number etc.
+     * Required for Card, Direct Bank and PaymentMethod and PayPage orders - set a client side order identifier, i.e. the webshop order number etc.
+     * Max length 30 characters.
      * 
      * Note that for Card and Direct Bank orders, you may not reuse a previously sent client order number, or you'll get error 127 from the service. 
      * 

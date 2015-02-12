@@ -5,29 +5,55 @@ namespace Svea;
  * Class CompanyCustomer, a customer information container for legal entities.
  * 
  * Note that "required" below as a requirement only when the IndividualCustomer is used 
- * to identify the customer when using the invoice or payment plan payment methods. 
+ * to identify the customer when using the invoice or payment plan payment methods.
+ *  
  * (For card and direct bank orders, adding customer information to the order is optional.)
  * 
-$order->
-    addCustomerDetails(
-        WebPayItem::companyCustomer()
-            ->setNationalIdNumber(2345234)      // required in SE, NO, DK, FI
-            ->setVatNumber("NL2345234")         // required in NL and DE
-            ->setCompanyName("TestCompagniet")  // required in NL and DE
-            ->setStreetAddress("Gatan", 23)     // required in NL and DE
-            ->setZipCode(9999)                  // required in NL and DE
-            ->setLocality("Stan")               // required in NL and DE
-            ->setEmail("test@svea.com")         // optional but desirable
-            ->setIpAddress("123.123.123")       // optional but desirable
-            ->setCoAddress("c/o Eriksson")      // optional
-            ->setPhoneNumber(999999)            // optional
-            ->setAddressSelector("7fd7768")     // optional, string recieved from WebPay::getAddress() request
-    )
-;
+ *     $order->addCustomerDetails(
+ *         WebPayItem::companyCustomer()
+ *             ->setNationalIdNumber(2345234)      // required in SE, NO, DK, FI
+ *             ->setVatNumber("NL2345234")         // required in NL and DE
+ *             ->setCompanyName("TestCompagniet")  // required in NL and DE
+ *             ->setStreetAddress("Gatan", 23)     // required in NL and DE
+ *             ->setZipCode(9999)                  // required in NL and DE
+ *             ->setLocality("Stan")               // required in NL and DE
+ *             ->setEmail("test@svea.com")         // optional but desirable
+ *             ->setIpAddress("123.123.123")       // optional but desirable
+ *             ->setCoAddress("c/o Eriksson")      // optional
+ *             ->setPhoneNumber(999999)            // optional
+ *             ->setAddressSelector("7fd7768")     // optional, string recieved from WebPay::getAddress() request
+ *     )
+ * ;
+ * 
  * @author anne-hal, Kristian Grossman-Madsen
  */
 class CompanyCustomer {
-
+    
+    /** @var string $orgNumber */
+    public $orgNumber;
+    /** @var string $companyVatNumber */
+    public $companyVatNumber; 
+    /** @var string $email */
+    public $email;
+    /** @var int $phonenumber */
+    public $phonenumber;
+    /** @var string $ipAddress */
+    public $ipAddress;  
+    /** @var string $street */
+    public $street;    
+    /** @var int $housenumber */
+    public $housenumber;
+    /** @var string $coAddress */
+    public $coAddress; 
+    /** @var string $zipCode */
+    public $zipCode; 
+    /** @var string $locality */
+    public $locality;
+    /** @var string $companyName */
+    public $companyName; 
+    /** @var string $addressSelector */
+    public $addressSelector;
+    
     /**
      * Example: 4608142222
      * Required for company customers in SE, NO, DK, FI
@@ -42,8 +68,6 @@ class CompanyCustomer {
         $this->orgNumber = $companyIdNumberAsString;
         return $this;
     }
-    /** @var string $orgNumber */
-    public $orgNumber;
     
     /**
      * Example: NL123456789A12
@@ -54,9 +78,7 @@ class CompanyCustomer {
     public function setVatNumber($vatNumberAsString) {
         $this->companyVatNumber = $vatNumberAsString;
         return $this;
-    }
-    /** @var string $companyVatNumber */
-    public $companyVatNumber;    
+    }   
 
     /**
      * Optional but desirable
@@ -67,8 +89,6 @@ class CompanyCustomer {
         $this->email = $emailAsString;
         return $this;
     }
-    /** @var string $email */
-    public $email;
     
      /**
      * Optional
@@ -79,8 +99,6 @@ class CompanyCustomer {
         $this->phonenumber = $phoneNumberAsInt;
         return $this;
     }
-    /** @var int $phonenumber */
-    public $phonenumber;
     
     /**
      * Optinal but desirable
@@ -90,26 +108,21 @@ class CompanyCustomer {
     public function setIpAddress($ipAddressAsString) {
         $this->ipAddress = $ipAddressAsString;
         return $this;
-    }
-    /** @var string $ipAddress */
-    public $ipAddress;    
-    
+    }  
+         
     /**
      * Required in NL and DE
-     * @param type $streetAsString
-     * @param type $houseNumberAsInt
+     * For other countries, you may ommit this, or let either of street and/or housenumber be empty
+     * 
+     * @param string $streetAsString
+     * @param int $houseNumberAsInt  -- optional
      * @return $this
      */
-    public function setStreetAddress($streetAsString, $houseNumberAsInt) {
+    public function setStreetAddress($streetAsString, $houseNumberAsInt = null) { // = null is poor man's overloading
         $this->street = $streetAsString;
         $this->housenumber = $houseNumberAsInt;
         return $this;
-    }
-    /** @var string $street */
-    public $street;    
-    /** @var int $housenumber */
-    public $housenumber;        
-    
+    }     
     /**
      * Optional in NL and DE
      * @param type $coAddressAsString
@@ -118,9 +131,7 @@ class CompanyCustomer {
     public function setCoAddress($coAddressAsString) {
         $this->coAddress = $coAddressAsString;
         return $this;
-    }
-    /** @var string $coAddress */
-    public $coAddress;      
+    }     
     
     /**
      * Requuired in NL and DE
@@ -130,9 +141,7 @@ class CompanyCustomer {
     public function setZipCode($zipCodeAsString) {
         $this->zipCode = $zipCodeAsString;
         return $this;
-    }
-    /** @var string $zipCode */
-    public $zipCode;      
+    }     
     
     /**
      * Required in NL and DE
@@ -142,9 +151,7 @@ class CompanyCustomer {
     public function setLocality($cityAsString) {
         $this->locality = $cityAsString;
         return $this;
-    }
-    /** @var string $locality */
-    public $locality;   
+    }   
     
     /**
      * Required for Eu countries like NL and DE
@@ -154,9 +161,7 @@ class CompanyCustomer {
     public function setCompanyName($nameAsString) {
         $this->companyName = $nameAsString;
         return $this;
-    }
-    /** @var string $companyName */
-    public $companyName;    
+    }   
     
     /**
     * Optional. If not set, the invoice/partpayment orders will use the first registered address as invoice address.
@@ -168,6 +173,4 @@ class CompanyCustomer {
         $this->addressSelector = $addressSelectorAsString;
         return $this;
     }
-    /** @var string $addressSelector */
-    public $addressSelector;
 }

@@ -1,4 +1,4 @@
-<?php
+<?php //
 /**
  * example file, how to create an invoice order request
  * 
@@ -39,7 +39,7 @@ $myOrder->setCountryCode("SE");                         // customer country, we 
 $myOrder
 //        ->setClientOrderNumber("order #20140519-375")   // optional - use a not previously sent client side order identifier, i.e. "order #20140519-371"
 //        ->setCustomerReference("customer #123")         // optional - This should contain a customer reference, as in "customer #123".
-        ->setOrderDate("2014-05-28")                    // required - or use an ISO801 date as produced by i.e. date('c')
+        ->setOrderDate("2014-05-28")                    // required - or use an ISO8601 date as produced by i.e. date('c')
 ;
 // Then specify the items bought as order rows, using the methods in the Svea\OrderRow class, and adding them to the order:
 $firstBoughtItem = WebPayItem::orderRow();
@@ -61,14 +61,16 @@ $myOrder->addOrderRow(
                 ->setDescription( "Korv med bröd" )
 );
 
-// For card orders the ->addCustomerDetails() method is optional, but recommended, so we'll add what info we have
+// Next, we create a customer identity object, note that for invoice orders Svea overrides any given address w/verified credit report address in the response.
 $myCustomerInformation = WebPayItem::individualCustomer(); // there's also a ::companyCustomer() method, used for non-person entities
+$myCustomerInformation->setNationalIdNumber(194605092222); // required for invoice orders, used to determine the invoice address, see WebPay::getAddress()
+
+// Also, for card orders addCustomerDetails() is optional, but recommended -- we'll just add what info we have, but do remember to check the response address!
 
 $myCustomerInformation->setName( $customerFirstName, $customerLastName);
 $sveaAddress = Svea\Helper::splitStreetAddress($customerAddress); // Svea requires an address and a house number
 $myCustomerInformation->setStreetAddress( $sveaAddress[0], $sveaAddress[1] );
 $myCustomerInformation->setZipCode( $customerZipCode )->setLocality( $customerCity );
-$myCustomerInformation->setNationalIdNumber(194605092222); // required for invoice orders, used to determine the invoice address, see WebPay::getAddress()
 
 $myOrder->addCustomerDetails( $myCustomerInformation );
 
@@ -83,6 +85,37 @@ $myResponse = $myInvoiceOrderRequest->doRequest();
 echo "<pre>Your request response:\n\n";
 print_r( $myResponse );
 
-echo "</pre><font color='red'><pre>\n";
-echo "Note that the customerIdentity received in the response indicates the Svea invoice address, which should normally match the order shipping address.";    
-?>
+echo "</pre><font color='blue'><pre>
+An example of a successful request response. The 'accepted' attribute is true (1), and resultcode/errormessage is not set. 
+(Note that the customerIdentity received in the response indicates the Svea invoice address, which should normally match the order shipping address.):
+
+Svea\WebService\CreateOrderResponse Object
+(
+    [sveaOrderId] => 503312
+    [sveaWillBuyOrder] => 1
+    [amount] => 23.73
+    [expirationDate] => 2015-03-10T00:00:00+01:00
+    [clientOrderNumber] => 
+    [orderType] => Invoice
+    [customerIdentity] => Svea\WebService\CreateOrderIdentity Object
+        (
+            [email] => 
+            [ipAddress] => 
+            [countryCode] => SE
+            [houseNumber] => 
+            [customerType] => Individual
+            [nationalIdNumber] => 194605092222
+            [phoneNumber] => 
+            [fullName] => Persson, Tess T
+            [street] => Testgatan 1
+            [coAddress] => c/o Eriksson, Erik
+            [zipCode] => 99999
+            [locality] => Stan
+        )
+
+    [accepted] => 1
+    [errormessage] => 
+    [resultcode] => 0
+)
+</pre>";
+

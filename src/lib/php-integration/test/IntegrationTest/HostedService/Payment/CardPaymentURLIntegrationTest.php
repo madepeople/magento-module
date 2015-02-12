@@ -29,7 +29,7 @@ class CardPaymentURLIntegrationTest extends \PHPUnit_Framework_TestCase {
             ->usePaymentMethod(\PaymentMethod::KORTCERT)
             ->setPayPageLanguage($orderLanguage)
             ->setReturnUrl($returnUrl)
-            ->getPaymentURL();
+            ->getPaymentUrl();
         // check that request response contains an URL
         $this->assertInstanceOf( "Svea\HostedAdminResponse", $response );     
     }
@@ -41,14 +41,14 @@ class CardPaymentURLIntegrationTest extends \PHPUnit_Framework_TestCase {
         
         // create order
         $order = \TestUtil::createOrder( TestUtil::createIndividualCustomer("SE")->setIpAddress($ipAddress) );
-        $order->setCustomerReference("foobar".date('c'));
+        $order->setClientOrderNumber("foobar".date('c'));
         // set payment method
         // call getPaymentURL
         $response = $order
             ->usePaymentMethod(\PaymentMethod::KORTCERT)
             ->setPayPageLanguage($orderLanguage)
             ->setReturnUrl($returnUrl)
-            ->getPaymentURL();
+            ->getPaymentUrl();
   
         $this->assertInstanceOf( "Svea\HostedService\HostedAdminResponse", $response );     
     }
@@ -65,17 +65,17 @@ class CardPaymentURLIntegrationTest extends \PHPUnit_Framework_TestCase {
         
         // create order
         $order = \TestUtil::createOrder( TestUtil::createIndividualCustomer("SE")->setIpAddress($ipAddress) );
-        $order->setCustomerReference("foobar".date('c'));
+        $order->setClientOrderNumber("foobar".date('c'));
         // set payment method
         // call getPaymentURL
         $response = $order
             ->usePaymentMethod(\PaymentMethod::KORTCERT )
             ->setPayPageLanguage($orderLanguage)
             ->setReturnUrl($returnUrl)
-            ->getPaymentURL();
+            ->getPaymentUrl();
 
         // check that request was accepted        
-        //print_r($response);
+        ////print_r($response);
         $this->assertEquals( 1, $response->accepted );                
 
         // check that response set id, created exist and not null
@@ -90,7 +90,7 @@ class CardPaymentURLIntegrationTest extends \PHPUnit_Framework_TestCase {
    /**
      * test_manual_CardPayment_getPaymentURL 
      */  
-    public function test_manual_CardPayment_getPaymentURL() {
+    public function test_manual_CardPayment_getPaymentUrl() {
         // Stop here and mark this test as incomplete.
         $this->markTestIncomplete(
             'skeleton for manual test of card payment'
@@ -99,7 +99,7 @@ class CardPaymentURLIntegrationTest extends \PHPUnit_Framework_TestCase {
         // 1. remove (put in a comment) the above code to enable the test
         // 2. run the test, and get the subscription paymenturl from the output
         // 3. go to the paymenturl and complete the transaction.
-        // 4. go to test.sveaekonomi.se/webpay/admin/start.xhtml
+        // 4. go to https://test.sveaekonomi.se/webpay-admin/admin/start.xhtml
         // 5. retrieve the transactionid from the response in the transaction log
         
         $orderLanguage = "sv";   
@@ -111,16 +111,16 @@ class CardPaymentURLIntegrationTest extends \PHPUnit_Framework_TestCase {
         // set payment method
         // call getPaymentURL
         $response = $order
-            ->setCustomerReference("created by test_manual_CardPayment_getPaymentURL") //override
+            ->setClientOrderNumber("foobar".date('c'))
             ->usePaymentMethod(\PaymentMethod::KORTCERT )
             ->setPayPageLanguage($orderLanguage)
             ->setReturnUrl($returnUrl)
-            ->getPaymentURL();
+            ->getPaymentUrl();
 
         // check that request was accepted
         $this->assertEquals( 1, $response->accepted );                
 
         // print the url to use to confirm the transaction
-        print_r( " test_manual_card_payment by going to: " . $response->testurl ." and complete payment manually" );
+        //print_r( " test_manual_card_payment by going to: " . $response->testurl ." and complete payment manually" );
     }   
 }
