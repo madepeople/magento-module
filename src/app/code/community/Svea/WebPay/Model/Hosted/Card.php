@@ -50,9 +50,9 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
             $sveaObject = $sveaObject->usePaymentMethod(PaymentMethod::KORTCERT);
         }
 
-        $paymentFormPrep = $sveaObject->setReturnUrl(Mage::getUrl("svea_webpay/hosted/return"))
-            ->setCallbackUrl(Mage::getUrl('svea_webpay/hosted/callback'))
-            ->setCancelUrl(Mage::getUrl("svea_webpay/hosted/cancel"));
+        $paymentFormPrep = $sveaObject->setReturnUrl(Mage::getUrl('svea_webpay/hosted/return', array('_secure' => true)))
+            ->setCallbackUrl(Mage::getUrl('svea_webpay/hosted/callback', array('_secure' => true)))
+            ->setCancelUrl(Mage::getUrl('svea_webpay/hosted/cancel', array('_secure' => true)));
 
         return $paymentFormPrep;
     }
