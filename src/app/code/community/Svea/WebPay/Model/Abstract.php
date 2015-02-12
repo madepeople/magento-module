@@ -36,6 +36,29 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
     }
 
     /**
+     * There are loads of different types of gift cards, we try to handle
+     * all of them in here
+     * in here
+     *
+     * @param $order
+     * @return number
+     */
+    protected function _getGiftCardAmount($order)
+    {
+        if ($order instanceof Mage_Sales_Model_Quote) {
+            $quote = $order;
+            $giftCardAmount = abs($quote->getGiftCardsAmount());
+        } else {
+            // EE gift cards
+            $giftCardAmount = abs($order->getGiftCardsAmount());
+
+            // Unirgy gift cards
+        }
+
+        return $giftCardAmount;
+    }
+
+    /**
      * Returns the main tax percentage of the order
      *
      * @param $order
@@ -86,8 +109,9 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
      */
     public function getSveaPaymentObject($order, $additionalInfo = null)
     {
-        //Get Request and billing addres
-        $svea = $order->getData('svea_payment_request');
+        $paymentMethodConfig = $this->getSveaStoreConfClass();
+        $svea = Mage::helper('svea_webpay')->getPaymentRequest($order, $paymentMethodConfig);
+
         $billingAddress = $order->getBillingAddress();
         $storeId = $order->getStoreId();
         $store = Mage::app()->getStore($storeId);
@@ -148,15 +172,22 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             $quote = $order;
             $totals = $quote->getTotals();
             $discount = abs($totals['discount']->getValue());
-            $shipping = abs($totals['shipping']->getValue());
-            $paymentFeeInclTax = 0;
-            $giftCardAmount = 0;
+            $shipping = abs($totals['shipping']->getAddress()
+                ->getShippingInclTax());
+            if (isset($totals['svea_payment_fee'])) {
+                $paymentFee = $totals['svea_payment_fee'];
+                $paymentFeeInclTax = $paymentFee->getAddress()
+                    ->getSveaPaymentFeeInclTax();
+            }  else {
+                $paymentFeeInclTax = 0;
+            }
         } else {
             $discount = abs($order->getDiscountAmount());
             $shipping = abs($order->getShippingInclTax());
             $paymentFeeInclTax = abs($order->getSveaPaymentFeeInclTax());
-            $giftCardAmount = abs($order->getGiftCardsAmount());
         }
+
+        $giftCardAmount = $this->_getGiftCardAmount($order);
 
         // Shipping
         if ($shipping > 0) {
@@ -219,57 +250,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             ->setOrderDate(date("Y-m-d"))
             ->setCurrency($order->getOrderCurrencyCode());
         return $svea;
-    }
-
-    /**
-     * Use Svea IntegrationLib validation to get Exceptions
-     *
-     * @return type
-     */
-    public function validate()
-    {
-        $paymentInfo = $this->getInfoInstance();
-        if ($paymentInfo instanceof Mage_Sales_Model_Order_Payment) {
-            $order = $paymentInfo->getOrder();
-        } else {
-            $order = $paymentInfo->getQuote();
-        }
-        $paymentMethodConfig = $this->getSveaStoreConfClass();
-        Mage::helper('svea_webpay')->getPaymentRequest($order, $paymentMethodConfig);
-        // For Finland we must take the additionalInformation from $_POST
-        // since no getAddress call has been made previously
-        $billingCountryId = $order->getBillingAddress()->getCountryId();
-        if ($billingCountryId === 'FI') {
-            $additionalInformation = @$_POST['payment'][@$_POST['payment']['method']];
-            if (!is_array($additionalInformation)) {
-                throw new Mage_Exception("Error when validation order: Svea invoice information not set in _POST");
-            }
-        } else {
-            $additionalInformation = $paymentInfo->getAdditionalInformation();
-
-            if (empty($additionalInformation) || !isset($additionalInformation['svea_customerType'])) {
-                $paymentData = $paymentInfo->getData();
-                $code = isset($paymentData[$this->getCode()])
-                    ? $this->getCode() : 'svea_info';
-
-                if (isset($paymentData[$code])) {
-                    $additionalInformation = $paymentData[$this->getCode()];
-                } else {
-                    $additionalInformation = array();
-                }
-            }
-        }
-        $sveaRequest = $this->getSveaPaymentObject($order, $additionalInformation);
-        $sveaRequest = $this->_choosePayment($sveaRequest);
-        $errors = $sveaRequest->validateOrder();
-        if (count($errors) > 0) {
-            $exceptionString = "";
-            foreach ($errors as $key => $value) {
-                $exceptionString .="-" . $key . " : " . $value . "\n";
-            }
-            Mage::throwException($this->_getHelper()->__($exceptionString));
-        }
-        return parent::validate();
     }
 
     public function getSveaStoreConfClass($storeId = null)

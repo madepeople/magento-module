@@ -216,7 +216,6 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
      */
     public function authorize(Varien_Object $payment, $amount)
     {
-
         $order = $payment->getOrder();
 
         // For Finland the values in _POST should be used, not
@@ -232,8 +231,9 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             }
         }
 
-        // Object created in validate()
-        $sveaObject = $order->getData('svea_payment_request');
+        $paymentMethodConfig = $this->getSveaStoreConfClass();
+        $sveaObject = Mage::helper('svea_webpay')->getPaymentRequest($order, $paymentMethodConfig);
+        $sveaObject = $this->getSveaPaymentObject($order, $payment->getAdditionalInformation());
         $sveaObject = $this->_choosePayment($sveaObject);
         $this->_setAddressToSveaAddress($payment);
         $response = $sveaObject->doRequest();

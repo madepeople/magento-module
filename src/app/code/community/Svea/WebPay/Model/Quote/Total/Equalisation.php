@@ -15,10 +15,6 @@
 class Svea_WebPay_Model_Quote_Total_Equalisation
     extends Mage_Sales_Model_Quote_Address_Total_Abstract
 {
-    public function __construct()
-    {
-        $this->setCode('svea_payment_fee');
-    }
 
     public function collect(Mage_Sales_Model_Quote_Address $address)
     {
@@ -28,8 +24,6 @@ class Svea_WebPay_Model_Quote_Total_Equalisation
         $baseGrandTotal = $address->getBaseGrandTotal();
 
         if ($grandTotal > 0 && $baseGrandTotal > 0) {
-            $sveaPaymentFee = $address->getSveaPaymentFee();
-
             $payment = $address->getQuote()
                 ->getPayment();
 
@@ -48,11 +42,18 @@ class Svea_WebPay_Model_Quote_Total_Equalisation
             $baseTaxAmount = $address->getBaseTaxAmount();
 
             $sveaRequest = $methodInstance->getSveaPaymentObject($address->getQuote());
+            $sveaTotals = $this->_calculateSveaTotal($sveaRequest);
 
-            $totalDiff = 10;
-            $taxDiff = 10;
-            $newGrandTotal = $grandTotal+$totalDiff;
-            $newBaseGrandTotal = $baseGrandTotal+$totalDiff;
+            $totalDiff = $taxDiff = 0;
+            if ($sveaTotals['total'] > 0) {
+                $totalDiff = $grandTotal-$sveaTotals['total'];
+            }
+            if ($sveaTotals['tax'] > 0) {
+                $taxDiff = $taxAmount-$sveaTotals['tax'];
+            }
+
+            $newGrandTotal = $grandTotal-$totalDiff;
+            $newBaseGrandTotal = $baseGrandTotal-$totalDiff;
 
             $newTaxAmount = $taxAmount+$taxDiff;
             $newBaseTaxAmount = $baseTaxAmount+$taxDiff;
@@ -62,5 +63,43 @@ class Svea_WebPay_Model_Quote_Total_Equalisation
             $address->setTaxAmount($newTaxAmount);
             $address->setBaseTaxAmount($newBaseTaxAmount);
         }
+    }
+
+    /**
+     * Calculate the totals for a svea request object. As of now we're not
+     * handling the total tax difference, that will come with the future
+     * php-integration update which exposes methods to retrieve the grand
+     * total and tax amount for the Svea request.
+     *
+     * @param $sveaRequest
+     * @return array
+     */
+    protected function _calculateSveaTotal($sveaRequest)
+    {
+        $total = 0;
+        $tax = 0;
+        foreach (array('fixedDiscountRows', 'invoiceFeeRows',
+                     'orderRows', 'shippingFeeRows') as $key) {
+            if (!count($sveaRequest->$key)) {
+                continue;
+            }
+            $rowTotal = 0;
+            foreach ($sveaRequest->$key as $row) {
+                if (null !== $row->amountIncVat) {
+                    $rowTotal += $row->amountIncVat*$row->quantity;
+                } else if (null !== $row->amount) {
+                    $rowTotal += $row->amount;
+                }
+            }
+            if ($key === 'fixedDiscountRows') {
+                $rowTotal *= -1;
+            }
+            $total += $rowTotal;
+        }
+        $result = array(
+            'total' => $total,
+            'tax' => $tax
+        );
+        return $result;
     }
 }
