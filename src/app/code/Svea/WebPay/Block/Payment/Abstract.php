@@ -73,7 +73,7 @@ abstract class Svea_WebPay_Block_Payment_Abstract
     protected function _toHtml()
     {
         $scriptUrl = Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_JS,
-                true) . 'svea.js';
+                true) . 'svea/checkout.js';
         $scriptUrl = Mage::helper('core')->jsonEncode($scriptUrl);
 
         $parameters = Mage::helper('core')->jsonEncode(array(

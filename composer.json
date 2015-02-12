@@ -1,0 +1,21 @@
+{
+    "name": "sveawebpay/magento-module",
+    "license": "BSD-4-Clause",
+    "type": "magento-module",
+    "description": "Svea WebPay Payment Extension",
+    "authors": [
+        {
+            "name": "Jonathan Selander",
+            "email":"jonathan@madepeople.se"
+        }
+    ],
+    "require": {
+        "magento-hackathon/magento-composer-installer": "*"
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packages.firegento.com"
+        }
+    ]
+}

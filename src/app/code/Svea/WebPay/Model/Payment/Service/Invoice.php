@@ -47,8 +47,8 @@ class Svea_WebPay_Model_Payment_Service_Invoice
         if ($response->accepted == 1) {
             $rawDetails = $this->_sveaResponseToArray($response);
             $payment->setTransactionId($response->sveaOrderId)
-                    ->setIsTransactionClosed(false)
-                    ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
+                ->setIsTransactionClosed(false)
+                ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
         } else {
             $errorMessage = $response->errormessage;
             $statusCode = $response->resultcode;
@@ -90,17 +90,17 @@ class Svea_WebPay_Model_Payment_Service_Invoice
         $svea->setOrderId($sveaOrderId);
 
         $response = $svea->deliverInvoiceOrder()
-                ->doRequest();
+            ->doRequest();
 
         if ($response->accepted == 1) {
             $rawDetails = $this->_sveaResponseToArray($response);
             $payment->setTransactionId($response->invoiceId)
-                    ->setIsTransactionClosed(false)
-                    ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
+                ->setIsTransactionClosed(false)
+                ->setTransactionAdditionalInfo(Mage_Sales_Model_Order_Payment_Transaction::RAW_DETAILS, $rawDetails);
         } else {
             $errorTranslated = Mage::helper('svea_webpay')->getErrorMessage(
-                    $response->resultcode,
-                    $response->errormessage);
+                $response->resultcode,
+                $response->errormessage);
 
             Mage::throwException($errorTranslated);
         }

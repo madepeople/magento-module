@@ -21,7 +21,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         }
         if (!empty($data) && isset($data[$this->_code])) {
             $this->getInfoInstance()->setAdditionalInformation($this->_code,
-                    $data[$this->_code]);
+                $data[$this->_code]);
         }
         return parent::assignData($data);
     }
@@ -48,7 +48,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
     {
         $diff = $this->getAmountDifference($svea, $amount);
         if ($diff) {
-            throw new Mage_Payment_Exception('The by Svea calculated grand total differs from Magento by ' . ($diff/100) . '. This is most likely caused by a bug or misconfiguration.');
+            throw new Mage_Payment_Exception('The by Svea calculated grand total differs from Magento by ' . ($diff / 100) . '. This is most likely caused by a bug or misconfiguration.');
         }
         return true;
     }
@@ -71,7 +71,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      *  These are treated the same way as simple products
      *
      * @param Svea\CreateOrder $svea
-     * @param object $object  An order, Invoice, Creditmemo, etc
+     * @param object $object An order, Invoice, Creditmemo, etc
      * @return Svea\CreateOrder
      */
     protected function _addItems($svea, $object)
@@ -122,10 +122,10 @@ abstract class Svea_WebPay_Model_Payment_Abstract
 
             $row = Item::orderRow();
             $row->setArticleNumber($item->getSku())
-                    ->setQuantity((int)$qty)
-                    ->setName($name)
-                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                    ->setVatPercent((int)$taxPercent);
+                ->setQuantity((int)$qty)
+                ->setName($name)
+                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                ->setVatPercent((int)$taxPercent);
 
             if (Mage::getStoreConfig('tax/calculation/price_includes_tax', $storeId)) {
                 $row->setAmountIncVat((float)$priceInclTax);
@@ -145,7 +145,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      * structured in this way as well
      *
      * @param object $svea
-     * @param object $object  Quote
+     * @param object $object Quote
      * @return \Svea_WebPay_Model_Payment_Abstract
      */
     protected function _addTotalsFromQuote($svea, $object)
@@ -168,9 +168,9 @@ abstract class Svea_WebPay_Model_Payment_Abstract
                 case 'giftcardaccount':
                 case 'ugiftcert':
                     $discountRow = Item::fixedDiscount()
-                            ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                            ->setName($total->getTitle())
-                            ->setAmountIncVat(abs($object->getDiscountAmount()));
+                        ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                        ->setName($total->getTitle())
+                        ->setAmountIncVat(abs($object->getDiscountAmount()));
 
                     $svea->addDiscount($discountRow);
                     break;
@@ -196,7 +196,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      * Adds the invoice fee row to the Svea object
      *
      * @param object $svea
-     * @param object $object  Order or quote
+     * @param object $object Order or quote
      * @param string $code
      * @return void
      */
@@ -217,10 +217,10 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         $paymentFeeInclTax = $object->getSveaPaymentFeeInclTax();
 
         $invoiceFeeRow = Item::invoiceFee()
-                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
-                ->setAmountExVat((float)$paymentFee)
-                ->setAmountIncVat((float)$paymentFeeInclTax);
+            ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+            ->setName(Mage::helper('svea_webpay')->__('invoice_fee'))
+            ->setAmountExVat((float)$paymentFee)
+            ->setAmountIncVat((float)$paymentFeeInclTax);
 
         $svea->addFee($invoiceFeeRow);
     }
@@ -229,7 +229,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      * Adds a discount row to the svea object
      *
      * @param object $svea
-     * @param object $object  Order or quote
+     * @param object $object Order or quote
      * @param string $code
      * @return void
      */
@@ -241,9 +241,9 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         }
 
         $discountRow = Item::fixedDiscount()
-                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                ->setName(Mage::helper('svea_webpay')->__('Discount'))
-                ->setAmountIncVat(abs($object->getDiscountAmount()));
+            ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+            ->setName(Mage::helper('svea_webpay')->__('Discount'))
+            ->setAmountIncVat(abs($object->getDiscountAmount()));
 
         $svea->addDiscount($discountRow);
     }
@@ -252,7 +252,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      * Adds the shipping information to the Svea order object
      *
      * @param object $svea
-     * @param object $object  Order or quote
+     * @param object $object Order or quote
      * @param string $code
      * @return void
      * @throws Mage_Payment_Exception
@@ -270,18 +270,18 @@ abstract class Svea_WebPay_Model_Payment_Abstract
         $store = Mage::app()->getStore($storeId);
         $taxCalculationModel = Mage::getSingleton('tax/calculation');
         $request = $taxCalculationModel->getRateRequest(
-                $object->getShippingAddress(),
-                $object->getBillingAddress(),
-                null,
-                $store);
+            $object->getShippingAddress(),
+            $object->getBillingAddress(),
+            null,
+            $store);
 
         $order = $object instanceof Mage_Sales_Model_Order
             ? $object : $object->getOrder();
 
         $shippingFee = Item::shippingFee()
-                ->setUnit(Mage::helper('svea_webpay')->__('unit'))
-                ->setName($order->getShippingDescription())
-                ->setAmountExVat((float)$object->getShippingAmount());
+            ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+            ->setName($order->getShippingDescription())
+            ->setAmountExVat((float)$object->getShippingAmount());
 
         $shippingTaxClass = Mage::getStoreConfig(Mage_Tax_Model_Config::CONFIG_XML_PATH_SHIPPING_TAX_CLASS, $storeId);
         $rate = $taxCalculationModel->getRate($request->setProductClassId($shippingTaxClass));
@@ -296,7 +296,7 @@ abstract class Svea_WebPay_Model_Payment_Abstract
      * Add totals values (rows) to the Svea object
      *
      * @param object $svea
-     * @param object $object  Order or quote
+     * @param object $object Order or quote
      * @return \Svea_WebPay_Model_Payment_Abstract
      */
     protected function _addTotals($svea, $object)
@@ -350,6 +350,6 @@ abstract class Svea_WebPay_Model_Payment_Abstract
             $sveaGrandTotal = $formatter->formatTotalAmount($rows);
         }
 
-        return ((int)bcmul($amount, 100))-$sveaGrandTotal;
+        return ((int)bcmul($amount, 100)) - $sveaGrandTotal;
     }
 }
