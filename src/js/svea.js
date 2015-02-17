@@ -427,6 +427,10 @@ var _SveaCustomer = Class.create({
                         .insert(addressBox);
 
                     addressDiv.show();
+
+                    if (addressSelectBox.value !== selectedAddress.addressSelector) {
+                        addressSelectBox.value = selectedAddress.addressSelector;
+                    }
                 } else {
                     addressDiv.hide();
                 }
