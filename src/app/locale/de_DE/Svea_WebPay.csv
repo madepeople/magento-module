@@ -66,3 +66,5 @@
 "Error_123","Svea error %s : Karte verloren";
 "Error_127","Svea error %s : Auftrags-Nr schon bei einem anderen Transaktion benutzt";
 "Error_129","Svea error %s : Mehr als einer Transaktion für angegebene Kundenreferenz entdeckt";
+
+"No customer found","Die Kunde ist nicht gefunden"

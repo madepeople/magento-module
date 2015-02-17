@@ -67,3 +67,5 @@
 "Error_123","Svea error %s : Lost card";
 "Error_127","Svea error %s : Customer reference number already used in another transaction";
 "Error_129","Svea error %s : More than one transaction found for the given customer reference number";
+
+"No customer found","No customer found"

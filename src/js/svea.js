@@ -961,7 +961,7 @@ var _SveaController = Class.create({
 
         this.customerStore.addFromResponse(data);
 
-        if (data.accepted === false) {
+        if ((data.accepted || false) === false) {
             alert(data.errormessage);
         }
 
@@ -1088,6 +1088,13 @@ var _SveaController = Class.create({
             }
         }
 
+        function on400(transport) {
+            var json = transport.responseText.evalJSON();
+            if (json.errormessage) {
+                alert(json.errormessage);
+            }
+        }
+
         startLoading();
         new Ajax.Request(this.getAddressUrl, {
             parameters: {
@@ -1099,7 +1106,8 @@ var _SveaController = Class.create({
             onComplete: function (transport) {
                 stopLoading();
             },
-            onSuccess: onSuccess.bind(this)
+            onSuccess: onSuccess.bind(this),
+            on400: on400.bind(this)
         });
     }
 
