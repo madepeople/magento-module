@@ -154,6 +154,24 @@
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </card_logos>
+                        <allowspecific translate="label">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>400</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>401</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </specificcountry>
                     </fields>
                 </svea_cardpayment>
 
@@ -260,6 +278,24 @@
                             <show_in_store>0</show_in_store>
                             <frontend_class>validate-number</frontend_class>
                         </sort_order>
+                        <allowspecific translate="label">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>400</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>401</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </specificcountry>
                     </fields>
                 </svea_directpayment>
 
@@ -421,6 +457,24 @@
                             <show_in_store>0</show_in_store>
                             <frontend_class>validate-number</frontend_class>
                         </sort_order>
+                        <allowspecific translate="label">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>400</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>401</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </specificcountry>
                     </fields>
                 </svea_invoice>
 
@@ -575,6 +629,24 @@
                             <show_in_store>0</show_in_store>
                             <frontend_class>validate-number</frontend_class>
                         </sort_order>
+                        <allowspecific translate="label">
+                            <label>Payment from Applicable Countries</label>
+                            <frontend_type>allowspecific</frontend_type>
+                            <sort_order>400</sort_order>
+                            <source_model>adminhtml/system_config_source_payment_allspecificcountries</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </allowspecific>
+                        <specificcountry translate="label">
+                            <label>Payment from Specific Countries</label>
+                            <frontend_type>multiselect</frontend_type>
+                            <sort_order>401</sort_order>
+                            <source_model>adminhtml/system_config_source_country</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                        </specificcountry>
                     </fields>
                 </svea_paymentplan>
             </groups>
