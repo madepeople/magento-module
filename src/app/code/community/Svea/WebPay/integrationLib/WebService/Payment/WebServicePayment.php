@@ -38,6 +38,28 @@ class WebServicePayment {
     }
 
     /**
+     * Get calculated totals before sending the request
+     * @return Array of the rounded sums of all orderrows as it will be handled in request
+     */
+    public function getRequestTotal() {
+        $object = $this->prepareRequest();
+        $total_incvat = 0;
+        $total_exvat = 0;
+        $total_vat = 0;
+        foreach ($object->request->CreateOrderInformation->OrderRows['OrderRow'] as $value) {
+            $rowExVat = $this->calculateOrderRowExVat($value);
+            $total_exvat += $rowExVat;
+            $rowVat = $this->CalculateTotalVatSumOfRows($value);
+            $total_vat += $rowVat;
+            $total_incvat += round(($rowExVat + $rowVat),2);
+        }
+        return array('total_exvat' => $total_exvat, 'total_incvat' => $total_incvat, 'total_vat' => $total_vat);
+
+
+    }
+
+
+    /**
      * Rebuild $order with svea_soap package to be in right format for SveaWebPay Europe Web service API
      * @return prepared SveaRequest
      * @throws \Svea\ValidationException
@@ -79,7 +101,7 @@ class WebServicePayment {
 
     /**
      * Transforms object to array and sends it to SveaWebPay Europe Web service API by php SoapClient
-     * @return CreateOrderEuResponse 
+     * @return CreateOrderEuResponse
      * @throws \Svea\ValidationException
      */
     public function doRequest() {
@@ -175,7 +197,7 @@ class WebServicePayment {
 
         return $individualCustomerIdentity;
     }
-    
+
     /**
      * new! If CustomerIdentity is crated by addCustomerDetails()
      * @return \SveaCustomerIdentity
@@ -240,5 +262,37 @@ class WebServicePayment {
         $individualCustomerIdentity->CustomerType = $isCompany ? "Company" : "Individual";
 
         return $individualCustomerIdentity;
+    }
+
+    /**
+     *
+     * @param type $value
+     * @return type
+     */
+     private function calculateOrderRowExVat($value) {
+                 if($value->PriceIncludingVat == 1){
+                    $rowsum_incvat = round($value->NumberOfUnits,2) * round($value->PricePerUnit,2) * (1 - ($value->DiscountPercent / 100));
+                    $rowsum_exvat = $rowsum_incvat / (1 + ($value->VatPercent / 100));
+
+                 } else {
+                    $rowsum_exvat = round($value->NumberOfUnits,2) * round($value->PricePerUnit,2) * (1 - ($value->DiscountPercent / 100));
+                 }
+                  return round($rowsum_exvat);
+    }
+
+    private function CalculateTotalVatSumOfRows($value) {
+          //if amount inc vat
+         $sum = 0;
+             //calculate the exvat sum
+             if($value->PriceIncludingVat == 1){
+                  $rowsum_incvat = round($value->NumberOfUnits,2) * round($value->PricePerUnit,2) * (1 - ($value->DiscountPercent / 100));
+                  $exvat = round($rowsum_incvat,2) / (1 + ($value->VatPercent / 100));
+             }  else {
+                 $exvat = round($value->NumberOfUnits,2) * round($value->PricePerUnit,2) * (1 - ($value->DiscountPercent / 100));
+             }
+             $vat = round($exvat,2) * ($value->VatPercent / 100 );
+             $sum += intval(100.00 * $vat) / 100.00; //php for math.truncate
+
+         return $sum;
     }
 }
