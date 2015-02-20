@@ -122,8 +122,21 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 throw new Mage_Payment_Exception('Selected civil registry address does not match the database.');
             }
 
+            $overwriteStatus = new Varien_Object(array(
+                'overwrite_shipping' => true,
+                'overwrite_billing' => true
+            ));
+            Mage::dispatchEvent('svea_overwrite_address_before', array(
+                'payment' => $payment,
+                'status' => $overwriteStatus
+            ));
+
             // Set the order addresses to the civil registry information
             foreach ($order->getAddressesCollection() as $orderAddress) {
+                $key = 'overwrite_' . $orderAddress->getAddressType();
+                if ($overwriteStatus->getData($key) !== true) {
+                    continue;
+                }
                 if ($sveaInformation['svea_customerType'] == 0) {
                     // Don't overwrite the name if a company
                     $orderAddress->setFirstname($address->firstName)
