@@ -131,7 +131,12 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             if (!(int)$taxPercent) {
                 // If it's a bundle item we have to calculate the tax from
                 // the including/excluding tax values
-                $taxPercent = round(100*(($priceInclTax/$price)-1));
+                if ($price > 0) {
+                    $taxPercent = round(100*(($priceInclTax/$price)-1));
+                } else {
+                    // What's this? Does svea *require* tax?
+                    $taxPercent = 0;
+                }
             }
             $name = $item->getName();
 
@@ -171,9 +176,14 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         if ($order instanceof Mage_Sales_Model_Quote) {
             $quote = $order;
             $totals = $quote->getTotals();
-            $discount = abs($totals['discount']->getValue());
-            $shipping = abs($totals['shipping']->getAddress()
-                ->getShippingInclTax());
+            $discount = $shipping = 0;
+            if (isset($totals['discount'])) {
+                $discount = abs($totals['discount']->getValue());
+            }
+            if (isset($totals['shipping'])) {
+                $shipping = abs($totals['shipping']->getAddress()
+                    ->getShippingInclTax());
+            }
             if (isset($totals['svea_payment_fee'])) {
                 $paymentFee = $totals['svea_payment_fee'];
                 $paymentFeeInclTax = $paymentFee->getAddress()
@@ -243,7 +253,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             $invoiceFeeRow->setAmountIncVat((float)$paymentFeeInclTax);
             $svea->addFee($invoiceFeeRow);
         }
-
 
         $svea->setCountryCode($billingAddress->getCountryId())
             ->setClientOrderNumber($order->getIncrementId())

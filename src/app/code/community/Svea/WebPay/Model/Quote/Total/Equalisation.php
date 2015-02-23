@@ -41,15 +41,23 @@ class Svea_WebPay_Model_Quote_Total_Equalisation
             $taxAmount = $address->getTaxAmount();
             $baseTaxAmount = $address->getBaseTaxAmount();
 
-            $sveaRequest = $methodInstance->getSveaPaymentObject($address->getQuote());
-            $sveaTotals = $this->_calculateSveaTotal($sveaRequest);
+            try {
+                $sveaRequest = $methodInstance->getSveaPaymentObject($address->getQuote());
+                $sveaTotals = $sveaRequest->useInvoicePayment()
+                    ->getRequestTotal();
+            } catch (Exception $e) {
+                // Could be a combination of tax and billing country settings
+                // that throw an exception
+                Mage::logException($e);
+                return;
+            }
 
             $totalDiff = $taxDiff = 0;
-            if ($sveaTotals['total'] > 0) {
-                $totalDiff = $grandTotal-$sveaTotals['total'];
+            if ($sveaTotals['total_incvat'] > 0) {
+                $totalDiff = $grandTotal-$sveaTotals['total_incvat'];
             }
-            if ($sveaTotals['tax'] > 0) {
-                $taxDiff = $taxAmount-$sveaTotals['tax'];
+            if ($sveaTotals['total_vat'] > 0) {
+                $taxDiff = $taxAmount-$sveaTotals['total_vat'];
             }
 
             $newGrandTotal = $grandTotal-$totalDiff;
@@ -76,30 +84,31 @@ class Svea_WebPay_Model_Quote_Total_Equalisation
      */
     protected function _calculateSveaTotal($sveaRequest)
     {
-        $total = 0;
-        $tax = 0;
-        foreach (array('fixedDiscountRows', 'invoiceFeeRows',
-                     'orderRows', 'shippingFeeRows') as $key) {
-            if (!count($sveaRequest->$key)) {
-                continue;
-            }
-            $rowTotal = 0;
-            foreach ($sveaRequest->$key as $row) {
-                if (null !== $row->amountIncVat) {
-                    $rowTotal += $row->amountIncVat*$row->quantity;
-                } else if (null !== $row->amount) {
-                    $rowTotal += $row->amount;
-                }
-            }
-            if ($key === 'fixedDiscountRows') {
-                $rowTotal *= -1;
-            }
-            $total += $rowTotal;
-        }
-        $result = array(
-            'total' => $total,
-            'tax' => $tax
-        );
-        return $result;
+
+//        $total = 0;
+//        $tax = 0;
+//        foreach (array('fixedDiscountRows', 'invoiceFeeRows',
+//                     'orderRows', 'shippingFeeRows') as $key) {
+//            if (!count($sveaRequest->$key)) {
+//                continue;
+//            }
+//            $rowTotal = 0;
+//            foreach ($sveaRequest->$key as $row) {
+//                if (null !== $row->amountIncVat) {
+//                    $rowTotal += $row->amountIncVat*$row->quantity;
+//                } else if (null !== $row->amount) {
+//                    $rowTotal += $row->amount;
+//                }
+//            }
+//            if ($key === 'fixedDiscountRows') {
+//                $rowTotal *= -1;
+//            }
+//            $total += $rowTotal;
+//        }
+//        $result = array(
+//            'total' => $total,
+//            'tax' => $tax
+//        );
+//        return $result;
     }
 }
