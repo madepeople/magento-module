@@ -45,6 +45,53 @@ abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstr
     abstract protected function _choosePayment($sveaObject, $addressSelector = NULL);
 
     /**
+     * This method is a sad reality in order for the total amount to work in
+     * all the different magento versions we support. Calculations differ
+     * between systems and we can't at this point send only the grand total
+     * value (that would fix things).
+     *
+     * @param $request
+     * @param $order
+     * @return mixed
+     */
+    protected function _equalizeRows($request, $order)
+    {
+        // Find out what the amount is, and if it differs from the Magento
+        // grand total, add it as an equalisation row
+        $paymentForm = $request->getPaymentForm();
+        $message = @simplexml_load_string($paymentForm->xmlMessage);
+        $amount = (int)$message->amount;
+
+        $grandTotal = (int)($order->getGrandTotal()*100);
+        if ($amount !== $grandTotal) {
+            // The difference can be negative or positive
+            $diff = $grandTotal-$amount;
+            $diff /= 100;
+            $svea = $request->order;
+            if ($diff < 0) {
+                // Negative, use a discount row
+                $row = WebPayItem::fixedDiscount()
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setAmountIncVat(abs($diff));
+                $svea->addDiscount($row);
+            } else {
+                // Positive, use a normal order row
+                $rate = $this->_getOrderMainTaxRate($order);
+                $row = WebPayItem::orderRow()
+                    ->setArticleNumber('eq')
+                    ->setQuantity(1)
+                    ->setName('Magento Equalisation')
+                    ->setUnit(Mage::helper('svea_webpay')->__('unit'))
+                    ->setVatPercent($rate)
+                    ->setAmountIncVat($diff);
+                $svea->addOrderRow($row);
+            }
+        }
+
+        return $request;
+    }
+
+    /**
      *
      * @return type Svea Payment form object
      */
@@ -63,6 +110,7 @@ abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstr
         $sveaRequest = $this->getSveaPaymentObject($order);
 
         $sveaRequest = $this->_choosePayment($sveaRequest);
+        $this->_equalizeRows($sveaRequest, $order);
         return $sveaRequest;
     }
 

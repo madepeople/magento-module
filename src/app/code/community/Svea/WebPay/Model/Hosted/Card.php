@@ -50,9 +50,9 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
             $sveaObject = $sveaObject->usePaymentMethod(PaymentMethod::KORTCERT);
         }
 
-        $paymentFormPrep = $sveaObject->setReturnUrl(Mage::getUrl("svea_webpay/hosted/return"))
-            ->setCallbackUrl(Mage::getUrl('svea_webpay/hosted/callback'))
-            ->setCancelUrl(Mage::getUrl("svea_webpay/hosted/cancel"));
+        $paymentFormPrep = $sveaObject->setReturnUrl(Mage::getUrl('svea_webpay/hosted/return', array('_secure' => true)))
+            ->setCallbackUrl(Mage::getUrl('svea_webpay/hosted/callback', array('_secure' => true)))
+            ->setCancelUrl(Mage::getUrl('svea_webpay/hosted/cancel', array('_secure' => true)));
 
         return $paymentFormPrep;
     }
@@ -72,18 +72,6 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
         if (null === $sveaOrderId) {
             // If there is no previous authorization
             $sveaOrderId = $payment->getTransactionId();
-        }
-        $information = $this->fetchTransactionInfo($payment, $sveaOrderId);
-
-        if ($information['status'] !== 'AUTHORIZED') {
-            $message = 'Payment cannot be captured: ';
-            if (!empty($information['errorMessage'])) {
-                $message .= $information['errorMessage'] . ' (' . $information['resultcode'] . ')';
-            } else {
-                $message .= $information['status'];
-            }
-            $message .= '.';
-            throw new Mage_Payment_Exception($message);
         }
 
         $order = $payment->getOrder();

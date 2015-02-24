@@ -36,9 +36,9 @@ class Svea_WebPay_Model_Hosted_Direct extends Svea_WebPay_Model_Hosted_Abstract
     {
         $paymentFormPrep = $sveaObject->usePayPageDirectBankOnly()
             ->setPayPageLanguage(Mage::helper('svea_webpay')->__('lang_code'))
-            ->setCallbackUrl(Mage::getUrl('svea_webpay/hosted/callback'))
-            ->setReturnUrl(Mage::getUrl('svea_webpay/hosted/return'))
-            ->setCancelUrl(Mage::getUrl('svea_webpay/hosted/cancel'));
+            ->setCallbackUrl(Mage::getUrl('svea_webpay/hosted/callback', array('_secure' => true)))
+            ->setReturnUrl(Mage::getUrl('svea_webpay/hosted/return', array('_secure' => true)))
+            ->setCancelUrl(Mage::getUrl('svea_webpay/hosted/cancel', array('_secure' => true)));
 
         return $paymentFormPrep;
     }

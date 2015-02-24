@@ -258,7 +258,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         // Possible discount
         $discount = abs($invoice->getDiscountAmount());
         if ($discount) {
-            if ($taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
+            if (!$taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
                 $orderTax = Mage::getModel('sales/order_tax')
                     ->load($order->getId(), 'order_id');
                 $rate = $orderTax->getPercent();
@@ -407,7 +407,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         // Discount
         $discount = abs($creditMemo->getDiscountAmount());
         if ($discount > 0) {
-            if ($taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
+            if (!$taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
                 $orderTax = Mage::getModel('sales/order_tax')
                     ->load($order->getId(), 'order_id');
                 $rate = $orderTax->getPercent();

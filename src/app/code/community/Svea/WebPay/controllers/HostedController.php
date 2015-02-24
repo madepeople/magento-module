@@ -17,7 +17,7 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
     {
         if (!$this->_xmlResponse) {
             $response = $this->getRequest()
-                ->getPost('response');
+                ->getParam('response');
             $response = @base64_decode($response);
             $response = @simplexml_load_string($response);
             $this->_xmlResponse = $response;
@@ -43,8 +43,8 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
             $config = new SveaMageConfigProvider($paymentMethodConfig);
             $request = $this->getRequest();
             $responseObject = new SveaResponse(array(
-                'response' => $request->getPost('response'),
-                'mac' => $request->getPost('mac'),
+                'response' => $request->getParam('response'),
+                'mac' => $request->getParam('mac'),
             ), null, $config);
             $this->_sveaResponseObject = $responseObject;
         }
