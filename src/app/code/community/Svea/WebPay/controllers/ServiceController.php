@@ -25,6 +25,8 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
 
     public function getAddressesAction()
     {
+        $sveaHelper = Mage::helper('svea_webpay');
+
         $ssn = $this->getRequest()->getParam('ssn');
         $countryCode = $this->getRequest()->getParam('cc');
         if (empty($countryCode)) {
@@ -44,60 +46,71 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
         $conf['company'] = (string)$this->getRequest()->getParam('type') === self::TYPE_COMPANY;
 
         try {
-            $result = Mage::helper('svea_webpay')->getAddresses($ssn, $countryCode, $conf);
+            $result = $sveaHelper->getAddresses($ssn, $countryCode, $conf);
 
-            if (isset($result->customerIdentity)) {
-                $quote = Mage::getSingleton('checkout/session')->getQuote();
-                if ($quote && $quote->getId()) {
-                    // Update the billing address so the fetched information is used
-                    // in the order object request
+            if ($result->resultcode !== 'Error') {
+                if (isset($result->customerIdentity) && count($result->customerIdentity)) {
+                    $quote = Mage::getSingleton('checkout/session')->getQuote();
+                    if ($quote && $quote->getId()) {
+                        // Update the billing address so the fetched information is used
+                        // in the order object request
 
-                    // The reason for choosing the first identity is that it will be
-                    // selected by default in the gui.
-                    $identity = $result->customerIdentity[0];
-                    $identityParameterMap = array(
-                        'firstName' => 'Firstname',
-                        'lastName' => 'Lastname',
-                        'phoneNumber' => 'Telephone',
-                        'zipCode' => 'Postcode',
-                        'locality' => 'City',
-                        'street' => 'street',
-                    );
+                        // The reason for choosing the first identity is that it will be
+                        // selected by default in the gui.
+                        $identity = $result->customerIdentity[0];
+                        $identityParameterMap = array(
+                            'firstName' => 'Firstname',
+                            'lastName' => 'Lastname',
+                            'phoneNumber' => 'Telephone',
+                            'zipCode' => 'Postcode',
+                            'locality' => 'City',
+                            'street' => 'street',
+                        );
 
-                    // If this address is a company the 'fullName' attribute should be
-                    // stored as a company on the billing address
-                    if ((string)$this->getRequest()->getParam('type') === self::TYPE_COMPANY) {
-                        $identityParameterMap['fullName'] = 'Company';
-                    }
-
-
-                    $billingAddress = $quote->getBillingAddress();
-                    foreach ($identityParameterMap as $source => $target) {
-                        if (empty($identity->$source)) {
-                            continue;
+                        // If this address is a company the 'fullName' attribute should be
+                        // stored as a company on the billing address
+                        if ((string)$this->getRequest()->getParam('type') === self::TYPE_COMPANY) {
+                            $identityParameterMap['fullName'] = 'Company';
                         }
-                        $method = 'set' . $target;
-                        $billingAddress->$method($identity->$source);
+
+
+                        $billingAddress = $quote->getBillingAddress();
+                        foreach ($identityParameterMap as $source => $target) {
+                            if (empty($identity->$source)) {
+                                continue;
+                            }
+                            $method = 'set' . $target;
+                            $billingAddress->$method($identity->$source);
+                        }
+
+                        $billingAddress->save();
+
+                        // Unsure how sure we can be that this information isn't
+                        // overwritten by something else at a later stage, should
+                        // we maybe disallow orders without this information on
+                        // quote payment? To me it makes sense, OK!
+                        $payment = $quote->getPayment();
+                        $additionalData = $payment->getAdditionalData();
+                        if (!empty($additionalData)) {
+                            $additionalData = unserialize($additionalData);
+                        } else {
+                            $additionalData = array();
+                        }
+                        $additionalData['getaddresses_response'] = $result;
+                        $payment->setAdditionalData(serialize($additionalData));
+                        $payment->save();
                     }
 
-                    $billingAddress->save();
-
-                    // Unsure how sure we can be that this information isn't
-                    // overwritten by something else at a later stage, should
-                    // we maybe disallow orders without this information on
-                    // quote payment? To me it makes sense, OK!
-                    $payment = $quote->getPayment();
-                    $additionalData = $payment->getAdditionalData();
-                    if (!empty($additionalData)) {
-                        $additionalData = unserialize($additionalData);
-                    } else {
-                        $additionalData = array();
-                    }
-                    $additionalData['getaddresses_response'] = $result;
-                    $payment->setAdditionalData(serialize($additionalData));
-                    $payment->save();
                 }
-
+            } else {
+                // resultcode === 'Error'
+                if (isset($result->errormessage)) {
+                    Mage::log("Got error from svea getAddress: '{$result->errormessage}'");
+                } else {
+                    Mage::log("Got error from svea getAddress without errormessage");
+                }
+                $this->getResponse()->setHeader('HTTP/1.0','400',true);
+                $result->errormessage = $sveaHelper->__('No customer found');
             }
         } catch (Exception $e) {
             $result = $e->getMessage();

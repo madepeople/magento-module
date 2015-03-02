@@ -68,3 +68,5 @@
 "Error_123","Svea error %s : Borttappat kort";
 "Error_127","Svea error %s : Kundrefernsnummer redan använt i en annan transaktion";
 "Error_129","Svea error %s : Mer än en transaktion hittad för angivet kundreferensnummer";
+
+"No customer found","Det går ej att hitta kunden"

@@ -66,3 +66,5 @@
 "Error_123","Svea error %s : Kortti hukattu";
 "Error_127","Svea error %s : Asiakkaan viitenumero jo käytetty toisessa tapahtumassa";
 "Error_129","Svea error %s : Enemmän kuin yksi tapahtuma löydetty annetulle asiakasviitenumerolle";
+
+"No customer found","Asiakasta ei löydy"

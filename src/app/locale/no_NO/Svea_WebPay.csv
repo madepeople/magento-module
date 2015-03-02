@@ -66,3 +66,4 @@
 "Error_123","Svea error %s : Mistet kort";
 "Error_127","Svea error %s : Kundefeferansenummer er allerede benyttet i en annan transaktion";
 "Error_129","Svea error %s : Mer enn en transaktion er funnet for angitt kundereferansenummer";
+"No customer found","Ingen kunde funnet"

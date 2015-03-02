@@ -65,3 +65,5 @@
 "Error_123","Svea error %s : Tabt kort';
 "Error_127","Svea error %s : Kundenummer allerede anvendt i en anden transaktion';
 "Error_129","Svea error %s : Mere end én transaktion fundet for angivet kundenummer';
+
+"No customer found","Ingen kunde fundet"

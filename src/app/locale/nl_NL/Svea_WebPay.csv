@@ -66,3 +66,5 @@
 "Error_123","Svea error %s : Verloren pas";
 "Error_127","Svea error %s : Klant referentienummer al gebruikt in een andere transactie";
 "Error_129","Svea error %s : Meer dan één transactie gevonden voor het opgegeven klant referentienummer";
+
+"No customer found","Geen klant gevonden"
