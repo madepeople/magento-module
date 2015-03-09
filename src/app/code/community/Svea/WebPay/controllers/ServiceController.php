@@ -90,15 +90,23 @@ class Svea_WebPay_ServiceController extends Mage_Core_Controller_Front_Action
                         // we maybe disallow orders without this information on
                         // quote payment? To me it makes sense, OK!
                         $payment = $quote->getPayment();
-                        $additionalData = $payment->getAdditionalData();
-                        if (!empty($additionalData)) {
-                            $additionalData = unserialize($additionalData);
-                        } else {
-                            $additionalData = array();
+                        $paymentMethodCode = $payment->getMethod();
+
+                        // Only save getaddress request in the following methods
+                        // since it might be used by other methods that also
+                        // uses the additional data
+                        if (in_array($paymentMethodCode, array('svea_invoice',
+                                                               'svea_paymentplan'))) {
+                            $additionalData = $payment->getAdditionalData();
+                            if (!empty($additionalData)) {
+                                $additionalData = unserialize($additionalData);
+                            } else {
+                                $additionalData = array();
+                            }
+                            $additionalData['getaddresses_response'] = $result;
+                            $payment->setAdditionalData(serialize($additionalData));
+                            $payment->save();
                         }
-                        $additionalData['getaddresses_response'] = $result;
-                        $payment->setAdditionalData(serialize($additionalData));
-                        $payment->save();
                     }
 
                 }
