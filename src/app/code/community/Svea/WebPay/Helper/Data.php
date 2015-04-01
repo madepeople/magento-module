@@ -533,6 +533,19 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * Check if the SSN selector should be displayed regardless of payment method
+     *
+     * This is based on a setting in admin but will only work if
+     * showSsnSelectorInPaymentMethod() is false.
+     *
+     * @return bool
+     */
+    public function alwaysDisplaySsnSelector()
+    {
+        return !$this->showSsnSelectorInPaymentMethod() && Mage::getStoreConfigFlag('payment/svea_general/always_display_ssn_selector');
+    }
+
+    /**
      * Check if required address fields should be locked
      *
      * @return bool
