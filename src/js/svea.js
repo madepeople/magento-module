@@ -178,13 +178,18 @@ function _sveaGetPaymentMethodCode() {
  * @returns Billing country code or null
  */
 function _sveaGetBillingCountryCode() {
-    var elem = $$('[name="billing[country_id]"]');
+    var billingCountryElement = $$('[name="billing[country_id]"]');
 
-    if (elem.length) {
-        return elem[0].value;
+    if (billingCountryElement.length) {
+        return billingCountryElement[0].value;
     } else {
-        // console.warn("Cannot find country_id");
-        return null;
+        billingCountryElement = $('svea-billing-country-id-' + _sveaGetPaymentMethodCode());
+        if (billingCountryElement) {
+            return billingCountryElement.value;
+        } else {
+            // console.warn('Could not find billing country id');
+            return null;
+        }
     }
 }
 
