@@ -20,6 +20,15 @@ $_country = Mage::getSingleton('checkout/session')
 ?>
 
 <div class="svea-ssn-container <?php echo $_class ?>">
+    <?php
+    /** The hidden input below is used to find out country in checkouts that
+     * doesn't display billing:country_id, like the magento old checkout
+     * (not onepage).
+     *
+     * See _sveaGetBillingCountryCode() in svea.js.
+     */
+    ?>
+    <input type="hidden" id="svea-billing-country-id-<?php echo $_code; ?>" disabled name="svea-billing-country-id" value="<?php echo $_country; ?>">
 
     <?php if ($_useCustomerTypeSelector): ?>
         <?php
