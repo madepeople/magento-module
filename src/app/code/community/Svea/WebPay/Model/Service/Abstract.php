@@ -200,8 +200,12 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             $svea = $svea->addCustomerDetails($item);
         } else {
             $item = WebPayItem::individualCustomer();
-            $item = $item->setNationalIdNumber($additionalInfo['svea_ssn'])
-                    ->setEmail($order->getBillingAddress()->getEmail())
+            // Not all countries has svea_ssn input
+            if (array_key_exists('svea_ssn', $additionalInfo)) {
+                $item = $item->setNationalIdNumber($additionalInfo['svea_ssn']);
+            }
+
+            $item = $item->setEmail($order->getBillingAddress()->getEmail())
                     ->setName($order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
                     ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($order->getBillingAddress()->getPostcode())
