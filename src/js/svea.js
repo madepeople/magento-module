@@ -770,12 +770,20 @@ var _SveaController = Class.create({
      * hidden, when true it should be visible.
      *
      * For Finland('FI') the container should be displayed but the getaddress
-     * button will be hidden by the template.
+     * button will be hidden by the template because the ssn should be stored.
+     *
+     * For Germany and Netherlands the container should be displayed but the
+     * getaddress button will be hidden by the template because they have
+     * birthday inputs.
      *
      * @returns Boolean
      */
     showContainer: function() {
-        return this.sveaAddressIsRequired() || _sveaGetBillingCountryCode() === 'FI';
+        var countryCode = _sveaGetBillingCountryCode();
+        return this.sveaAddressIsRequired()
+            || countryCode === 'FI'
+            || countryCode === 'DE'
+            || countryCode === 'NL';
     },
     /** Toggle visibility of ssn container
      *
