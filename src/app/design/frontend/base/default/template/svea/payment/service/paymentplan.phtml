@@ -72,7 +72,7 @@ $_ssnHtml = $this->getSsnHtml();
                 </p>
 
                 <p id="paymentplan_initial_fee_text" style="display:none">
-                    <?php echo Mage::helper('svea_webpay')->__('initial_fee') ?>
+                    <?php echo Mage::helper('svea_webpay')->__('initial_fee') ?>: <span></span> <?php echo $_currency ?>
                 </p>
             </div>
         </div>
@@ -99,6 +99,7 @@ $_ssnHtml = $this->getSsnHtml();
                 } else {
                     $('paymentplan_cost_text').show();
                     $('paymentplan_cost').update(available_campaigns[i].amount);
+                    $('paymentplan_initial_fee_text').down('span').update(available_campaigns[i].initial_fee);
                 }
                 // Convert to int here to check if there is an initial fee.
                 // If 0 < initial_fee < 0.49 this is a bug.
