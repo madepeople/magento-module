@@ -218,29 +218,37 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         }
         $paymentMethodConfig = $this->getSveaStoreConfClass();
         Mage::helper('svea_webpay')->getPaymentRequest($order, $paymentMethodConfig);
-        // For Finland we must take the additionalInformation from $_POST
-        // since no getAddress call has been made previously
         $billingCountryId = $order->getBillingAddress()->getCountryId();
-        if ($billingCountryId === 'FI') {
-            $additionalInformation = @$_POST['payment'][@$_POST['payment']['method']];
-            if (!is_array($additionalInformation)) {
-                throw new Mage_Exception("Error when validation order: Svea invoice information not set in _POST");
+        $additionalInformation = $paymentInfo->getAdditionalInformation();
+
+        if (empty($additionalInformation) || !isset($additionalInformation['svea_customerType'])) {
+            $paymentData = $paymentInfo->getData();
+            $code = isset($paymentData[$this->getCode()])
+                  ? $this->getCode() : 'svea_info';
+
+            if (isset($paymentData[$code])) {
+                $additionalInformation = $paymentData[$this->getCode()];
+            } else {
+                $additionalInformation = array();
             }
-        } else {
-            $additionalInformation = $paymentInfo->getAdditionalInformation();
+        }
 
-            if (empty($additionalInformation) || !isset($additionalInformation['svea_customerType'])) {
-                $paymentData = $paymentInfo->getData();
-                $code = isset($paymentData[$this->getCode()])
-                    ? $this->getCode() : 'svea_info';
-
-                if (isset($paymentData[$code])) {
-                    $additionalInformation = $paymentData[$this->getCode()];
-                } else {
-                    $additionalInformation = array();
+        // Add _POST data to additionalInformation if it's not already set in
+        // payment.
+        // This is because some countries like Finland doesn't make a getAddress()
+        // call so for onepage checkouts the svea_ info has to be taken from _POST
+        // _but_ for multi-page checkouts that information has already been posted
+        $postSveaInfo = @$_POST['payment'][@$_POST['payment']['method']];
+        if (is_array($postSveaInfo)) {
+            foreach ($postSveaInfo as $key => $value) {
+                if (strpos($key, 'svea_') === 0) {
+                    if (!array_key_exists($key, $additionalInformation)) {
+                        $additionalInformation[$key] = $value;
+                    }
                 }
             }
         }
+
         $sveaRequest = $this->getSveaPaymentObject($order, $additionalInformation);
         $sveaRequest = $this->_choosePayment($sveaRequest);
         $errors = $sveaRequest->validateOrder();

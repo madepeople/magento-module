@@ -452,8 +452,8 @@ var _SveaCustomer = Class.create({
         // most likely the order cannot be completed.
         ($$('input[name="payment[' + _sveaGetFormKey() + '][svea_addressSelector]"]')[0] || {value: null}).value = this.selectedAddressId;
 
-        // Update address field values if svea is required.
-        if (this.sveaController.sveaAddressIsRequired()) {
+        // Update address field values if getAddress is required.
+        if (this.sveaController.getAddressIsRequired()) {
             this._setAddressFieldValues();
         }
 
@@ -601,17 +601,27 @@ var _SveaCustomerStore = Class.create({
  */
 var _SveaController = Class.create({
 
-    /** List of payment methods that must use SVEA getAddress if a valid country is selected
-     */
-    validPaymentMethods: [
-        'svea_invoice',
-        'svea_paymentplan'
-    ],
-    /** List of countries that must use SVEA getAddress if a valid payment method is selected
+    /** List of countries that can use svea
      */
     validCountries: [
+        'NL',
+        'DE',
+        'FI',
         'SE',
-        'DK'
+        'DK',
+        'NO'
+    ],
+    /** List of countries that _must_ use SVEA getAddress
+     */
+    getAddressCountries: [
+        'SE',
+        'DK',
+    ],
+    /** List of payment methods that must use SVEA getAddress
+     */
+    getAddressPaymentMethods: [
+        'svea_invoice',
+        'svea_paymentplan'
     ],
     getAddressUrl: null,
     oneStepCheckoutSetMethodsSeparateUrl: null,
@@ -625,11 +635,11 @@ var _SveaController = Class.create({
         this.customerStore = new _SveaCustomerStore(this);
         // Store last state
         this.lastState = this.getCurrentState();
-        // If the last state required SVEA
-        this.lastStateRequiredSvea = this.sveaAddressIsRequired();
+        // If the last state required getAddress
+        this.lastStateRequiredSvea = this.getAddressIsRequired();
 
         // Store current address values
-        if (!this.sveaAddressIsRequired()) {
+        if (!this.getAddressIsRequired()) {
             this.lastStateAddressValues = this.getCurrentReadonlyAddressValues();
         } else {
             // If we started as SVEA have a blank address
@@ -757,22 +767,22 @@ var _SveaController = Class.create({
             item.writeAttribute('readonly', false);
         });
     },
-    /** Check if a svea address is required in the checkout
-     *
-     * @returns Boolean
+    /** Check if a getAddress request is required
      */
-    sveaAddressIsRequired: function() {
+    getAddressIsRequired: function() {
         var paymentMethod = _sveaGetPaymentMethodCode(),
             countryCode = _sveaGetBillingCountryCode();
 
         if (paymentMethod === null) {
+            console.warn('Paymentmethod not found');
             return false;
         }
         if (countryCode === null) {
+            console.warn('Countrycode not found');
             return false;
         }
 
-        return this.validPaymentMethods.indexOf(paymentMethod) !== -1 && this.validCountries.indexOf(countryCode) !== -1;
+        return this.getAddressPaymentMethods.indexOf(paymentMethod) !== -1 && this.getAddressCountries.indexOf(countryCode) !== -1;
     },
     /** Check if the container with its content should be displayed
      *
@@ -780,24 +790,41 @@ var _SveaController = Class.create({
      * the same value. When this returns `false` the svea ssn container should be
      * hidden, when true it should be visible.
      *
-     * For Finland('FI') the container should be displayed but the getaddress
-     * button will be hidden by the template because the ssn should be stored.
-     *
-     * For Germany and Netherlands the container should be displayed but the
-     * getaddress button will be hidden by the template because they have
-     * birthday inputs.
-     *
-     * For Germany and Netherlands the container should be displayed because it
-     * contains birthday inputs.
-     *
-     * @returns Boolean
+     * @returns boolean
      */
     showContainer: function() {
-        var countryCode = _sveaGetBillingCountryCode();
-        return this.sveaAddressIsRequired()
-            || countryCode === 'FI'
-            || countryCode === 'DE'
-            || countryCode === 'NL';
+        var paymentMethod = _sveaGetPaymentMethodCode(),
+            countryCode = _sveaGetBillingCountryCode(),
+            getAddressIsRequired = this.getAddressIsRequired(),
+            alwaysDisplaySsnSelector = window._svea.alwaysDisplaySsnSelector,
+            isGetAddressCountry = this.getAddressCountries.indexOf(countryCode) !== -1,
+            isSveaPaymentMethod = paymentMethod === null ? false : paymentMethod.indexOf('svea_') === 0,
+            isValidCountry = this.validCountries.indexOf(countryCode) !== -1
+            ;
+
+        // If getAddress is required the container must be displayed
+        if (getAddressIsRequired) {
+            return true;
+        } else {
+            // Never display if countryCode is not set
+            if (countryCode === null) {
+                return false;
+            } else {
+                if (isSveaPaymentMethod) {
+                    // If svea method _and_ valid country - display
+                    return isValidCountry;
+                } else {
+                    if (alwaysDisplaySsnSelector && isGetAddressCountry) {
+                        // Display even if it isn't a svea method
+                        // since the ssn selector should always be displayed
+                        // and this is a get address country
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            }
+        }
     },
     /** Toggle visibility of ssn container
      *
@@ -865,7 +892,7 @@ var _SveaController = Class.create({
      */
     setupGui: function() {
         var newState = this.getCurrentState(),
-            newStateRequiresSvea = this.sveaAddressIsRequired(),
+            newStateRequiresSvea = this.getAddressIsRequired(),
             newStateAddressValues = this.getCurrentReadonlyAddressValues();
 
         if (newStateRequiresSvea) {
@@ -1003,9 +1030,8 @@ var _SveaController = Class.create({
         // Always call setup gui
         this.setupGui();
 
-        // Update address manually if svea is not required
-
-        if (!this.sveaAddressIsRequired()) {
+        // Update address manually if getAddress isn't required
+        if (!this.getAddressIsRequired()) {
             this.customerStore.getCurrent()._setAddressFieldValues();
         }
 
@@ -1085,8 +1111,9 @@ var _SveaController = Class.create({
         // Run setupGui
         this.setupGui();
 
-        // Update address values since that will not happen if svea isn't required
-        if (!this.sveaAddressIsRequired()) {
+        // Update address values since that will not happen if getAddress
+        // isn't required
+        if (!this.getAddressIsRequired()) {
             this.customerStore.getCurrent()._setAddressFieldValues();
         }
     },
@@ -1207,7 +1234,7 @@ function sveaAddressSelectChanged()
     sveaController.setupGui();
 
     // Update address values since that will not happen if svea isn't required
-    if (!sveaController.sveaAddressIsRequired()) {
+    if (!sveaController.getAddressIsRequired()) {
         sveaController.customerStore.getCurrent()._setAddressFieldValues();
     }
 }
