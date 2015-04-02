@@ -176,16 +176,13 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             // Default to the item price
+            $name = $item->getName();
             $price = $orderItem->getPrice();
             $priceInclTax = $orderItem->getPriceInclTax();
             $taxPercent = $orderItem->getTaxPercent();
             if (!(int)$taxPercent) {
-                // If it's a bundle item we have to calculate the tax from
-                // the including/excluding tax values
-                $taxPercent = round(100*(($priceInclTax/$price)-1));
+                $taxPercent = false;
             }
-
-            $name = $item->getName();
 
             $parentItem = $orderItem->getParentItem();
             if ($parentItem) {
@@ -200,6 +197,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                         $name = '- ' . $name;
                         break;
                 }
+            }
+
+            if ($taxPercent === false) {
+                // If it's a bundle item we have to calculate the tax from
+                // the including/excluding tax values
+                $taxPercent = round(100*(($priceInclTax/$price)-1));
             }
 
             switch (get_class($item)) {
@@ -339,16 +342,14 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             }
 
             // Default to the item price
+            $name = $item->getName();
             $price = $orderItem->getPrice();
             $priceInclTax = $orderItem->getPriceInclTax();
             $taxPercent = $orderItem->getTaxPercent();
             if (!(int)$taxPercent) {
-                // If it's a bundle item we have to calculate the tax from
-                // the including/excluding tax values
-                $taxPercent = round(100*(($priceInclTax/$price)-1));
+                $taxPercent = false;
             }
 
-            $name = $item->getName();
             $qty = $item->getQty();
 
             $parentItem = $orderItem->getParentItem();
@@ -365,6 +366,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                         $name = '- ' . $name;
                         break;
                 }
+            }
+
+            if ($taxPercent === false) {
+                // If it's a bundle item we have to calculate the tax from
+                // the including/excluding tax values
+                $taxPercent = round(100*(($priceInclTax/$price)-1));
             }
 
             $orderRow = WebPayItem::orderRow()
@@ -523,6 +530,19 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
     public function showSsnSelectorInPaymentMethod()
     {
         return Mage::getStoreConfigFlag('payment/svea_general/display_ssn_selector_with_payment_method');
+    }
+
+    /**
+     * Check if the SSN selector should be displayed regardless of payment method
+     *
+     * This is based on a setting in admin but will only work if
+     * showSsnSelectorInPaymentMethod() is false.
+     *
+     * @return bool
+     */
+    public function alwaysDisplaySsnSelector()
+    {
+        return !$this->showSsnSelectorInPaymentMethod() && Mage::getStoreConfigFlag('payment/svea_general/always_display_ssn_selector');
     }
 
     /**
