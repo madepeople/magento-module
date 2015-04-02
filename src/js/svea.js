@@ -787,6 +787,9 @@ var _SveaController = Class.create({
      * getaddress button will be hidden by the template because they have
      * birthday inputs.
      *
+     * For Germany and Netherlands the container should be displayed because it
+     * contains birthday inputs.
+     *
      * @returns Boolean
      */
     showContainer: function() {
