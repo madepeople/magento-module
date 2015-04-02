@@ -178,13 +178,18 @@ function _sveaGetPaymentMethodCode() {
  * @returns Billing country code or null
  */
 function _sveaGetBillingCountryCode() {
-    var elem = $$('[name="billing[country_id]"]');
+    var billingCountryElement = $$('[name="billing[country_id]"]');
 
-    if (elem.length) {
-        return elem[0].value;
+    if (billingCountryElement.length) {
+        return billingCountryElement[0].value;
     } else {
-        // console.warn("Cannot find country_id");
-        return null;
+        billingCountryElement = $('svea-billing-country-id-' + _sveaGetPaymentMethodCode());
+        if (billingCountryElement) {
+            return billingCountryElement.value;
+        } else {
+            // console.warn('Could not find billing country id');
+            return null;
+        }
     }
 }
 
@@ -278,7 +283,7 @@ var _SveaCustomer = Class.create({
 
     response: null,
 
-    initialize: function(config, response) {
+    initialize: function(config, response, sveaController) {
         /** Create a new Svea customer returned from svea getAddress
          *
          * @param config Object with countryCode, customerType and nationalIdNumber set
@@ -291,6 +296,7 @@ var _SveaCustomer = Class.create({
         this.nationalIdNumber = config.nationalIdNumber;
         this.selectedAddressId = null;
         this.addresses = {};
+        this.sveaController = sveaController;
 
         if (this.countryCode === null ||
             this.customerType === null ||
@@ -400,6 +406,11 @@ var _SveaCustomer = Class.create({
 
         if (container) {
 
+            // Select correct address
+            if (addressSelectBox.value !== selectedAddress.addressSelector) {
+                addressSelectBox.value = selectedAddress.addressSelector;
+            }
+
             // Update the selected address summary
             addressDiv = $(container).down('.sveaShowAddresses');
 
@@ -428,9 +439,6 @@ var _SveaCustomer = Class.create({
 
                     addressDiv.show();
 
-                    if (addressSelectBox.value !== selectedAddress.addressSelector) {
-                        addressSelectBox.value = selectedAddress.addressSelector;
-                    }
                 } else {
                     addressDiv.hide();
                 }
@@ -444,8 +452,11 @@ var _SveaCustomer = Class.create({
         // most likely the order cannot be completed.
         ($$('input[name="payment[' + _sveaGetFormKey() + '][svea_addressSelector]"]')[0] || {value: null}).value = this.selectedAddressId;
 
-        // Update address field values
-        this._setAddressFieldValues();
+        // Update address field values if svea is required.
+        if (this.sveaController.sveaAddressIsRequired()) {
+            this._setAddressFieldValues();
+        }
+
     },
     /** Set values in address input fields according to the selected address
      *
@@ -539,7 +550,9 @@ var _SveaCustomer = Class.create({
 var _SveaCustomerStore = Class.create({
 
     customers: null,
-    initialize: function() {
+    sveaController: null, // back reference to the svea controller
+    initialize: function(sveaController) {
+        this.sveaController = sveaController;
         this.customers = {};
     },
     /** Add a customer
@@ -565,7 +578,8 @@ var _SveaCustomerStore = Class.create({
                 customerType: _sveaGetCustomerType(),
                 nationalIdNumber: _sveaGetBillingNationalIdNumber()
             },
-            response));
+            response,
+            this.sveaController));
 
     },
     /** Get current customer according to selected billing country, paymentMethod and nationalIdNumber
@@ -577,7 +591,7 @@ var _SveaCustomerStore = Class.create({
             countryCode: _sveaGetBillingCountryCode(),
             customerType: _sveaGetCustomerType(),
             nationalIdNumber: _sveaGetBillingNationalIdNumber()
-        });
+        }, undefined, this.sveaController);
 
         return this.customers[invalidCustomer.getHash()] || invalidCustomer;
     }
@@ -608,7 +622,7 @@ var _SveaController = Class.create({
 
         this.reconfigure(config);
 
-        this.customerStore = new _SveaCustomerStore();
+        this.customerStore = new _SveaCustomerStore(this);
         // Store last state
         this.lastState = this.getCurrentState();
         // If the last state required SVEA
@@ -639,6 +653,8 @@ var _SveaController = Class.create({
         // The URL OneStepCheckout uses to save payment method and payment
         // method additional data, optional if OneStepCheckout isn't used.
         this.oneStepCheckoutSetMethodsSeparateUrl = config.oneStepCheckoutSetMethodsSeparateUrl || null;
+
+        this.useGetAddressForAllPaymentMethods = config.useGetAddressForAllPaymentMethods;
     },
     /** Toggle visibility and state of 'ship to different address'-checkbox
      *
@@ -880,38 +896,42 @@ var _SveaController = Class.create({
         // This clears the readonly fields if this doesn't require svea
         this.customerStore.getCurrent().setupGui();
 
-        // Restore new values and then last values if we went from svea to non-svea
-        if (this.lastStateRequiredSvea && !newStateRequiresSvea) {
-            var hasOldValues = false;
+        // If the ssn selector is used for all payment methods we do not
+        // try to restore the address if the payment method changed.
+        if (!this.useGetAddressForAllPaymentMethods) {
+            // Restore new values and then last values if we went from svea to non-svea
+            if (this.lastStateRequiredSvea && !newStateRequiresSvea) {
+                var hasOldValues = false;
 
-            if (this.hasOnlyEmptyValues(this.lastStateAddressValues)) {
-                // We restore the new values here because if lastStateAddressValues
-                // aren't set we want to fill in the current values so they can
-                // be used. This is very hackish but time is short.
+                if (this.hasOnlyEmptyValues(this.lastStateAddressValues)) {
+                    // We restore the new values here because if lastStateAddressValues
+                    // aren't set we want to fill in the current values so they can
+                    // be used. This is very hackish but time is short.
+                    $H(newStateAddressValues).each(function(pair){
+                        $(pair.key).value = pair.value;
+                    });
+                } else {
+                    // Restore all values that are saved since they have at least
+                    // one value
+                    $H(this.lastStateAddressValues).each(function(pair){
+                        $(pair.key).value = pair.value;
+                    });
+                }
+            }
+
+            // Restore _current_ address values if we went from non-svea to non-svea
+            // because they might have been overwritten by the call to
+            // this.customerStore.getCurrent().setupGui()
+            if (!this.lastStateRequiredSvea && !newStateRequiresSvea) {
                 $H(newStateAddressValues).each(function(pair){
                     $(pair.key).value = pair.value;
                 });
-            } else {
-                // Restore all values that are saved since they have at least
-                // one value
-                $H(this.lastStateAddressValues).each(function(pair){
-                    $(pair.key).value = pair.value;
-                });
             }
-        }
 
-        // Restore _current_ address values if we went from non-svea to non-svea
-        // because they might have been overwritten by the call to
-        // this.customerStore.getCurrent().setupGui()
-        if (!this.lastStateRequiredSvea && !newStateRequiresSvea) {
-            $H(newStateAddressValues).each(function(pair){
-                $(pair.key).value = pair.value;
-            });
-        }
-
-        // Store lastStateAddressValues unless this is a svea -> svea change
-        if (!(newStateRequiresSvea && this.lastStateRequiredSvea)) {
-            this.lastStateAddressValues = newStateAddressValues;
+            // Store lastStateAddressValues unless this is a svea -> svea change
+            if (!(newStateRequiresSvea && this.lastStateRequiredSvea)) {
+                this.lastStateAddressValues = newStateAddressValues;
+            }
         }
 
         // If OneStepCheckout is used the current payment method
@@ -978,6 +998,12 @@ var _SveaController = Class.create({
 
         // Always call setup gui
         this.setupGui();
+
+        // Update address manually if svea is not required
+
+        if (!this.sveaAddressIsRequired()) {
+            this.customerStore.getCurrent()._setAddressFieldValues();
+        }
 
     },
     /** Setup observers
@@ -1054,6 +1080,11 @@ var _SveaController = Class.create({
 
         // Run setupGui
         this.setupGui();
+
+        // Update address values since that will not happen if svea isn't required
+        if (!this.sveaAddressIsRequired()) {
+            this.customerStore.getCurrent()._setAddressFieldValues();
+        }
     },
 
     /** Get and update address from svea with an AJAX request
@@ -1164,11 +1195,17 @@ function setCustomerTypeRadioThing()
  */
 function sveaAddressSelectChanged()
 {
+    var sveaController = window._svea.controller;
     // Update the selected address id on the current address
-    window._svea.controller.customerStore.getCurrent().setSelectedAddressId($F(this));
+    sveaController.customerStore.getCurrent().setSelectedAddressId($F(this));
 
     // The database needs to find out about the newly selected address
-    window._svea.controller.setupGui();
+    sveaController.setupGui();
+
+    // Update address values since that will not happen if svea isn't required
+    if (!sveaController.sveaAddressIsRequired()) {
+        sveaController.customerStore.getCurrent()._setAddressFieldValues();
+    }
 }
 
 $(document).observe('dom:loaded', function() {

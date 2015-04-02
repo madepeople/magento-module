@@ -17,9 +17,20 @@ $_country = Mage::getSingleton('checkout/session')
     ->getBillingAddress()
     ->getCountry();
 
+$_sveaHelper = Mage::helper('svea_webpay');
+
 ?>
 
 <div class="svea-ssn-container <?php echo $_class ?>">
+    <?php
+    /** The hidden input below is used to find out country in checkouts that
+     * doesn't display billing:country_id, like the magento old checkout
+     * (not onepage).
+     *
+     * See _sveaGetBillingCountryCode() in svea.js.
+     */
+    ?>
+    <input type="hidden" id="svea-billing-country-id-<?php echo $_code; ?>" disabled name="svea-billing-country-id" value="<?php echo $_country; ?>">
 
     <?php if ($_useCustomerTypeSelector): ?>
         <?php
@@ -36,14 +47,14 @@ $_country = Mage::getSingleton('checkout/session')
                        name="_svea_customerType"
                        value="0"
                        onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
-                       checked> <?php echo Mage::helper('svea_webpay')->__('private'); ?>
+                       checked> <?php echo $_sveaHelper->__('private'); ?>
             </label>
             <label>
                 <input type="radio"
                        class="payment_form_customerType_1"
                        name="_svea_customerType"
                        onclick="(function(){$$('body')[0].fire('svea:customerTypeChanged',$(this).value);}).call(this);"
-                       value="1"> <?php echo Mage::helper('svea_webpay')->__('company'); ?>
+                       value="1"> <?php echo $_sveaHelper->__('company'); ?>
             </label>
         </div>
     <?php endif ?>
@@ -56,8 +67,8 @@ $_country = Mage::getSingleton('checkout/session')
         <div class="field <?php if (in_array($_country, array('SE', 'DK'))): ?>float-btn<?php endif;?>">
             <label class="required" for="payment_form_ssn_<?php echo $_code ?>">
                 <em>*</em>
-                <span class="label_ssn_customerType_0"><?php echo Mage::helper('svea_webpay')->__('text_ssn') ?></span>
-                <span class="label_ssn_customerType_1" style="display:none;"><?php echo Mage::helper('svea_webpay')->__('text_vat_no') ?></span>
+                <span class="label_ssn_customerType_0"><?php echo $_sveaHelper->__('text_ssn') ?></span>
+                <span class="label_ssn_customerType_1" style="display:none;"><?php echo $_sveaHelper->__('text_vat_no') ?></span>
             </label>
 
             <div class="input-box">
@@ -74,7 +85,7 @@ $_country = Mage::getSingleton('checkout/session')
                             onclick="(function(){$$('body')[0].fire('svea:getAddressFromServer');})();"
                             type="button">
                         <span>
-                            <span class="inner"><?php echo Mage::helper('svea_webpay')->__('get_address'); ?></span>
+                            <span class="inner"><?php echo $_sveaHelper->__('get_address'); ?></span>
                             <span class="loader"><img src="<?php echo $this->getSkinUrl('svea/images/ajax-loader-white.gif') ?>"></span>
                         </span>
 
@@ -91,9 +102,9 @@ $_country = Mage::getSingleton('checkout/session')
             <?php
             ?>
 
-            <?php if ($this->helper('svea_webpay')->showSsnSelectorInPaymentMethod()): ?>
+            <?php if ($_sveaHelper->showSsnSelectorInPaymentMethod()): ?>
                 <div id="showAddressBox_<?php echo $_code ?>" class="field">
-                    <label class="sveaShowAdressesLabel" for="sveaShowAddresses_<?php echo $_code ?>" style="display:none"><?php echo Mage::helper('svea_webpay')->__('invoice_address'); ?></label>
+                    <label class="sveaShowAdressesLabel" for="sveaShowAddresses_<?php echo $_code ?>" style="display:none"><?php echo $_sveaHelper->__('invoice_address'); ?></label>
 
                     <div class="sveaShowAddresses"
                          id="sveaShowAddresses_<?php echo $_code ?>"></div>
@@ -107,7 +118,7 @@ $_country = Mage::getSingleton('checkout/session')
     <?php if (in_array($_country, array('NL', 'DE'))): ?>
         <div class="field forNLDE">
             <label for="payment_form_birthYear_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthyear'); ?>
+                   class="required"><em>*</em><?php echo $_sveaHelper->__('text_birthyear'); ?>
             </label>
 
             <div class="input-box">
@@ -126,7 +137,7 @@ $_country = Mage::getSingleton('checkout/session')
         </div>
         <div class="field forNLDE">
             <label for="payment_form_birthMonth_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthmonth'); ?>
+                   class="required"><em>*</em><?php echo $_sveaHelper->__('text_birthmonth'); ?>
             </label>
 
             <div class="input-box">
@@ -144,7 +155,7 @@ $_country = Mage::getSingleton('checkout/session')
         </div>
         <div class="field forNLDE">
             <label for="payment_form_birthDay_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_birthday'); ?>
+                   class="required"><em>*</em><?php echo $_sveaHelper->__('text_birthday'); ?>
             </label>
 
             <div class="input-box">
@@ -166,7 +177,7 @@ $_country = Mage::getSingleton('checkout/session')
     <?php if (in_array($_country, array('NL', 'DE', 'FI'))): ?>
         <div class="field forNLDEcompany" style="display:none;">
             <label for="payment_form_vatNo_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_vat_no'); ?>
+                   class="required"><em>*</em><?php echo $_sveaHelper->__('text_vat_no'); ?>
             </label>
 
             <div class="input-box">
@@ -183,7 +194,7 @@ $_country = Mage::getSingleton('checkout/session')
     <?php if ($_country == "NL"): ?>
         <div class="field forNLDE forNL">
             <label for="payment_form_initials_<?php echo $_code ?>"
-                   class="required"><em>*</em><?php echo Mage::helper('svea_webpay')->__('text_initials'); ?>
+                   class="required"><em>*</em><?php echo $_sveaHelper->__('text_initials'); ?>
             </label>
 
             <div class="input-box">
@@ -215,6 +226,7 @@ $_country = Mage::getSingleton('checkout/session')
     if (!window._svea.controller) {
         var config = {};
         config.getAddressUrl = '<?php echo $this->getUrl('svea_webpay/service/getAddresses', array('_secure' => true)) ?>';
+        config.useGetAddressForAllPaymentMethods = <?php echo $_sveaHelper->alwaysDisplaySsnSelector() ? 'true': 'false'; ?>;
         config.oneStepCheckoutSetMethodsSeparateUrl = '<?php echo $this->getUrl('onestepcheckout/ajax/set_methods_separate', array('_secure'=>true)); ?>';
         window._svea.controller = new _SveaController(config);
     }
