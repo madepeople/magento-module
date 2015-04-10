@@ -163,7 +163,6 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
      */
     public function getSveaPaymentObject($order, $additionalInfo = null)
     {
-        Mage::log($additionalInfo);
         $svea = parent::getSveaPaymentObject($order, $additionalInfo);
         //Add more customer info
         $countryCode = $order->getBillingAddress()->getCountryId();
@@ -251,8 +250,6 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
      */
     public function authorize(Varien_Object $payment, $amount)
     {
-        Mage::log(__METHOD__);
-
         $order = $payment->getOrder();
 
         $paymentInfo = $this->getInfoInstance();
@@ -273,12 +270,19 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             }
         }
         $paymentInfo->setAdditionalInformation($additionalInfo);
+        // Save the information in database
+        $resource = Mage::getSingleton('core/resource');
+        $tableName = $resource->getTableName('sales_flat_quote_payment');
+        $connection = $resource->getConnection('core_write');
+        $connection->query("UPDATE {$tableName} SET additional_information=:data WHERE payment_id=:paymentId LIMIT 1",
+                           array(
+                               'data' => serialize($additionalInfo),
+                               'paymentId' => $paymentInfo->getId(),
+                           ));
 
         // Object created in validate()
         $sveaObject = $order->getData('svea_payment_request');
         $sveaObject = $this->_choosePayment($sveaObject);
-
-        Mage::log($sveaObject);
 
         $this->_setAddressToSveaAddress($payment);
         $response = $sveaObject->doRequest();

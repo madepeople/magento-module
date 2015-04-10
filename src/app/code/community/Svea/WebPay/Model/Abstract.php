@@ -236,7 +236,7 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         // Add _POST data to additionalInformation if it's not already set in
         // payment.
         // This is because some countries like Finland doesn't make a getAddress()
-        // call so for onepage checkouts the svea_ info has to be taken from _POST
+        // call so for onepage checkouts the svea_info has to be taken from _POST
         // _but_ for multi-page checkouts that information has already been posted
         $postSveaInfo = @$_POST['payment'][@$_POST['payment']['method']];
         if (is_array($postSveaInfo)) {
@@ -249,6 +249,17 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             }
         }
 
+        $paymentInfo->setAdditionalInformation($additionalInformation);
+        // Save the information in database
+        $resource = Mage::getSingleton('core/resource');
+        $tableName = $resource->getTableName('sales_flat_quote_payment');
+        $connection = $resource->getConnection('core_write');
+        $connection->query("UPDATE {$tableName} SET additional_information=:data WHERE payment_id=:paymentId LIMIT 1",
+                           array(
+                               'data' => serialize($additionalInformation),
+                               'paymentId' => $paymentInfo->getId(),
+                           ));
+
         $sveaRequest = $this->getSveaPaymentObject($order, $additionalInformation);
         $sveaRequest = $this->_choosePayment($sveaRequest);
         $errors = $sveaRequest->validateOrder();
@@ -259,6 +270,8 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             }
             Mage::throwException($this->_getHelper()->__($exceptionString));
         }
+
+        // TODO: Should we save the new values here since we are validating them?
         return parent::validate();
     }
 
