@@ -169,7 +169,8 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         $company = $additionalInfo['svea_customerType'];
         $address = $order->getBillingAddress()->getStreetFull();
 
-        //Seperates the street from the housenumber according to testcases
+        // Seperates the street from the housenumber according to testcases
+        // XXX: Doesn't work with combined utf8 characters, for example 6fcc88
         $pattern = "/^(?:\s)*([0-9]*[A-ZÄÅÆÖØÜßäåæöøüa-z]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]+)(?:\s*)([0-9]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]*[^\s])?(?:\s)*$/";
         preg_match($pattern, $address, $addressArray);
         if (empty($addressArray)) {
@@ -200,8 +201,13 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             $svea = $svea->addCustomerDetails($item);
         } else {
             $item = WebPayItem::individualCustomer();
-            $item = $item->setNationalIdNumber($additionalInfo['svea_ssn'])
-                    ->setEmail($order->getBillingAddress()->getEmail())
+
+            // Not all countries has svea_ssn input
+            if (array_key_exists('svea_ssn', $additionalInfo)) {
+                $item = $item->setNationalIdNumber($additionalInfo['svea_ssn']);
+            }
+
+            $item = $item->setEmail($order->getBillingAddress()->getEmail())
                     ->setName($order->getBillingAddress()->getFirstname(), $order->getBillingAddress()->getLastname())
                     ->setStreetAddress($addressArray[1], $addressArray[2])
                     ->setZipCode($order->getBillingAddress()->getPostcode())
@@ -210,10 +216,25 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     ->setPhoneNumber($order->getBillingAddress()->getTelephone());
 
             if ($countryCode == "DE" || $countryCode == "NL") {
-                $item = $item->setBirthDate($additionalInfo['svea_birthYear'], $additionalInfo['svea_birthMonth'], $additionalInfo['svea_birthDay']);
+                $validBirthday = true;
+                foreach (array(
+                    'svea_birthYear',
+                    'svea_birthMonth',
+                    'svea_birthDay',
+                ) as $key) {
+                    if (!array_key_exists($key, $additionalInfo) || trim($additionalInfo[$key]) === "") {
+                        $validBirthday = false;
+                    }
+                }
+
+                if ($validBirthday) {
+                    $item = $item->setBirthDate($additionalInfo['svea_birthYear'], $additionalInfo['svea_birthMonth'], $additionalInfo['svea_birthDay']);
+                }
             }
             if ($countryCode == "NL") {
-                $item = $item->setInitials($additionalInfo['svea_initials']);
+                if (array_key_exists('svea_initials', $additionalInfo)) {
+                    $item = $item->setInitials($additionalInfo['svea_initials']);
+                }
             }
             $svea = $svea->addCustomerDetails($item);
         }
@@ -229,25 +250,40 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
      */
     public function authorize(Varien_Object $payment, $amount)
     {
-
         $order = $payment->getOrder();
 
-        // For Finland the values in _POST should be used, not
-        // previously stored information because no getAddress() request has been
-        // made.
-        if ($order->getBillingAddress()->getCountryId() == 'FI') {
-            $sveaInfo = @$_POST['payment'][@$_POST['payment']['method']];
-            if (!is_array($sveaInfo)) {
-                throw new Mage_Exception("Error when saving order: Svea invoice information not set in _POST");
-            } else {
-                $paymentInfo = $this->getInfoInstance();
-                $paymentInfo->setAdditionalInformation($sveaInfo);
+        $paymentInfo = $this->getInfoInstance();
+        $additionalInfo = $paymentInfo->getAdditionalInformation();
+
+        // Add _POST data to additionalInfo if it's not already set in payment
+        // This is because some countries like Finland doesn't make a getAddress()
+        // call so for onepage checkouts the svea_ info has to be taken from _POST
+        // _but_ for multi-page checkouts that information has already been posted
+        $postSveaInfo = @$_POST['payment'][@$_POST['payment']['method']];
+        if (is_array($postSveaInfo)) {
+            foreach ($postSveaInfo as $key => $value) {
+                if (strpos($key, 'svea_') === 0) {
+                    if (!array_key_exists($key, $additionalInfo)) {
+                        $additionalInfo[$key] = $value;
+                    }
+                }
             }
         }
+        $paymentInfo->setAdditionalInformation($additionalInfo);
+        // Save the information in database
+        $resource = Mage::getSingleton('core/resource');
+        $tableName = $resource->getTableName('sales_flat_quote_payment');
+        $connection = $resource->getConnection('core_write');
+        $connection->query("UPDATE {$tableName} SET additional_information=:data WHERE payment_id=:paymentId LIMIT 1",
+                           array(
+                               'data' => serialize($additionalInfo),
+                               'paymentId' => $paymentInfo->getId(),
+                           ));
 
         // Object created in validate()
         $sveaObject = $order->getData('svea_payment_request');
         $sveaObject = $this->_choosePayment($sveaObject);
+
         $this->_setAddressToSveaAddress($payment);
         $response = $sveaObject->doRequest();
         if ($response->accepted == 1) {

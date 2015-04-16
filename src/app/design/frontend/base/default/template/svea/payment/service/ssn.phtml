@@ -24,8 +24,8 @@ $_sveaHelper = Mage::helper('svea_webpay');
 <div class="svea-ssn-container <?php echo $_class ?>">
     <?php
     /** The hidden input below is used to find out country in checkouts that
-     * doesn't display billing:country_id, like the magento old checkout
-     * (not onepage).
+     * doesn't display billing:country_id or payment_method, like the magento
+     * old checkout (not onepage).
      *
      * See _sveaGetBillingCountryCode() in svea.js.
      */
@@ -221,6 +221,7 @@ $_sveaHelper = Mage::helper('svea_webpay');
     window._svea.useFormKey = <?php echo $_code === 'svea_info' ? 'true' : 'false' ?>;
     window._svea.formKey = <?php echo $_code === 'svea_info' ? "'$_code'" : 'null' ?>;
     window._svea.lockRequiredFields = <?php echo $this->shouldLockRequiredFields() ? 'true': 'false' ?>;
+    window._svea.alwaysDisplaySsnSelector = <?php echo json_encode($_sveaHelper->alwaysDisplaySsnSelector()); ?>;
 
     // Create svea controller if the controller doesn't exist
     if (!window._svea.controller) {
