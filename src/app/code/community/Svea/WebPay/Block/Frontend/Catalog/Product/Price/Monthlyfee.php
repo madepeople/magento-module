@@ -9,40 +9,7 @@ class Svea_WebPay_Block_Frontend_Catalog_Product_Price_Monthlyfee
 {
     protected $_template = 'svea/catalog/product/price.phtml';
 
-    protected $_campaignCollection;
     protected $_productPrice;
-
-    /**
-     * Get the campaigns valid for the current product. Does it make sense to
-     * cache this differently in large product listings? Perhaps fetch it all
-     * from the database and iterate through an array
-     *
-     * @return Varien_Data_Collection_Db
-     */
-    protected function _getCampaignCollection()
-    {
-        if (is_null($this->_campaignCollection)) {
-            $collection = Mage::getModel('svea_webpay/paymentplan')
-                    ->getCollection();
-
-            $price = Mage::helper('core')->currency($this->getProductPrice(), false, false);
-            $storeId = Mage::app()->getStore()->getStoreId();
-
-            /*$collection->getSelect()
-                    ->where('fromamount < ?', $price)
-                    ->orWhere('toamount > ?', $price)
-                    ->order('monthlyannuityfactor', Varien_Data_Collection::SORT_ORDER_ASC);*/
-            $collection->getSelect()
-                    ->where('(fromamount <= ? AND toamount >= ?)', $price)
-                    ->where('storeid = ?',$storeId)
-                    //->where('timestamp = ?',$latestTimestamp)
-                    ->order('monthlyannuityfactor', Varien_Data_Collection::SORT_ORDER_ASC);
-
-            $this->_campaignCollection = $collection;
-        }
-
-        return $this->_campaignCollection;
-    }
 
     /**
      * Get all current layout handles
@@ -75,29 +42,15 @@ class Svea_WebPay_Block_Frontend_Catalog_Product_Price_Monthlyfee
     }
 
     /**
-     * Public campaigns getter
+     * Get pricewidget data
      *
-     * @return Varien_Data_Collection_Db
-     */
-    public function getCampaigns()
-    {
-        return $this->_getCampaignCollection();
-    }
-
-    /**
-     * Get the cheapest campaign valid for the current product
+     * @see Svea_WebPay_Helper_Data::getPricewidgetData() for more information
      *
-     * @return bool|Varien_Object
+     * @return array
      */
-    public function getCheapestCampaign()
+    public function getPricewidgetData()
     {
-        $collection = $this->_getCampaignCollection();
-        if (!$collection->count()) {
-            return false;
-        }
-
-        return $collection->getIterator()
-                ->current();
+        return Mage::helper('svea_webpay')->getPricewidgetData($this->getProductPrice());
     }
 
     /**
@@ -134,27 +87,4 @@ class Svea_WebPay_Block_Frontend_Catalog_Product_Price_Monthlyfee
         return false;
     }
 
-    /**
-     * The text used to display monthly fee campaign information
-     *
-     * @param float $pricePerMonth
-     * @return string
-     */
-    public function getCampaignString($campaign)
-    {
-        if(empty($campaign))
-            return;
-
-        $formattedPrice = Mage::helper('core')->currency($this->getProductPrice(), false, false);
-        $monthlyAmount = $campaign->getMonthlyannuityfactor() * $formattedPrice;
-        $currentCurrency =  Mage::app()->getStore()
-                ->getCurrentCurrencyCode();
-
-        $finalPricePerMonth = ($currentCurrency == "EUR") ? number_format($monthlyAmount + $campaign->getNotificationfee(), 2) : number_format($monthlyAmount + $campaign->getNotificationfee(), 0);
-
-        return Mage::helper('svea_webpay')->__('from_about')
-                . ' ' . $finalPricePerMonth
-                . ' ' . Mage::app()->getStore()->getCurrentCurrencyCode()
-                . '/' . Mage::helper('svea_webpay')->__('month');
-    }
 }
