@@ -12,22 +12,28 @@ $_priceWidget = $this->getPricewidgetData();
 
     <ul id="svea-dropdown">
         <?php foreach ($_priceWidget['methods'] as $_method): ?>
-            <li class="svea-method">
-                <?php echo $_method['label'] ?>
-                <?php foreach ($_method['rows'] as $row): ?>
-                    <li class="svea-option">
-                        <span class="svea-label"><?php echo $row['label'] ?></span>
-                        <span class="svea-cost"><?php echo $row['cost'] ?></span>
-                    </li>
-                <?php endforeach ?>
+            <?php if ($_method['enabled']): ?>
+                <li class="svea-method">
+                    <?php echo $_method['label'] ?>
+                    <?php foreach ($_method['rows'] as $row): ?>
+                        <li class="svea-option">
+                            <span class="svea-label"><?php echo $row['label'] ?></span>
+                            <span class="svea-cost"><?php echo $row['cost'] ?></span>
+                        </li>
+                    <?php endforeach ?>
             </li>
+            <?php endif; ?>
         <?php endforeach ?>
     </ul>
 </div>
 <?php endif ?>
 
 <script>
-    jQuery('#svea-price-from').click(function() {
-        jQuery('#svea-campaign-info').toggleClass('svea-open');
+    document.observe("dom:loaded", function() {
+        $('svea-price-from').observe(
+            'click',
+            function() {
+                $('svea-campaign-info').toggleClassName('svea-open');
+            });
     });
 </script>

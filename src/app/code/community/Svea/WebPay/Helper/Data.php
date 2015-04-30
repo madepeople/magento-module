@@ -595,6 +595,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      *     'label' => 'From 10 kr',
      *     'methods' => array(
      *         'paymentplan' => array(
+     *             'enabled' => true,
      *             'label' => 'Svea delbetalning',
      *             'rows' => array(
      *                 array(
@@ -609,6 +610,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      *         ),
      *         'invoice' => array(
      *             'label' => 'Svea faktura',
+     *             'enabled' => true,
      *             'rows' => array(
      *                 'label' => 'Minimum amount to pay',
      *                 'cost' => '50 kr',
@@ -632,10 +634,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             'enabled' => false,
             'methods' => array(
                 'paymentplan' => array(
+                    'enabled' => false,
                     'label' => $helper->__('paymentplan_info'),
                     'rows' => array(),
                 ),
                 'invoice' => array(
+                    'enabled' => false,
                     'label' => $helper->__('invoice_info'),
                     'rows' => array(),
                 ),
@@ -651,6 +655,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         $pricePerMonthSuffix = "{$currencySymbol}/{$helper->__('month')}";
 
         foreach ($this->getPaymentPlansForCost($cost) as $paymentPlan) {
+            $widget['methods']['paymentplan']['enabled'] = true;
+
             $monthlyCost = $paymentPlan['pricePerMonth'];
             $widget['methods']['paymentplan']['rows'][] = array(
                 'label' => $paymentPlan['paymentPlan']->description,
@@ -673,6 +679,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         );
 
         if (array_key_exists($country, $lowestInvoiceAmount)) {
+            $widget['methods']['invoice']['enabled'] = true;
             $minimumCost = ceil(max($cost * 0.03, $lowestInvoiceAmount[$country]));
             $widget['methods']['invoice']['rows'][] = array(
                 'label' => $helper->__('Minimum amount to pay'),
