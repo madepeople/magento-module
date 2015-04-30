@@ -685,6 +685,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
         $widget['label'] = "{$helper->__('From')} {$lowestCost} {$currencySymbol}";
 
+        // Disable if there are no rows
+        if (empty($widget['methods']['invoice']['rows']) &&
+            empty($widget['methods']['paymentplan']['rows'])) {
+            $widget['enabled'] = false;
+        }
+
         return $widget;
     }
 
