@@ -1,0 +1,111 @@
+/* line 8, ../sass/price-widget.scss */
+#svea-campaign-info {
+  max-width: 100%;
+  position: relative;
+}
+/* line 12, ../sass/price-widget.scss */
+#svea-campaign-info #svea-price-from {
+  width: 150px;
+  max-width: 100%;
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #ddd;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  background: #f8f8f8;
+  padding: 5px 10px 3px 10px;
+  text-align: center;
+  cursor: pointer;
+}
+/* line 23, ../sass/price-widget.scss */
+#svea-campaign-info #svea-price-from img {
+  max-width: 50px;
+  display: block;
+  margin: 0 auto;
+}
+/* line 28, ../sass/price-widget.scss */
+#svea-campaign-info #svea-price-from span.svea-price {
+  border-top: 1px solid #ddd;
+  display: inline-block;
+  width: 100%;
+  margin-top: 4px;
+  padding-top: 4px;
+  line-height: 1;
+  font-weight: bold;
+  color: #002855;
+  position: relative;
+}
+/* line 38, ../sass/price-widget.scss */
+#svea-campaign-info #svea-price-from span.svea-price span.arrow {
+  position: absolute;
+  right: 0;
+}
+/* line 43, ../sass/price-widget.scss */
+#svea-campaign-info #svea-price-from:hover {
+  background: #eee;
+}
+/* line 47, ../sass/price-widget.scss */
+#svea-campaign-info ul#svea-dropdown {
+  display: none;
+  background: #fff;
+  position: absolute;
+  max-width: 100%;
+  width: 300px;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+  height: auto;
+  -moz-border-radius: 0px 5px 5px 5px;
+  -webkit-border-radius: 0px;
+  border-radius: 0px 5px 5px 5px;
+  margin-top: -1px;
+  -moz-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  -webkit-box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 40, 85, 0.1);
+  z-index: 10;
+  overflow: hidden;
+}
+/* line 61, ../sass/price-widget.scss */
+#svea-campaign-info ul#svea-dropdown li {
+  padding: 5px 10px;
+  border-bottom: 1px solid rgba(0, 40, 85, 0.1);
+  overflow: hidden;
+}
+/* line 65, ../sass/price-widget.scss */
+#svea-campaign-info ul#svea-dropdown li:last-child {
+  border-bottom: 0;
+}
+/* line 68, ../sass/price-widget.scss */
+#svea-campaign-info ul#svea-dropdown li.svea-method {
+  font-weight: bold;
+  font-size: 13px;
+  background: #002855;
+  color: white;
+}
+/* line 74, ../sass/price-widget.scss */
+#svea-campaign-info ul#svea-dropdown li .svea-label {
+  display: block;
+}
+/* line 77, ../sass/price-widget.scss */
+#svea-campaign-info ul#svea-dropdown li .svea-cost {
+  display: block;
+  font-weight: bold;
+  color: #002855;
+}
+/* line 85, ../sass/price-widget.scss */
+#svea-campaign-info.svea-open ul#svea-dropdown {
+  display: block !important;
+}
+/* line 88, ../sass/price-widget.scss */
+#svea-campaign-info.svea-open #svea-price-from {
+  -moz-border-radius: 5px 5px 0px 0px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px 5px 0px 0px;
+  border-bottom-color: #f8f8f8;
+}
