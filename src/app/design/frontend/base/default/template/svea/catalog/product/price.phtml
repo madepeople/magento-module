@@ -3,23 +3,31 @@ $_priceWidget = $this->getPricewidgetData();
 ?>
 
 <?php if ($this->isProductPage() && $_priceWidget['enabled']): ?>
-<div class="sveaCampainInfo">
+<div id="svea-campaign-info">
 
-    <span><?php echo $_priceWidget['label'] ?></span>
+    <div id="svea-price-from">
+        <img src="<?php echo Mage::getDesign()->getSkinUrl('svea/images/svea-webpay.png'); ?>">
+        <span class="svea-price"><?php echo $_priceWidget['label'] ?><span class="arrow">&#9662;</span></span>
+    </div>
 
-    <ul class="dropdown"><?php foreach ($_priceWidget['methods'] as $_method): ?>
-        <li>
-            <ul><?php echo $_method['label'] ?>
+    <ul id="svea-dropdown">
+        <?php foreach ($_priceWidget['methods'] as $_method): ?>
+            <li class="svea-method">
+                <?php echo $_method['label'] ?>
                 <?php foreach ($_method['rows'] as $row): ?>
-                <li>
-                    <span class="label"><?php echo $row['label'] ?></span>
-                    <span class="cost"><?php echo $row['cost'] ?></span>
-                </li>
+                    <li class="svea-option">
+                        <span class="svea-label"><?php echo $row['label'] ?></span>
+                        <span class="svea-cost"><?php echo $row['cost'] ?></span>
+                    </li>
                 <?php endforeach ?>
-            </ul>
-        </li>
+            </li>
         <?php endforeach ?>
     </ul>
-
 </div>
 <?php endif ?>
+
+<script>
+    jQuery('#svea-price-from').click(function() {
+        jQuery('#svea-campaign-info').toggleClass('svea-open');
+    });
+</script>
