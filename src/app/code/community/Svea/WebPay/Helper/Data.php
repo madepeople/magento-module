@@ -261,15 +261,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         // Possible discount
         $discount = abs($invoice->getDiscountAmount());
         if ($discount) {
-            if (!$taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
-                $orderTax = Mage::getModel('sales/order_tax')
-                    ->load($order->getId(), 'order_id');
-                $rate = $orderTax->getPercent();
-                $discount *= 1+($rate/100);
-                $calculator = Mage::getModel('core/calculator', $order->getStore());
-                $discount = $calculator->deltaRound($discount, true);
-            }
-
             $discountRow = WebPayItem::fixedDiscount()
                 ->setAmountIncVat($discount)
                 ->setName(Mage::helper('svea_webpay')->__('discount'))
@@ -414,15 +405,6 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         // Discount
         $discount = abs($creditMemo->getDiscountAmount());
         if ($discount > 0) {
-            if (!$taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
-                $orderTax = Mage::getModel('sales/order_tax')
-                    ->load($order->getId(), 'order_id');
-                $rate = $orderTax->getPercent();
-                $discount *= 1+($rate/100);
-                $calculator = Mage::getModel('core/calculator', $order->getStore());
-                $discount = $calculator->deltaRound($discount, true);
-            }
-
             $discountRow = WebPayItem::fixedDiscount()
                 ->setAmountIncVat($discount)
                 ->setName(Mage::helper('svea_webpay')->__('discount'))
