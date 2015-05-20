@@ -156,15 +156,6 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
         // Discount
         $discount = abs($order->getDiscountAmount());
         if ($discount > 0) {
-            if (!$taxConfig->applyTaxAfterDiscount($order->getStoreId())) {
-                $rate = $this->_getOrderMainTaxRate($order);
-
-                // Round this to two decimals using magento rounding functions
-                $discount *= 1+($rate/100);
-                $calculator = Mage::getModel('core/calculator', $order->getStore());
-                $discount = $calculator->deltaRound($discount, true);
-            }
-
             $discountRow = WebPayItem::fixedDiscount()
                 ->setName(Mage::helper('svea_webpay')->__('discount'))
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
