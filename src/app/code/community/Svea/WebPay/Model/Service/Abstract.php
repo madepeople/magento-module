@@ -169,18 +169,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         $company = $additionalInfo['svea_customerType'];
         $address = $order->getBillingAddress()->getStreetFull();
 
-        // Seperates the street from the housenumber according to testcases
-        // XXX: Doesn't work with combined utf8 characters, for example 6fcc88
-        $pattern = "/^(?:\s)*([0-9]*[A-ZÄÅÆÖØÜßäåæöøüa-z]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]+)(?:\s*)([0-9]*\s*[A-ZÄÅÆÖØÜßäåæöøüa-z]*[^\s])?(?:\s)*$/";
-        preg_match($pattern, $address, $addressArray);
-        if (empty($addressArray)) {
-            // Fallback if all fails (which it does)
-            $addressArray = array(null, $address, "");
-        }
-        if (!array_key_exists(2, $addressArray)) {
-            // Fix for addresses without house number
-            $addressArray[2] = "";
-        }
+        $addressArray = \Svea\Helper::splitStreetAddress($address);
 
         if ($company == "1") {
             $item = WebPayItem::companyCustomer();
