@@ -1269,7 +1269,9 @@ $(document).observe('dom:loaded', function() {
             _oldStreamcheckoutSwitchMethod = Streamcheckout.prototype.switchPaymentBlock;
 
             Streamcheckout.prototype.switchPaymentBlock = function(method) {
-                window._svea.controller.changeCb();
+                if ('_svea' in window) {
+                    window._svea.controller.changeCb();
+                }
                 return _oldStreamcheckoutSwitchMethod.call(this, method);
             };
         }
