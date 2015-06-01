@@ -78,6 +78,10 @@ $_sveaHelper = Mage::helper('svea_webpay');
                        name="payment[<?php echo $_code ?>][svea_ssn]"/>
             </div>
 
+            <?php if ($_sveaHelper->createOrderOverwritesAddressForCountry($_country)): ?>
+                <div style="margin:10px 0"><?php echo $this->__('The Invoice will be sent to the address registered to your social security number'); ?></div>
+            <?php endif ?>
+
             <!-- Hide get address button for FI, NL, NO and DE -->
             <?php if (in_array($_country, array('SE', 'DK'))): ?>
                 <div id="payment-method-buttons-container-<?php echo $_code ?>" class="field get-address-btn">

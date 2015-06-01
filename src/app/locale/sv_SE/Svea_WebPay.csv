@@ -70,3 +70,4 @@
 "Error_129","Svea error %s : Mer än en transaktion hittad för angivet kundreferensnummer";
 
 "No customer found","Det går ej att hitta kunden"
+"The Invoice will be sent to the address registered to your social security number","Fakturan skickas till folkbokföringsadressen"

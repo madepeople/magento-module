@@ -40,6 +40,36 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
+     * List of country codes for countries where the result of calling
+     * createOrder will replace any entered address with the result from
+     * createOrder.
+     *
+     * @var array
+     */
+    private $_createOrderOverwritesAddressCountries = array(
+        'SE',
+        'EN',
+        'FI',
+        'NO',
+        'DK',
+        'DE',
+        'NL',
+    );
+
+
+    /**
+     * Check if a call to createOrder will overwrite the entered address
+     *
+     * @param $countryCode string Country code
+     *
+     * @returns bool
+     */
+    public function createOrderOverwritesAddressForCountry($countryCode)
+    {
+        return in_array(strtoupper($countryCode), $this->_createOrderOverwritesAddressCountries);
+    }
+
+    /**
      * Creates Svea Create order object with Config auth values
      *
      * @param type $order
