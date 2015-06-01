@@ -300,57 +300,7 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 $rawDetails[$key] = $val;
             }
 
-            // Set billing address for FI customers
-            // getAddress() is not called for FI customers according to SVEA
-            // specifications so the billing address should be overwritten
-            // with the response address even though the customer is not
-            // notified about that.
-            $quote = $order->getQuote();
-            $quoteBillingAddress = $quote->getBillingAddress();
-            $addresses = array(
-                $order->getBillingAddress(),
-                $quoteBillingAddress,
-                $order->getShippingAddress(),
-                $quote->getShippingAddress(),
-            );
-            if ($quoteBillingAddress->getCountryId() === 'FI') {
-                $identity = $response->customerIdentity;
-                $identityParameterMap = array(
-                    'firstName' => 'Firstname',
-                    'lastName' => 'Lastname',
-                    'phoneNumber' => 'Telephone',
-                    'zipCode' => 'Postcode',
-                    'locality' => 'City',
-                    'street' => 'Street',
-                );
-
-                if ($identity->customerType === 'Company') {
-                    $identityParameterMap['fullName'] = 'Company';
-                }
-
-                foreach ($identityParameterMap as $source => $target) {
-                    if (!isset($identity->$source)) {
-                        continue;
-                    }
-                    $method = "set{$target}";
-                    foreach ($addresses as $address) {
-                        $address->$method($identity->$source);
-                    }
-                }
-
-                // The response for individual only has fullName set -
-                // explode on comma and set firstName/lastName
-                if ($identity->customerType === 'Individual') {
-                    list($lastName, $firstName) = explode(',', $identity->fullName);
-                    foreach ($addresses as $address) {
-                        $address->setFirstname($firstName);
-                        $address->setLastname($lastName);
-                    }
-                }
-                foreach ($addresses as $address) {
-                    $address->save();
-                }
-            }
+            $this->_replaceBillingAddress($order, $response);
 
             $payment->setTransactionId($response->sveaOrderId)
                     ->setIsTransactionClosed(false)
@@ -363,6 +313,68 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
             $order->addStatusToHistory($order->getStatus(), $errorTranslated, false);
 
             Mage::throwException($errorTranslated);
+        }
+    }
+
+    /**
+     * Replace all order addresses with the address returned in a svea response
+     *
+     * @param $order The order
+     * @param $response A Svea createOrder response
+     */
+    private function _replaceBillingAddress($order, $response)
+    {
+        // Set billing address for FI customers
+        // getAddress() is not called for FI customers according to SVEA
+        // specifications so the billing address should be overwritten
+        // with the response address even though the customer is not
+        // notified about that.
+        $quote = $order->getQuote();
+        $quoteBillingAddress = $quote->getBillingAddress();
+        $addresses = array(
+            $order->getBillingAddress(),
+            $quoteBillingAddress,
+            $order->getShippingAddress(),
+            $quote->getShippingAddress(),
+        );
+
+        if (Mage::helper('svea_webpay')->createOrderOverwritesAddressForCountry($quoteBillingAddress->getCountryId())) {
+            $identity = $response->customerIdentity;
+            $identityParameterMap = array(
+                'firstName' => 'Firstname',
+                'lastName' => 'Lastname',
+                'phoneNumber' => 'Telephone',
+                'zipCode' => 'Postcode',
+                'locality' => 'City',
+                'street' => 'Street',
+            );
+
+            if ($identity->customerType === 'Company') {
+                $identityParameterMap['fullName'] = 'Company';
+            }
+
+            foreach ($identityParameterMap as $source => $target) {
+                if (!isset($identity->$source)) {
+                    continue;
+                }
+                $method = "set{$target}";
+                foreach ($addresses as $address) {
+                    $address->$method($identity->$source);
+                }
+            }
+
+            // The response for individual only has fullName set -
+            // explode on comma and set firstName/lastName
+            if ($identity->customerType === 'Individual') {
+                list($lastName, $firstName) = explode(',', $identity->fullName);
+                foreach ($addresses as $address) {
+                    $address->setFirstname($firstName);
+                    $address->setLastname($lastName);
+                }
+            }
+            foreach ($addresses as $address) {
+                $address->save();
+            }
         }
     }
 
