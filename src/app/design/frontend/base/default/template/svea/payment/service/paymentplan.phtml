@@ -99,8 +99,9 @@ $_ssnHtml = $this->getSsnHtml();
                 } else {
                     $('paymentplan_cost_text').show();
                     $('paymentplan_cost').update(available_campaigns[i].amount);
-                    $('paymentplan_initial_fee_text').down('span').update(available_campaigns[i].initial_fee);
                 }
+                $('paymentplan_initial_fee_text').down('span').update(available_campaigns[i].initial_fee);
+
                 // Convert to int here to check if there is an initial fee.
                 // If 0 < initial_fee < 0.49 this is a bug.
                 if (parseFloat(available_campaigns[i].initial_fee) !== 0) {
@@ -109,11 +110,11 @@ $_ssnHtml = $this->getSsnHtml();
                     $('paymentplan_initial_fee_text').hide();
                 }
 
-                if ($('paymentplan_cost_text').visible()
-                    && $('paymentplan_initial_fee_text').visible()) {
-                    $('paymentplan_info').show();
-                } else {
+                if (!$('paymentplan_cost_text').visible()
+                    && !$('paymentplan_initial_fee_text').visible()) {
                     $('paymentplan_info').hide();
+                } else {
+                    $('paymentplan_info').show();
                 }
             }
         }
