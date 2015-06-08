@@ -58,11 +58,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
     }
 
     /**
-     * Get paymentplans that are valid for a specific quote
+     * Get paymentplans that are valid for a cost
      *
      * The arrays in the result has the following keys:
      *
      * - pricePerMonth: Price per month including notificationFee
+     * - contractLength: Number of months the contract will run for
      * - campaignCode: The campaign code
      * - isCampaign: If this is a campaign
      * - description: Translated free text description
@@ -70,15 +71,17 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      * - notificationFee: Notification fee
      * - initialFee: Initial fee
      *
-     * @param $quote The quote
+     * @param $cost The cost in current currency. The value used will be the ciel:ed value of $cost.
+     * @param $storeId The store id
      *
      * @returns array List of arrays.
      */
-    public function getPaymentPlansForQuote($quote)
+    public function getPaymentPlansForCost($cost, $storeId=null)
     {
-        // TODO: Should we also round total and shipping amount?
-        $orderTotal = round($quote->getGrandTotal() - $quote->getShippingAmount());
-        $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams($quote->getStoreId());
+        if ($storeId === null) {
+            $storeId = Mage::app()->getStore()->getId();
+        }
+        $latestTimestamp = $this->getLatestUpdateOfPaymentPlanParams($storeId);
 
         $paymentPlans = array();
         $paymentPlansAsObjects = new stdClass();
@@ -93,11 +96,12 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
         $validPaymentPlans = array();
 
-        foreach(WebPay::paymentPlanPricePerMonth($orderTotal, $paymentPlansAsObjects)->values as $validCampaign) {
+        foreach(WebPay::paymentPlanPricePerMonth($cost, $paymentPlansAsObjects)->values as $validCampaign) {
             $campaignCode = $validCampaign['campaignCode'];
             $paymentPlan = $paymentPlans[$campaignCode];
 
             $validCampaign['paymentPlan'] = $paymentPlan;
+            $validCampaign['contractLength'] = $paymentPlan->contractlength;
             $validCampaign['notificationFee'] = $paymentPlan->notificationfee;
             $validCampaign['initialFee'] = $paymentPlan->initialfee;
 
@@ -111,6 +115,21 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $validPaymentPlans;
+    }
+
+    /**
+     * Get paymentplans that are valid for a specific quote
+     *
+     * @param $quote The quote
+     *
+     * @returns array List of arrays, see self::getPaymentPlansForCost()
+     */
+    public function getPaymentPlansForQuote($quote)
+    {
+
+        // TODO: Should we also round total and shipping amount?
+        return $this->getPaymentPlansForCost(round($quote->getGrandTotal() - $quote->getShippingAmount()));
+
     }
 
     /**
@@ -535,6 +554,153 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
     public function lockRequiredFields()
     {
         return Mage::getStoreConfigFlag('payment/svea_general/lock_required_fields');
+    }
+
+    /**
+     * Get price-widget data for a specific price
+     *
+     * The price widget displays different partpayment combinations and minimum
+     * invoice-payment for a specific price.
+     *
+     * Returns an array which has at least one key, 'enabled' set.
+     * If 'enabled' is FALSE the widget should not be displayed.
+     * If 'enabled' is TRUE the widget should be displayed. It will have 'label',
+     * 'invoice' and 'paymentplan' set.
+     *
+     * - The label is what should be displayed in the button.
+     * - Both 'paymentplan' and 'invoice' are arrays with 'label' and 'rows' set
+     * - Each row will have 'label' and 'cost' set, where cost is a formatted string.
+     * Example result:
+     *
+     * array(
+     *     'enabled' => true,
+     *     'label' => 'From 10 kr',
+     *     'methods' => array(
+     *         'paymentplan' => array(
+     *             'enabled' => true,
+     *             'label' => 'Svea delbetalning',
+     *             'rows' => array(
+     *                 array(
+     *                     'label' => '12 MÅNADER LÅN',
+     *                     'cost' => '16 kr/månad',
+     *                 ),
+     *                 array(
+     *                     'label' => '24 MÅNADER LÅN',
+     *                     'cost' => '10 kr/månad',
+     *                 ),
+     *             ),
+     *         ),
+     *         'invoice' => array(
+     *             'label' => 'Svea faktura',
+     *             'enabled' => true,
+     *             'rows' => array(
+     *                 'label' => 'Minimum amount to pay',
+     *                 'cost' => '50 kr',
+     *             ),
+     *         ),
+     *     ),
+     * );
+     *
+     * @param $cost float The cost that the widget data should be configured for
+     *
+     * @return array
+     */
+
+    public function getPricewidgetData($cost)
+    {
+        $helper = Mage::helper('svea_webpay');
+        $lowestCost = null;
+        $currencySymbol = Mage::app()->getLocale()->currency(Mage::app()->getStore()->getCurrentCurrencyCode())->getSymbol();
+
+        $widget = array(
+            'enabled' => false,
+            'methods' => array(
+                'paymentplan' => array(
+                    'enabled' => false,
+                    'label' => $helper->__('paymentplan_info'),
+                    'rows' => array(),
+                ),
+                'invoice' => array(
+                    'enabled' => false,
+                    'label' => $helper->__('invoice_info'),
+                    'rows' => array(),
+                ),
+            ),
+        );
+
+        if (!$this->paymentplanIsEnabled() && !$this->invoiceIsEnabled()) {
+            return $widget;
+        }
+
+        $widget['enabled'] = true;
+
+        $pricePerMonthSuffix = "{$currencySymbol}/{$helper->__('month')}";
+
+        foreach ($this->getPaymentPlansForCost($cost) as $paymentPlan) {
+            $widget['methods']['paymentplan']['enabled'] = true;
+
+            $monthlyCost = $paymentPlan['pricePerMonth'];
+            $widget['methods']['paymentplan']['rows'][] = array(
+                'label' => $paymentPlan['paymentPlan']->description,
+                'cost' => "{$monthlyCost} {$pricePerMonthSuffix}",
+            );
+
+            if ($lowestCost === null || $lowestCost > $monthlyCost) {
+                $lowestCost = $monthlyCost;
+            }
+        }
+
+        $locale = Mage::app()->getLocale()->getLocaleCode();
+        $country = substr($locale, strlen($locale) - 2, 2);
+        $lowestInvoiceAmount = array(
+            'SE' => 50,
+            'NO' => 100,
+            'DK' => 100,
+            'FI' => 10,
+            'NL' => 10,
+        );
+
+        if (array_key_exists($country, $lowestInvoiceAmount)) {
+            $widget['methods']['invoice']['enabled'] = true;
+            $minimumCost = ceil(max($cost * 0.03, $lowestInvoiceAmount[$country]));
+            $widget['methods']['invoice']['rows'][] = array(
+                'label' => $helper->__('Minimum amount to pay'),
+                'cost' => "{$minimumCost} {$currencySymbol}",
+            );
+            if ($lowestCost === null || $lowestCost > $minimumCost) {
+                $lowestCost = $minimumCost;
+            }
+        }
+
+        $widget['label'] = "{$helper->__('From')} {$lowestCost} {$currencySymbol}";
+
+        // Disable if there are no rows
+        if (empty($widget['methods']['invoice']['rows']) &&
+            empty($widget['methods']['paymentplan']['rows'])) {
+            $widget['enabled'] = false;
+        }
+
+        return $widget;
+    }
+
+    /**
+     * Check if paymentplan is enabled
+     *
+     * @return bool
+     */
+    public function paymentplanIsEnabled()
+    {
+        return Mage::getStoreConfig('payment/svea_paymentplan/active') === '1';
+    }
+
+    /**
+     * Check if invoice is enabled
+     *
+     * @return bool
+     */
+    public function invoiceIsEnabled()
+    {
+        return Mage::getStoreConfig('payment/svea_invoice/active') === '1';
     }
 
 }

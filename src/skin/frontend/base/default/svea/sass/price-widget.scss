@@ -1,0 +1,93 @@
+// Svea product view price widget
+/////////////////////////////////////
+
+@import "compass/css3";
+
+$svea-blue: #002855;
+
+#svea-campaign-info {
+    //background:red;
+    max-width: 100%;
+    position: relative;
+    #svea-price-from {
+        width:150px;
+        max-width: 100%;
+        @include box-shadow(0px 1px 3px rgba(0,0,0,.1));
+        border:1px solid #ddd;
+        @include border-radius(5px);
+        @include box-sizing(border-box);
+        background:#f8f8f8;
+        padding:5px 10px 3px 10px;
+        text-align: center;
+        cursor: pointer;
+        img {
+            max-width: 50px;
+            display: block;
+            margin:0 auto;
+        }
+        span.svea-price {
+            border-top:1px solid #ddd;
+            display: inline-block;
+            width:100%;
+            margin-top:4px;
+            padding-top: 4px;
+            line-height: 1;
+            font-weight: bold;
+            color:$svea-blue;
+            position: relative;
+            span.arrow {
+                position: absolute;
+                right:0;
+            }
+        }
+        &:hover {
+            background:#eee;
+        }
+    }
+    ul#svea-dropdown {
+        display:none;
+        background:#fff;
+        position: absolute;
+        max-width:100%;
+        width:300px;
+        @include box-sizing(border-box);
+        height:auto;
+        @include border-radius(0px 5px 5px 5px);
+        margin-top: -1px;
+        @include box-shadow(0px 1px 3px rgba(0,0,0,.1));
+        border:1px solid rgba($svea-blue,0.1);
+        z-index: 10;
+        overflow: hidden;
+        li {
+            padding:5px 10px;
+            border-bottom: 1px solid rgba($svea-blue,0.1);
+            overflow:hidden;
+            &:last-child {
+                border-bottom: 0;
+            }
+            &.svea-method {
+                font-weight: bold;
+                font-size: 13px;
+                background: $svea-blue;
+                color: white;
+            }
+            .svea-label {
+                display: block;
+            }
+            .svea-cost {
+                display:block;
+                font-weight: bold;
+                color: $svea-blue;
+            }
+        }
+    }
+    &.svea-open {
+        ul#svea-dropdown {
+            display: block !important;
+        }
+        #svea-price-from {
+            @include border-radius(5px 5px 0px 0px);
+            border-bottom-color: #f8f8f8;
+        }
+    }
+}

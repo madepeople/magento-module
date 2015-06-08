@@ -8,4 +8,15 @@
             </block>
         </reference>
     </streamcheckout_index_index>
+
+    <!-- The price-widget can be on any page so the css is added to default -->
+    <default>
+        <reference name="head">
+            <action method="addItem" ifconfig="payment/svea_paymentplan/active">
+                <type>skin_css</type>
+                <name>svea/css/price-widget.css</name>
+            </action>
+        </reference>
+    </default>
+
 </layout>
