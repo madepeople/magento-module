@@ -30,6 +30,24 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
     protected $_canCreateBillingAgreement = false;
     protected $_canManageRecurringProfiles = false;
 
+    /**
+     * There is no point of having the svea methods available when
+     * grand total is 0
+     */
+    public function isAvailable($quote = null)
+    {
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
+        $grandTotal = (float)$quote->getGrandTotal();
+        if ($grandTotal === 0.0) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function isTest()
     {
         return $this->getConfigData('test');
