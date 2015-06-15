@@ -155,26 +155,35 @@
 #streamcheckout .form-list .svea-ssn-container .field.float-btn .get-address-btn button span {
   line-height: 25px !important;
 }
-/* line 40, ../sass/partials/_streamcheckout.scss */
+/* line 36, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list .svea-ssn-container .address-disclaimer {
+  clear: both;
+  margin: 10px 0;
+}
+/* line 41, ../sass/partials/_streamcheckout.scss */
+#streamcheckout .form-list .svea-ssn-container .sveaShowAddresses label {
+  font-weight: bold;
+}
+/* line 49, ../sass/partials/_streamcheckout.scss */
 #streamcheckout #payment-method-block .sp-methods {
   border-bottom: 1px solid #eee;
 }
-/* line 42, ../sass/partials/_streamcheckout.scss */
+/* line 51, ../sass/partials/_streamcheckout.scss */
 #streamcheckout #payment-method-block .sp-methods dt {
   border-top: 1px solid #eee;
   padding: 5px 0;
 }
-/* line 46, ../sass/partials/_streamcheckout.scss */
+/* line 55, ../sass/partials/_streamcheckout.scss */
 #streamcheckout #payment-method-block .sp-methods dd {
   margin-left: 18px !important;
 }
-/* line 49, ../sass/partials/_streamcheckout.scss */
+/* line 58, ../sass/partials/_streamcheckout.scss */
 #streamcheckout #payment-method-block .sp-methods .svea-payment-logos {
   margin-left: 0;
   float: right;
   max-width: 100px;
 }
-/* line 53, ../sass/partials/_streamcheckout.scss */
+/* line 62, ../sass/partials/_streamcheckout.scss */
 #streamcheckout #payment-method-block .sp-methods .svea-payment-logos img {
   max-width: 100%;
   float: left !important;
