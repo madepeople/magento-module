@@ -52,7 +52,12 @@ class Svea_WebPay_Model_Adminhtml_Observer extends Mage_Core_Model_Observer
                 curl_setopt($ch, CURLOPT_USERAGENT, "Svea WebPay module");
                 curl_setopt($ch, CURLOPT_TIMEOUT, 15);
                 $releases = curl_exec($ch);
+                $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 curl_close($ch);
+
+                if ($status >= 400) {
+                    return;
+                }
 
                 if (false === $releases) {
                     $this->_saveReleasesToCache(json_encode(array()));
