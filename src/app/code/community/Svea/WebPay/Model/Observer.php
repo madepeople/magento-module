@@ -27,18 +27,20 @@ class Svea_WebPay_Model_Observer
 
         $countryId = $order->getBillingAddress()->getCountryId();
 
-        if ($countryId === 'FI') {
-            $helper = Mage::helper('svea_webpay');
-            $additionalData = $payment->getAdditionalInformation();
-            if ((int)$additionalData['svea_customerType'] === 0) {
-                $ssnLabel = $helper->__('text_ssn');
-                $customerType = $helper->__('private');
-            } else {
-                $ssnLabel = $helper->__('text_vat_no');
-                $customerType = $helper->__('company');
+        if (!in_array($payment->getMethod(), array('svea_cardpayment', 'svea_directpayment'))) {
+            if ($countryId === 'FI') {
+                $helper = Mage::helper('svea_webpay');
+                $additionalData = $payment->getAdditionalInformation();
+                if ((int)$additionalData['svea_customerType'] === 0) {
+                    $ssnLabel = $helper->__('text_ssn');
+                    $customerType = $helper->__('private');
+                } else {
+                    $ssnLabel = $helper->__('text_vat_no');
+                    $customerType = $helper->__('company');
+                }
+                $transport->setData($helper->__('customer_type'), $customerType);
+                $transport->setData($ssnLabel, $additionalData['svea_ssn']);
             }
-            $transport->setData($helper->__('customer_type'), $customerType);
-            $transport->setData($ssnLabel, $additionalData['svea_ssn']);
         }
     }
 
