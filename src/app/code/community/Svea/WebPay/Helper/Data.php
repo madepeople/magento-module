@@ -16,6 +16,34 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 {
 
     /**
+     * cdn domain for logos
+     *
+     * @var string
+     */
+    const LOGO_CND_DOMAIN = 'cdn.svea.com';
+
+    /**
+     * Constant for small logo size
+     *
+     * @var string
+     */
+    const LOGO_SIZE_SMALL = 'small';
+
+    /**
+     * Constant for medium logo size
+     *
+     * @var string
+     */
+    const LOGO_SIZE_MEDIUM = 'medium';
+
+    /**
+     * Constant for large logo size
+     *
+     * @var string
+     */
+    const LOGO_SIZE_LARGE = 'large';
+
+    /**
      * Get Addresses from Svea API
      *
      * @param type $ssn
@@ -731,6 +759,74 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
     public function invoiceIsEnabled()
     {
         return Mage::getStoreConfig('payment/svea_invoice/active') === '1';
+    }
+
+    /**
+     * Get URL to the logo that should be used
+     *
+     * If the session has a quote with a valid shipping address country id that
+     * country will be used to find out which logo should be used.
+     *
+     * If there is no valid shipping address country.
+     *
+     * @throws Mage_Exception If $size isn't a valid size
+     *
+     * @param size One of then self::LOGO_SIZE_ constants
+     *
+     * @returns string
+     */
+    public function getLogoUrl($size=self::LOGO_SIZE_SMALL)
+    {
+
+        if (!in_array($size, array(self::LOGO_SIZE_SMALL,
+                                   self::LOGO_SIZE_MEDIUM,
+                                   self::LOGO_SIZE_LARGE))) {
+            throw new Mage_Exception("Not a valid logo size");
+        }
+
+        $color = trim(Mage::getStoreConfig('payment/svea_general/logo_color'));
+        if (!in_array($color, array('rgb', 'bw', 'bw-neg'))) {
+            $color = "rgb";
+        }
+
+        $quote = Mage::getSingleton('checkout/session')->getQuote();
+        if ($quote) {
+            $countryCode = $quote->getShippingAddress()->getCountryId();
+        }
+
+        switch (strtoupper($countryCode)) {
+            case 'SE':
+            case 'FI':
+            case 'DE':
+                $type = 'ekonomi';
+                break;
+            case 'NO':
+            case 'DK':
+            case 'NL':
+                $type = 'finans';
+                break;
+            default:
+                $type = trim(Mage::getStoreConfig('payment/svea_general/default_logo'));
+                if (!$type) {
+                    $type = 'ekonomi';
+                }
+                break;
+        }
+
+        if (!in_array($type, array('ekonomi', 'finans'))) {
+            $type = 'ekonomi';
+        }
+
+        switch ($type) {
+        case 'ekonomi':
+            $path = "/sveaekonomi/{$color}_ekonomi_{$size}.png";
+            break;
+        case 'finans':
+            $path = "/sveafinans/{$color}_svea-finans_{$size}.png";
+            break;
+        }
+
+        return "//" . self::LOGO_CND_DOMAIN . $path;
     }
 
 }

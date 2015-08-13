@@ -87,4 +87,13 @@ class Svea_WebPay_Block_Frontend_Catalog_Product_Price_Monthlyfee
         return false;
     }
 
+    /**
+     * Get URL for the logo that should be displayed
+     */
+    public function getLogoUrl()
+    {
+
+        return Mage::helper('svea_webpay')->getLogoUrl(Svea_WebPay_Helper_Data::LOGO_SIZE_MEDIUM);
+    }
+
 }

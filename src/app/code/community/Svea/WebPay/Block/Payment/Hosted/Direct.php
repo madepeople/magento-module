@@ -7,6 +7,7 @@ class Svea_WebPay_Block_Payment_Hosted_Direct extends Svea_WebPay_Block_Payment_
 {
 
     protected $_template = 'svea/payment/hosted.phtml';
-    protected $_logoCode = 'svea_directbank';
+
+    protected $_hasLogo = false;
 
 }
