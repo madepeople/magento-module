@@ -109,9 +109,11 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
                 continue;
             }
 
+
             // Default to the item price
             $name = $item->getName();
             $price = $item->getPrice();
+
             $priceInclTax = $item->getPriceInclTax();
             $taxPercent = $item->getTaxPercent();
             if (!(int)$taxPercent) {
@@ -133,9 +135,17 @@ abstract class Svea_WebPay_Model_Abstract extends Mage_Payment_Model_Method_Abst
             }
 
             if ($taxPercent === false) {
-                // If it's a bundle item we have to calculate the tax from
-                // the including/excluding tax values
-                $taxPercent = round(100*(($priceInclTax/$price)-1));
+                if ((float)$price === 0.0) {
+                    if ((float)$priceInclTax === 0.0) {
+                        $taxPercent = 0;
+                    } else {
+                        throw new Mage_Exception("Price is 0 but priceIncTax is not");
+                    }
+                } else {
+                    // If it's a bundle item we have to calculate the tax from
+                    // the including/excluding tax values
+                    $taxPercent = round(100*(($priceInclTax/$price)-1));
+                }
             }
 
             $qty = get_class($item) == 'Mage_Sales_Model_Quote_Item' ? $item->getQty() : $item->getQtyOrdered();
