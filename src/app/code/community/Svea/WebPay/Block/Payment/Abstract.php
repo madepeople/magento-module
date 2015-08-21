@@ -7,14 +7,7 @@
 abstract class Svea_WebPay_Block_Payment_Abstract extends Mage_Payment_Block_Form
 {
 
-    /**
-     * Payment method logo code
-     *
-     * If not set no logo will be used.
-     *
-     * @string|null
-     */
-    protected $_logoCode = null;
+    protected $_hasLogo = false;
 
     /**
      * Get URL to payment method logo
@@ -23,14 +16,11 @@ abstract class Svea_WebPay_Block_Payment_Abstract extends Mage_Payment_Block_For
      */
     public function getLogoUrl()
     {
-
-        if ($this->_logoCode !== null) {
-            $lang = strtoupper(Mage::helper('svea_webpay')->__('lang_code'));
-            return Mage::getBaseUrl('media') . "svea/{$lang}/{$this->_logoCode}.png";
+        if ($this->_hasLogo) {
+            return Mage::helper('svea_webpay')->getLogoUrl(Svea_Webpay_Helper_Data::LOGO_SIZE_SMALL);
         } else {
             return null;
         }
-
     }
 
     protected function _construct()

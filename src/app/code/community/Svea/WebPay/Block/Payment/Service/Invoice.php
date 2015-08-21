@@ -7,7 +7,7 @@ class Svea_WebPay_Block_Payment_Service_Invoice
     extends Svea_WebPay_Block_Payment_Service_Abstract
 {
 
-    protected $_logoCode = 'svea_invoice';
+    protected $_hasLogo = true;
 
     protected function _construct()
     {

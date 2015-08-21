@@ -7,7 +7,7 @@ class Svea_WebPay_Block_Payment_Service_PaymentPlan extends Svea_WebPay_Block_Pa
 {
 
     protected $_template = 'svea/payment/service/paymentplan.phtml';
-    protected $_logoCode = 'svea_paymentplan';
+    protected $_hasLogo = true;
 
     /**
      * Get list of paymentplans that are valid for the current quote
