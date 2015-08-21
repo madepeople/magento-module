@@ -44,6 +44,38 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
     const LOGO_SIZE_LARGE = 'large';
 
     /**
+     * Get the language code used in the paypage, by locale.
+     *
+     * @param $localeCode
+     * @return mixed
+     */
+    public function getLanguageCode($localeCode)
+    {
+        $localeLangMapping = array(
+            'da_DK' => 'da',
+            'de_DE' => 'de',
+            'en_US' => 'en',
+            'fi_FI' => 'fi',
+            'nl_NL' => 'nl',
+            'nb_NO' => 'no',
+            'nn_NO' => 'no',
+            'no_NO' => 'no',
+            'sv_SE' => 'sv',
+            'fr_FR' => 'fr',
+            'it_IT' => 'it',
+            'es_ES' => 'es',
+        );
+
+        if (isset($localeLangMapping[$localeCode])) {
+            $lang = $localeLangMapping[$localeCode];
+            return $lang;
+        }
+
+        // Integration package fallback
+        return $localeCode;
+    }
+
+    /**
      * Get Addresses from Svea API
      *
      * @param type $ssn
