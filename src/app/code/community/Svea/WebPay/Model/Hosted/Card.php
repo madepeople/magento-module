@@ -44,7 +44,7 @@ class Svea_WebPay_Model_Hosted_Card extends Svea_WebPay_Model_Hosted_Abstract
         // In Denmark there might be other card choices. May not be necessary
         // in future updates to Svea's systems
         if (!isset($sveaObject->countryCode) || $sveaObject->countryCode == "DK") {
-            $sveaObject->usePayPageCardOnly();
+            $sveaObject = $sveaObject->usePayPageCardOnly();
         } else {
             $sveaObject = $sveaObject->usePaymentMethod(PaymentMethod::KORTCERT);
         }
