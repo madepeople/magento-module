@@ -43,15 +43,8 @@ $_ssnHtml = $this->getSsnHtml();
                 foreach ($_resultParams as $_campaign): $_i++;
                     ?>
                     <?php $_selected = ($_i === 1) ? "selected" : "" ?>
-                    <?php if ($_campaign['isCampaign']): ?>
-                        <option <?php echo $_selected ?>
-                            value="<?php echo $_campaign['campaignCode']; ?>"> <?php echo $_campaign['description']; ?></option>
-                    <?php else: ?>
-                        <option <?php echo $_selected ?>
-                            value="<?php echo $_campaign['campaignCode'] ?>"> <?php echo $_campaign['paymentPlan']->contractlength; ?>
-                            mån
-                        </option>
-                    <?php endif; ?>
+                    <option <?php echo $_selected ?>
+                        value="<?php echo $_campaign['campaignCode']; ?>"> <?php echo $_campaign['description']; ?></option>
                     <?php
                     $_campaigns[] = array(
                         'code' => $_campaign['campaignCode'],
