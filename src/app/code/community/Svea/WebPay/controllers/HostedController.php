@@ -271,8 +271,9 @@ class Svea_WebPay_HostedController extends Mage_Core_Controller_Front_Action
         } catch (Exception $e) {
             Mage::logException($e);
             $write->rollback();
+            $this->getResponse()
+                ->setHttpResponseCode(500);
             throw $e;
         }
     }
-
 }
