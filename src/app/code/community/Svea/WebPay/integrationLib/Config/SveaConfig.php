@@ -20,6 +20,9 @@ class SveaConfig {
     const SWP_TEST_ADMIN_URL = "https://partnerweb.sveaekonomi.se/WebPayAdminService_test/AdminService.svc/backward"; // /backward => SOAP 1.1
     const SWP_PROD_ADMIN_URL = "https://partnerweb.sveaekonomi.se/WebPayAdminService/AdminService.svc/backward"; // /backward => SOAP 1.1
 
+    const SWP_TEST_PREPARED_URL = "https://test.sveaekonomi.se/webpay/preparedpayment/";
+    const SWP_PROD_PREPARED_URL = "https://webpay.sveaekonomi.se/webpay/preparedpayment/";
+
     /**
      * Replace the provided Svea test account credentials with your own to use
      * the package with your own account.
@@ -104,10 +107,18 @@ class SveaConfig {
                                 \ConfigurationProvider::INVOICE_TYPE     => self::SWP_TEST_WS_URL,
                                 \ConfigurationProvider::PAYMENTPLAN_TYPE => self::SWP_TEST_WS_URL,
                                 \ConfigurationProvider::HOSTED_ADMIN_TYPE => self::SWP_TEST_HOSTED_ADMIN_URL,
-                                \ConfigurationProvider::ADMIN_TYPE       => self::SWP_TEST_ADMIN_URL
+                                \ConfigurationProvider::ADMIN_TYPE       => self::SWP_TEST_ADMIN_URL,
+                                \ConfigurationProvider::PREPARED_URL    => self::SWP_TEST_PREPARED_URL
                             );
 
-        return new SveaConfigurationProvider(array("url" => $url, "credentials" => $testConfig));
+        $integrationproperties = array(
+                                'integrationcompany' => "myintegrationcompany",
+                                'integrationversion' => "myintegrationversion",
+                                'integrationplatform' => "myintegrationplatform"
+                            )
+        ;
+
+        return new SveaConfigurationProvider(array("url" => $url, "credentials" => $testConfig, "integrationproperties" => $integrationproperties));
     }
 
     public static function getProdConfig() {
@@ -160,10 +171,19 @@ class SveaConfig {
                                 \ConfigurationProvider::INVOICE_TYPE     => self::SWP_PROD_WS_URL,
                                 \ConfigurationProvider::PAYMENTPLAN_TYPE => self::SWP_PROD_WS_URL,
                                 \ConfigurationProvider::HOSTED_ADMIN_TYPE => self::SWP_PROD_HOSTED_ADMIN_URL,
-                                \ConfigurationProvider::ADMIN_TYPE       => self::SWP_PROD_ADMIN_URL
-                            );
+                                \ConfigurationProvider::ADMIN_TYPE       => self::SWP_PROD_ADMIN_URL,
+                                \ConfigurationProvider::PREPARED_URL    => self::SWP_PROD_PREPARED_URL
+                            )
+        ;
 
-        return new SveaConfigurationProvider(array("url" => $url, "credentials" => $prodConfig));
+        $integrationproperties = array(
+                                'integrationcompany' => "myintegrationcompany",
+                                'integrationversion' => "myintegrationversion",
+                                'integrationplatform' => "myintegrationplatform"
+                            )
+        ;
+
+        return new SveaConfigurationProvider(array("url" => $url, "credentials" => $prodConfig, "integrationproperties" => $integrationproperties));
     }
 
     /**
@@ -231,6 +251,7 @@ class SveaConfig {
                        \ConfigurationProvider::PAYMENTPLAN_TYPE => self::SWP_TEST_WS_URL,
                        \ConfigurationProvider::HOSTED_ADMIN_TYPE => self::SWP_TEST_HOSTED_ADMIN_URL,
                        \ConfigurationProvider::ADMIN_TYPE  => self::SWP_TEST_ADMIN_URL,
+                       \ConfigurationProvider::PREPARED_URL    => self::SWP_TEST_PREPARED_URL
 
         );
         $produrl = array(
@@ -238,10 +259,20 @@ class SveaConfig {
                        \ConfigurationProvider::INVOICE_TYPE     => self::SWP_PROD_WS_URL,
                        \ConfigurationProvider::PAYMENTPLAN_TYPE => self::SWP_PROD_WS_URL,
                        \ConfigurationProvider::HOSTED_ADMIN_TYPE => self::SWP_PROD_HOSTED_ADMIN_URL,
-                       \ConfigurationProvider::ADMIN_TYPE => self::SWP_PROD_ADMIN_URL
+                       \ConfigurationProvider::ADMIN_TYPE => self::SWP_PROD_ADMIN_URL,
+                       \ConfigurationProvider::PREPARED_URL    => self::SWP_PROD_PREPARED_URL
         );
 
+        $integrationproperties = array(
+                        'integrationcompany' => "myintegrationcompany",
+                        'integrationversion' => "myintegrationversion",
+                        'integrationplatform' => "myintegrationplatform"
+                    )
+        ;
+
         // return a ConfigurationProvider object
-        return new SveaConfigurationProvider(array("url" => $prod ? $produrl : $testurl, "credentials" => $singleCountryConfig));
+        return new SveaConfigurationProvider(
+            array("url" => $prod ? $produrl : $testurl, "credentials" => $singleCountryConfig, "integrationproperties" => $integrationproperties)
+        );
     }
 }
