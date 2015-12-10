@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Svea_WebPay>
-            <version>4.1.6</version>
+            <version>4.1.7</version>
         </Svea_WebPay>
     </modules>
     <global>
@@ -33,6 +33,9 @@
                     <paymentplan>
                         <table>svea_webpay_paymentplan</table>
                     </paymentplan>
+                    <customer_address>
+                        <table>svea_webpay_customer_address</table>
+                    </customer_address>
                 </entities>
             </svea_webpay_resource>
         </models>

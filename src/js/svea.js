@@ -351,6 +351,7 @@ var _SveaCustomer = Class.create({
     getSelectedAddress: function() {
         return this.addresses[this.selectedAddressId] || {
             addressSelector: null,
+            publicKey: null,
             fullName: null,
             firstName: '',
             lastName: '',
@@ -395,6 +396,7 @@ var _SveaCustomer = Class.create({
     updateSelectedAddressGui: function() {
         var selectedAddress = null,
             addressSelectBox = _$('.svea_address_selectbox'),
+            publicKeyInput = _$('input[name=svea_publicKey]'),
             container = addressSelectBox ? addressSelectBox.up('.svea-ssn-container') : null,
             name,
             newLabel,
@@ -451,6 +453,9 @@ var _SveaCustomer = Class.create({
         // if svea is required and this is not present there is a problem and
         // most likely the order cannot be completed.
         ($$('input[name="payment[' + _sveaGetFormKey() + '][svea_addressSelector]"]')[0] || {value: null}).value = this.selectedAddressId;
+
+        // Set public key
+        ($$('input[name="payment[' + _sveaGetFormKey() + '][svea_publicKey]"]')[0] || {value: null}).value = (this.getSelectedAddress() || {}).publicKey || '';
 
         // Update address field values if getAddress is required.
         if (this.sveaController.getAddressIsRequired()) {
