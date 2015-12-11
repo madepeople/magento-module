@@ -85,6 +85,10 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
      */
     public function getAddresses($ssn, $countryCode, $conf)
     {
+        $result = $this->_getAddressesResponseFromResellerRegister($ssn, $countryCode, $conf);
+        if ($result !== null) {
+            return $result;
+        }
         $sveaconfig = new SveaMageConfigProvider($conf);
         $addressRequest = WebPay::getAddresses($sveaconfig)
                 ->setOrderTypeInvoice()
@@ -97,6 +101,38 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         return $addressRequest->doRequest();
+    }
+
+    /**
+     * Get addresses from the reseller register
+     *
+     * @return array|null
+     */
+    protected function _getAddressesResponseFromResellerRegister($ssn, $countryCode, $conf)
+    {
+
+        // The registry only container companies
+        if (!$conf['company']) {
+            return null;
+        }
+        $addresses = array();
+        foreach (Mage::getModel('svea_webpay/customer_address')
+                     ->getCollection()
+                     ->addFieldToFilter('orgnr', $ssn)
+                     ->addFieldToFilter('country_code', $countryCode)
+                 as $address) {
+            $addresses[] = $address->getAsGetAddressResponse();
+        }
+        if (!empty($addresses)) {
+            $result = new stdClass();
+            $result->customerIdentity = $addresses;
+            $result->accepted = true;
+            $result->errormessage = '';
+            $result->resultcode = 'Accepted';
+            return $result;
+        } else {
+            return null;
+        }
     }
 
     /**

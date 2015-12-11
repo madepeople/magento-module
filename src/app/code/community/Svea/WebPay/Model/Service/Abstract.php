@@ -187,7 +187,6 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 $item = $item->setNationalIdNumber($additionalInfo['svea_ssn']);
                 $item = $item->setAddressSelector($additionalInfo['svea_addressSelector']);
             }
-            $svea = $svea->addCustomerDetails($item);
         } else {
             $item = WebPayItem::individualCustomer();
 
@@ -225,8 +224,17 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                     $item = $item->setInitials($additionalInfo['svea_initials']);
                 }
             }
-            $svea = $svea->addCustomerDetails($item);
+
         }
+        // Set public key on the object if publicKey is set in additionalInfo
+        if (array_key_exists('svea_publicKey', $additionalInfo)) {
+            $publicKey = $additionalInfo['svea_publicKey'];
+            if ($publicKey !== '') {
+                $item = $item->setPublicKey($publicKey);
+                // $item = $item->setAddressSelector('');
+            }
+        }
+        $svea = $svea->addCustomerDetails($item);
         return $svea;
     }
 

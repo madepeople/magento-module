@@ -100,6 +100,9 @@ $_sveaHelper = Mage::helper('svea_webpay');
             
         </div>
 
+        <!-- hidden public key input -->
+        <input type="hidden" name="svea_publicKey">
+
         <!-- Hide address select box for FI, NL, NO and DE -->
         <?php if (in_array($_country, array('SE', 'DK'))): ?>
             <select class="svea_address_selectbox" onchange="sveaAddressSelectChanged.call(this);"
@@ -212,8 +215,8 @@ $_sveaHelper = Mage::helper('svea_webpay');
         </div>
     <?php endif; ?>
 
-    <input type="hidden" name="payment[<?php echo $_code ?>][svea_addressSelector]"
-           class="svea_address_selector">
+    <input type="hidden" name="payment[<?php echo $_code ?>][svea_addressSelector]" class="svea_address_selector">
+    <input type="hidden" name="payment[<?php echo $_code ?>][svea_publicKey]">
 </div>
 
 <script>

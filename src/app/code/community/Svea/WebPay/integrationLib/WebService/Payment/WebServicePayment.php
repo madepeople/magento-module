@@ -22,7 +22,6 @@ class WebServicePayment {
     }
 
     private function getPasswordBasedAuthorization() {
-       // $authArray = $this->order->conf->getPasswordBasedAuthorization($this->orderType);
         $auth = new WebServiceSoap\SveaAuth();
         $auth->Username = $this->order->conf->getUsername($this->orderType,  $this->order->countryCode);
         $auth->Password = $this->order->conf->getPassword($this->orderType,  $this->order->countryCode);
@@ -43,20 +42,23 @@ class WebServicePayment {
      * @throws \Svea\ValidationException
      */
     public function prepareRequest() {
+        // validate order, throw exception on validation failure
         $errors = $this->validateOrder();
         if (count($errors) > 0) {
             $exceptionString = "";
             foreach ($errors as $key => $value) {
                 $exceptionString .="-". $key. " : ".$value."\n";
             }
-
             throw new \Svea\ValidationException($exceptionString);
         }
+
+        // create soap order object, set authorization
         $sveaOrder = new WebServiceSoap\SveaOrder;
         $sveaOrder->Auth = $this->getPasswordBasedAuthorization();
         //make orderrows and put in CreateOrderInfromation
         $orderinformation = $this->formatOrderInformationWithOrderRows($this->order->orderRows);
-        //paralell ways of crateing customer
+
+        //parallel ways of creating customer
         if (isset($this->order->customerIdentity)) {
             $orderinformation->CustomerIdentity = $this->formatCustomerDetails();
         } else {
@@ -79,14 +81,13 @@ class WebServicePayment {
 
     /**
      * Transforms object to array and sends it to SveaWebPay Europe Web service API by php SoapClient
-     * @return CreateOrderEuResponse 
+     * @return CreateOrderEuResponse
      * @throws \Svea\ValidationException
      */
     public function doRequest() {
 
         $object = $this->prepareRequest();
-        $url = $this->order->conf->getEndPoint($this->orderType);
-        $request = new WebServiceSoap\SveaDoRequest($url);
+        $request = new WebServiceSoap\SveaDoRequest($this->order->conf, $this->orderType);
         $svea_req = $request->CreateOrderEu($object);
 
         $response = new \SveaResponse($svea_req,"");
@@ -99,14 +100,18 @@ class WebServicePayment {
      * @return \SveaCreateOrderInformation
      */
     protected function formatOrderInformationWithOrderRows($rows) {
-        $orderInformation = new WebServiceSoap\SveaCreateOrderInformation((isset($this->order->campaignCode) ? $this->order->campaignCode : ""),
-                        (isset($this->order->sendAutomaticGiroPaymentForm) ? $this->order->sendAutomaticGiroPaymentForm : 0));
+        $orderInformation = new WebServiceSoap\SveaCreateOrderInformation(
+                (isset($this->order->campaignCode) ? $this->order->campaignCode : ""),
+                (isset($this->order->sendAutomaticGiroPaymentForm) ? $this->order->sendAutomaticGiroPaymentForm : 0)
+            )
+        ;
 
+        // rewrite order rows to soap_class order rows
         $formatter = new WebServiceRowFormatter($this->order);
         $formattedOrderRows = $formatter->formatRows();
 
-        foreach ($formattedOrderRows as $orderRow) {
-            $orderInformation->addOrderRow($orderRow);
+        foreach ($formattedOrderRows as $formattedOrderRow) {
+            $orderInformation->addOrderRow($formattedOrderRow);
         }
 
         return $orderInformation;
@@ -172,12 +177,13 @@ class WebServicePayment {
 
         $individualCustomerIdentity->CountryCode = $this->order->countryCode;
         $individualCustomerIdentity->CustomerType = $isCompany ? "Company" : "Individual";
+        $individualCustomerIdentity->PublicKey = isset($this->order->publicKey) ? $this->order->publicKey : "";
 
         return $individualCustomerIdentity;
     }
-    
+
     /**
-     * new! If CustomerIdentity is crated by addCustomerDetails()
+     * if CustomerIdentity is created by addCustomerDetails()
      * @return \SveaCustomerIdentity
      */
     public function formatCustomerDetails() {
@@ -238,7 +244,71 @@ class WebServicePayment {
 
         $individualCustomerIdentity->CountryCode = $this->order->countryCode;
         $individualCustomerIdentity->CustomerType = $isCompany ? "Company" : "Individual";
+        $individualCustomerIdentity->PublicKey = isset($this->order->customerIdentity->publicKey) ? $this->order->customerIdentity->publicKey : "";
 
         return $individualCustomerIdentity;
+    }
+
+    /**
+     * Get calculated totals before sending the request
+     * @return Array of the rounded sums of all orderrows as it will be sent to Svea
+     */
+    public function getRequestTotals() {
+        $object = $this->prepareRequest();
+        $total_incvat = 0;
+        $total_exvat = 0;
+        $total_vat = 0;
+        foreach ($object->request->CreateOrderInformation->OrderRows['OrderRow'] as $value) {
+            $rowExVat = $this->calculateOrderRowExVat($value);
+            $total_exvat += $rowExVat;
+            $rowVat = $this->calculateTotalVatSumOfRows($value);
+            $total_vat += $rowVat;
+            $total_incvat += \Svea\Helper::bround(($rowExVat + $rowVat),2);
+        }
+        return array('total_exvat' => $total_exvat, 'total_incvat' => $total_incvat, 'total_vat' => $total_vat);
+
+
+    }
+
+    private function calculateOrderRowExVat($row) {
+        if ($row->PriceIncludingVat == true) {
+            $rowsum_incvat = $this->getRowAmount( $row );
+            $rowsum_exvat = $this->convertIncVatToExVat( $row, $rowsum_incvat );
+        } else {
+            $rowsum_exvat = $this->getRowAmount( $row );
+        }
+        return \Svea\Helper::bround($rowsum_exvat,2);
+    }
+
+    private function convertIncVatToExVat( $row, $rowsum_incvat ) {
+        return \Svea\Helper::bround( ($rowsum_incvat / (1 + ($row->VatPercent / 100))),2);
+    }
+
+    private function getRowAmount( $row ) {
+        return \Svea\Helper::bround($row->NumberOfUnits,2) *
+               \Svea\Helper::bround($row->PricePerUnit,2) *
+               (1 - ($row->DiscountPercent / 100));
+    }
+
+    private function calculateTotalVatSumOfRows($row) {
+        //if amount inc vat
+        $sum = 0;
+        //calculate the exvat sum
+        if ($row->PriceIncludingVat == true) {
+            $rowsum_incvat = $this->getRowAmount( $row );
+            $exvat = $this->convertIncVatToExVat( $row, $rowsum_incvat );
+
+            $vat = \Svea\Helper::bround($rowsum_incvat,2) - \Svea\Helper::bround($exvat,2);
+            $sum += $vat;
+        } else {
+            $exvat = $this->getRowAmount( $row );
+
+            $vat = \Svea\Helper::bround($exvat,2) * ($row->VatPercent / 100 );
+            $sum += \Svea\Helper::bround($vat,2);
+        }
+//        $vat = \Svea\Helper::bround($exvat,2) * ($row->VatPercent / 100 );
+//        $sum += intval(100.00 * $vat) / 100.00; //php for .NET Math.Truncate -- round to nearest integer towards zero
+
+        return $sum;
     }
 }
