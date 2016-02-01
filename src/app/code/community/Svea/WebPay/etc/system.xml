@@ -11,6 +11,15 @@
                     <show_in_website>1</show_in_website>
                     <show_in_store>1</show_in_store>
                     <fields>
+                        <version translate="label">
+                            <label>SVEA WebPay version</label>
+                            <frontend_type>select</frontend_type>
+                            <frontend_model>Svea_WebPay_Block_Adminhtml_Version</frontend_model>
+                            <sort_order>0</sort_order>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </version>
 
                         <display_ssn_selector_with_payment_method translate="label comment">
                             <label>Display 'Get Address' button with payment method</label>
