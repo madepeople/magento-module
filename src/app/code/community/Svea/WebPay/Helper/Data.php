@@ -897,4 +897,25 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         return "//" . self::LOGO_CND_DOMAIN . $path;
     }
 
+    /**
+     * Check if the shipping address may be supplied by the customer
+     *
+     * @return bool
+     */
+    public function allowCustomShippingAddress()
+    {
+        if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+            $customer = Mage::getSingleton('customer/session')->getCustomer();
+        } else {
+            $customer = null;
+        }
+        $status = new Varien_Object(array(
+            'allowCustomShippingAddress' => false,
+        ));
+        Mage::dispatchEvent('svea_allow_custom_shipping_address', array(
+            'customer' => $customer,
+            'status' => $status
+        ));
+        return $status->getData('allowCustomShippingAddress');
+    }
 }

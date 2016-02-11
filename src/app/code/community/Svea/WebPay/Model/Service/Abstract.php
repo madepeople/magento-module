@@ -122,19 +122,11 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
                 throw new Mage_Payment_Exception('Selected civil registry address does not match the database.');
             }
 
-            $overwriteStatus = new Varien_Object(array(
-                'overwrite_shipping' => true,
-                'overwrite_billing' => true
-            ));
-            Mage::dispatchEvent('svea_overwrite_address_before', array(
-                'payment' => $payment,
-                'status' => $overwriteStatus
-            ));
+            $allowCustomShippingAddress = Mage::helper('svea_webpay')->allowCustomShippingAddress();
 
             // Set the order addresses to the civil registry information
             foreach ($order->getAddressesCollection() as $orderAddress) {
-                $key = 'overwrite_' . $orderAddress->getAddressType();
-                if ($overwriteStatus->getData($key) !== true) {
+                if ($orderAddress->getAddressType() === 'shipping' && $allowCustomShippingAddress) {
                     continue;
                 }
                 if ($sveaInformation['svea_customerType'] == 0) {
@@ -331,9 +323,12 @@ abstract class Svea_WebPay_Model_Service_Abstract extends Svea_WebPay_Model_Abst
         $addresses = array(
             $order->getBillingAddress(),
             $quoteBillingAddress,
-            $order->getShippingAddress(),
-            $quote->getShippingAddress(),
         );
+
+        if (!Mage::helper('svea_webpay')->allowCustomShippingAddress()) {
+            $addresses[] = $order->getShippingAddress();
+            $addresses[] = $quote->getShippingAddress();
+        }
 
         if (Mage::helper('svea_webpay')->createOrderOverwritesAddressForCountry($quoteBillingAddress->getCountryId())) {
             $identity = $response->customerIdentity;
