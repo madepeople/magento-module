@@ -674,13 +674,17 @@ var _SveaController = Class.create({
     /** Toggle visibility and state of 'ship to different address'-checkbox
      *
      * @param visible If true the checkbox will be visible
-     * @param checked If true the checkbox will be checked
      *
      * @returns undefined
      */
     toggleShipToDifferentAddress: function(visible) {
         var $div,
             $elem;
+
+        // Don't do anything if a custom shipping address is allowed
+        if (window._svea.allowCustomShippingAddress) {
+            return;
+        }
 
         // call shipping.setSameAsBilling just in case
         /*global shipping */

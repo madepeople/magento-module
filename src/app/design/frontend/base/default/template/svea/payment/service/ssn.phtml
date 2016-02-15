@@ -230,6 +230,7 @@ $_sveaHelper = Mage::helper('svea_webpay');
     window._svea.formKey = <?php echo $_code === 'svea_info' ? "'$_code'" : 'null' ?>;
     window._svea.lockRequiredFields = <?php echo $this->shouldLockRequiredFields() ? 'true': 'false' ?>;
     window._svea.alwaysDisplaySsnSelector = <?php echo json_encode($_sveaHelper->alwaysDisplaySsnSelector()); ?>;
+    window._svea.allowCustomShippingAddress = <?php echo json_encode($_sveaHelper->allowCustomShippingAddress()); ?>
 
     // Create svea controller if the controller doesn't exist
     if (!window._svea.controller) {

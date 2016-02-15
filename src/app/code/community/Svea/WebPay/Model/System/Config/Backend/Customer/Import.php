@@ -27,7 +27,8 @@ class Svea_Webpay_Model_System_Config_Backend_Customer_Import extends Mage_Core_
 
     public function _afterSave()
     {
-        if (!isset($_FILES['groups']['tmp_name']['svea_general']['fields']['import_customer_addresses']['value'])) {
+        if (!isset($_FILES['groups']['tmp_name']['svea_general']['fields']['import_customer_addresses']['value']) ||
+            $_FILES['groups']['tmp_name']['svea_general']['fields']['import_customer_addresses']['value'] == '') {
             return $this;
         } else {
             try {
