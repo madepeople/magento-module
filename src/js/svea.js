@@ -477,11 +477,14 @@ var _SveaCustomer = Class.create({
             'billing:street1': 'street',
             'billing:city': 'locality',
             'billing:postcode': 'zipCode',
-            'billing:company': 'fullName'
         },
             newValues = {},
             selectedAddress = this.getSelectedAddress();
 
+        // If the customer is a company use 'fullName' as company name.
+        if (_sveaGetCustomerType() == _sveaCustomerTypeCompanyIntegerValue.toString()) {
+            keyMap['billing:company'] = 'fullName';
+        }
         // New values
         Object.keys(keyMap).each(function(key) {
             newValues[key] = selectedAddress[keyMap[key]];
