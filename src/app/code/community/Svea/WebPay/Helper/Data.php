@@ -322,8 +322,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
             // Default to the item price
             $name = $item->getName();
-            $price = $orderItem->getPrice();
-            $priceInclTax = $orderItem->getPriceInclTax();
+            $price = $orderItem->getBasePrice();
+            $priceInclTax = $orderItem->getBasePriceInclTax();
             $taxPercent = $orderItem->getTaxPercent();
             if (!(int)$taxPercent) {
                 $taxPercent = false;
@@ -333,8 +333,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             if ($parentItem) {
                 switch ($parentItem->getProductType()) {
                     case Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE:
-                        $price = $parentItem->getPrice();
-                        $priceInclTax = $parentItem->getPriceInclTax();
+                        $price = $parentItem->getBasePrice();
+                        $priceInclTax = $parentItem->getBasePriceInclTax();
                         $taxPercent = $parentItem->getTaxPercent();
                         break;
                     case Mage_Catalog_Model_Product_Type::TYPE_BUNDLE:
@@ -395,16 +395,16 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $shippingFee->setVatPercent((int)$rate);
 
             if ($taxConfig->shippingPriceIncludesTax($storeId)) {
-                $shippingFee->setAmountIncVat($invoice->getShippingInclTax());
+                $shippingFee->setAmountIncVat($invoice->getBaseShippingInclTax());
             } else {
-                $shippingFee->setAmountExVat($invoice->getShippingAmount());
+                $shippingFee->setAmountExVat($invoice->getBaseShippingAmount());
             }
 
             $sveaObject->addFee($shippingFee);
         }
 
         // Possible discount
-        $discount = abs($invoice->getDiscountAmount());
+        $discount = abs($invoice->getBaseDiscountAmount());
         if ($discount) {
             $discountRow = WebPayItem::fixedDiscount()
                 ->setAmountIncVat($discount)
@@ -415,17 +415,18 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Gift card(s)
-        if (abs($order->getGiftCardsAmount())) {
+        if (abs($order->getBaseGiftCardsAmount())) {
             $giftCardRow = WebPayItem::fixedDiscount()
-                    ->setAmountIncVat(abs($order->getGiftCardsAmount()))
+                    ->setAmountIncVat(abs($order->getBaseGiftCardsAmount()))
                     ->setUnit(Mage::helper('svea_webpay')->__('unit'));
 
             $sveaObject->addDiscount($giftCardRow);
         }
 
         // Invoice fee
-        $paymentFee = $invoice->getSveaPaymentFeeAmount();
-        $paymentFeeInclTax = $invoice->getSveaPaymentFeeInclTax();
+        $paymentFee = $invoice->getBaseSveaPaymentFeeAmount();
+        
+        $paymentFeeInclTax = $invoice->getBaseSveaPaymentFeeInclTax();
         $invoiced = $invoice->getOrder()->getSveaPaymentFeeInvoiced();
 
         if ($paymentFee > 0 && $invoiced == 0) {
@@ -479,8 +480,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
 
             // Default to the item price
             $name = $item->getName();
-            $price = $orderItem->getPrice();
-            $priceInclTax = $orderItem->getPriceInclTax();
+            $price = $orderItem->getBasePrice();
+            $priceInclTax = $orderItem->getBasePriceInclTax();
             $taxPercent = $orderItem->getTaxPercent();
             if (!(int)$taxPercent) {
                 $taxPercent = false;
@@ -492,8 +493,8 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             if ($parentItem) {
                 switch ($parentItem->getProductType()) {
                     case Mage_Catalog_Model_Product_Type::TYPE_CONFIGURABLE:
-                        $price = $parentItem->getPrice();
-                        $priceInclTax = $parentItem->getPriceInclTax();
+                        $price = $parentItem->getBasePrice();
+                        $priceInclTax = $parentItem->getBasePriceInclTax();
                         $taxPercent = $parentItem->getTaxPercent();
                         $qty = $parentItem->getQtyRefunded();
                         break;
@@ -539,7 +540,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $shippingFee->setVatPercent((int)$rate);
 
             if ($taxConfig->shippingPriceIncludesTax($storeId)) {
-                $shippingFee->setAmountIncVat($creditMemo->getShippingInclTax());
+                $shippingFee->setAmountIncVat($creditMemo->getBaseShippingInclTax());
             } else {
                 $shippingFee->setAmountExVat($creditMemo->getShippingAmount());
             }
@@ -548,7 +549,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Discount
-        $discount = abs($creditMemo->getDiscountAmount());
+        $discount = abs($creditMemo->getBaseDiscountAmount());
         if ($discount > 0) {
             $discountRow = WebPayItem::fixedDiscount()
                 ->setAmountIncVat($discount)
@@ -559,17 +560,17 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
         }
 
         // Gift cards
-        if (abs($creditMemo->getGiftCardsAmount()) > 0) {
+        if (abs($creditMemo->getBaseGiftCardsAmount()) > 0) {
             $giftCardRow = WebPayItem::fixedDiscount()
-                ->setAmountIncVat(abs($creditMemo->getGiftCardsAmount()))
+                ->setAmountIncVat(abs($creditMemo->getBaseGiftCardsAmount()))
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'));
 
             $sveaObject->addDiscount($giftCardRow);
         }
 
         // Invoice fee
-        $paymentFee = $creditMemo->getSveaPaymentFeeAmount();
-        $paymentFeeInclTax = $creditMemo->getSveaPaymentFeeInclTax();
+        $paymentFee = $creditMemo->getBaseSveaPaymentFeeAmount();
+        $paymentFeeInclTax = $creditMemo->getBaseSveaPaymentFeeInclTax();
         $refunded = $creditMemo->getOrder()->getSveaPaymentFeeRefunded();
         if ($paymentFee > 0 && $refunded == 0) {
             $invoiceFee = WebPayItem::invoiceFee()
@@ -582,7 +583,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             $creditMemo->getOrder()->setSveaPaymentFeeRefunded($paymentFeeInclTax);
         }
 
-        $adjustmentFee = $creditMemo->getAdjustmentPositive();
+        $adjustmentFee = $creditMemo->getBaseAdjustmentPositive();
         if ($adjustmentFee > 0) {
             $invoiceAdjustment = WebPayItem::invoiceFee()
                     ->setVatPercent(0)
