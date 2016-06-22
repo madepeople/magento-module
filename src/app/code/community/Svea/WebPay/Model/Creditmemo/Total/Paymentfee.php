@@ -25,6 +25,11 @@ class Svea_WebPay_Model_Creditmemo_Total_Paymentfee
             return $this;
         }
 
+        if ($order->getSveaPaymentFeeRefunded() > 0) {
+            // Already refunded
+            return $this;
+        }
+
         $paymentFeeAmount = 0;
         $basePaymentFeeAmount = 0;
         $paymentFeeTaxAmount = 0;
