@@ -62,7 +62,7 @@ abstract class Svea_WebPay_Model_Hosted_Abstract extends Svea_WebPay_Model_Abstr
         $message = @simplexml_load_string($paymentForm->xmlMessage);
         $amount = (int)$message->amount;
 
-        $grandTotal = (int)($order->getGrandTotal()*100);
+        $grandTotal = (int)($order->getBaseGrandTotal()*100);
         if ($amount !== $grandTotal) {
             // The difference can be negative or positive
             $diff = $grandTotal-$amount;

@@ -384,7 +384,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                 $store);
 
         // Add shipping fee
-        if ($invoice->getShippingAmount() > 0) {
+        if ($invoice->getBaseShippingAmount() > 0) {
             $shippingFee = WebPayItem::shippingFee()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setName($order->getShippingDescription());
@@ -529,7 +529,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
                 $store);
 
         // Shipping
-        if ($creditMemo->getShippingAmount() > 0) {
+        if ($creditMemo->getBaseShippingAmount() > 0) {
             $shippingFee = WebPayItem::shippingFee()
                 ->setUnit(Mage::helper('svea_webpay')->__('unit'))
                 ->setName($order->getShippingDescription());
@@ -542,7 +542,7 @@ class Svea_WebPay_Helper_Data extends Mage_Core_Helper_Abstract
             if ($taxConfig->shippingPriceIncludesTax($storeId)) {
                 $shippingFee->setAmountIncVat($creditMemo->getBaseShippingInclTax());
             } else {
-                $shippingFee->setAmountExVat($creditMemo->getShippingAmount());
+                $shippingFee->setAmountExVat($creditMemo->getBaseShippingAmount());
             }
 
             $sveaObject->addFee($shippingFee);
